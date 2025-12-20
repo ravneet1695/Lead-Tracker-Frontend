@@ -55,6 +55,12 @@ export const routes: Routes = [
         canActivate: [AuthGuard],
         data: { permissions: ['groups.read'] }
     },
+    {
+        path: 'goal-management',
+        loadChildren: () => import('./modules/goal/goal.module').then(m => m.GoalModule),
+        canActivate: [AuthGuard],
+        data: { permissions: ['goals.read'] }
+    },
     // Redirect old routes to new unified dashboard
     { path: 'sales/dashboard', redirectTo: '/dashboard', pathMatch: 'full' },
     { path: 'manager/dashboard', redirectTo: '/dashboard', pathMatch: 'full' },
