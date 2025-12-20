@@ -1,0 +1,168 @@
+<div class="role-form-container">
+    <!-- Header -->
+    <div class="form-header">
+        <div class="header-left">
+            <button class="btn-back" (click)="onCancel()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </button>
+            <h1>{{ isEditMode ? 'Edit Role' : 'Create New Role' }}</h1>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading role...</p>
+    </div>
+
+    <!-- Form -->
+    <form *ngIf="!loading" [formGroup]="roleForm" (ngSubmit)="onSubmit()" class="role-form">
+        <!-- Basic Information Card -->
+        <div class="form-card">
+            <div class="card-header">
+                <h2>Basic Information</h2>
+                <p>Define the role's name, label, and description</p>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name">
+                        Name <span class="required">*</span>
+                        <span class="hint">(lowercase, underscores only)</span>
+                    </label>
+                    <input type="text" id="name" formControlName="name" class="form-control"
+                        [class.invalid]="isFieldInvalid('name')" placeholder="e.g., custom_role">
+                    <div class="error-message" *ngIf="isFieldInvalid('name')">
+                        {{ getFieldError('name') }}
+                    </div>
+                    <div class="help-text" *ngIf="isSystemRole">
+                        System role names cannot be modified
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="label">
+                        Label <span class="required">*</span>
+                    </label>
+                    <input type="text" id="label" formControlName="label" class="form-control"
+                        [class.invalid]="isFieldInvalid('label')" placeholder="e.g., Custom Role">
+                    <div class="error-message" *ngIf="isFieldInvalid('label')">
+                        {{ getFieldError('label') }}
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="description">Description</label>
+                    <textarea id="description" formControlName="description" class="form-control" rows="3"
+                        placeholder="Describe what this role can do..."></textarea>
+                </div>
+
+                <!-- Role Type Selection (Super Admin only) -->
+                <div class="form-group full-width" *ngIf="isSuperAdmin() && !isEditMode">
+                    <label>
+                        Role Type <span class="required">*</span>
+                    </label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" formControlName="isSystem" [value]="false" checked>
+                            <span>Custom Role</span>
+                            <small>(Organization-specific)</small>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" formControlName="isSystem" [value]="true">
+                            <span>System Role</span>
+                            <small>(Global, available to all organizations)</small>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Organization Selection (for Custom roles - Super Admin only) -->
+                <div class="form-group full-width"
+                    *ngIf="isSuperAdmin() && !roleForm.get('isSystem')?.value && !isEditMode">
+                    <label for="organization">
+                        Organization <span class="required">*</span>
+                    </label>
+                    <select id="organization" formControlName="organization" class="form-control"
+                        [class.invalid]="isFieldInvalid('organization')">
+                        <option value="">Select Organization</option>
+                        <option *ngFor="let org of organizations" [value]="org._id">
+                            {{ org.name }}
+                        </option>
+                    </select>
+                    <div class="error-message" *ngIf="isFieldInvalid('organization')">
+                        Organization is required for custom roles
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" formControlName="isActive">
+                        <span>Active</span>
+                    </label>
+                    <div class="help-text">Inactive roles cannot be assigned to users</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Permissions Card -->
+        <div class="form-card">
+            <div class="card-header">
+                <h2>Permissions</h2>
+                <p>Select the permissions for this role</p>
+                <label class="select-all-label">
+                    <input type="checkbox" [checked]="areAllPermissionsSelected()"
+                        (change)="toggleAllPermissions($event)">
+                    <span>Select All Permissions</span>
+                </label>
+            </div>
+
+            <div class="permissions-grid">
+                <div class="permission-category" *ngFor="let category of availablePermissions">
+                    <h3 class="category-title">{{ category.category }}</h3>
+                    <div class="permission-list">
+                        <label class="permission-item" *ngFor="let permission of category.permissions">
+                            <input type="checkbox" [checked]="isPermissionSelected(permission)"
+                                (change)="togglePermission(permission)">
+                            <span class="permission-name">{{ permission }}</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="permissions-summary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>{{ permissionsArray.length }} permission(s) selected</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="submitting">
+                Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="submitting || roleForm.invalid">
+                <span *ngIf="!submitting">{{ isEditMode ? 'Update Role' : 'Create Role' }}</span>
+                <span *ngIf="submitting">
+                    <svg class="spinner-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="2" x2="12" y2="6"></line>
+                        <line x1="12" y1="18" x2="12" y2="22"></line>
+                        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                        <line x1="2" y1="12" x2="6" y2="12"></line>
+                        <line x1="18" y1="12" x2="22" y2="12"></line>
+                        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                    </svg>
+                    {{ isEditMode ? 'Updating...' : 'Creating...' }}
+                </span>
+            </button>
+        </div>
+    </form>
+</div>

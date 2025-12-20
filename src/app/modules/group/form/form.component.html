@@ -1,0 +1,169 @@
+<div class="form-container">
+    <!-- Header -->
+    <div class="form-header">
+        <button class="btn-back" (click)="cancel()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+        </button>
+        <h1>{{ isEditMode ? 'Edit group' : 'Create new group' }}</h1>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="groupForm" (ngSubmit)="onSubmit()" class="group-form">
+        <!-- Basic Information Section -->
+        <div class="form-section">
+            <h2 class="section-title">Basic information</h2>
+            <div class="section-subtitle">Define the group's name, description and basic details</div>
+
+            <div class="form-row three-columns">
+                <!-- Code -->
+                <div class="form-group">
+                    <label for="code" class="form-label">
+                        Code <span class="required">*</span>
+                    </label>
+                    <div class="code-display">
+                        <span class="code-badge">{{ groupForm.get('code')?.value || 'Generating...' }}</span>
+                        <small class="code-hint">Auto-generated</small>
+                    </div>
+                    <input type="hidden" formControlName="code">
+                </div>
+
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="name" class="form-label">
+                        Name <span class="required">*</span>
+                    </label>
+                    <input type="text" id="name" formControlName="name" class="form-control"
+                        placeholder="Enter group name" [class.invalid]="isFieldInvalid('name')">
+                    <span *ngIf="isFieldInvalid('name')" class="error-message">
+                        {{ getFieldError('name') }}
+                    </span>
+                </div>
+
+                <!-- Organization (Super Admin only) -->
+                <div class="form-group" *ngIf="showOrganizationField">
+                    <label for="organization" class="form-label">
+                        Organization <span class="required">*</span>
+                    </label>
+                    <select id="organization" formControlName="organization" class="form-control"
+                        [class.invalid]="isFieldInvalid('organization')" [disabled]="isEditMode">
+                        <option value="">Select organization</option>
+                        <option *ngFor="let org of organizations" [value]="org._id">{{ org.name }}</option>
+                    </select>
+                    <span *ngIf="isFieldInvalid('organization')" class="error-message">
+                        {{ getFieldError('organization') }}
+                    </span>
+                </div>
+
+                <!-- Status (if not showing organization, use this space) -->
+                <div class="form-group" *ngIf="!showOrganizationField">
+                    <label for="isActive" class="form-label">Status</label>
+                    <div class="toggle-container">
+                        <label class="toggle-switch">
+                            <input type="checkbox" formControlName="isActive">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">
+                            {{ groupForm.get('isActive')?.value ? 'Active' : 'Inactive' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description (Full Width) -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea id="description" formControlName="description" class="form-control" rows="3"
+                        placeholder="Describe what this group can do..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members & Managers Section -->
+        <div class="form-section">
+            <h2 class="section-title">Members & managers</h2>
+            <div class="section-subtitle">Select users and assign managers for this group</div>
+
+            <div class="form-row three-columns">
+                <!-- Users -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Users <span class="required">*</span>
+                    </label>
+                    <div class="checkbox-list">
+                        <div *ngIf="users.length === 0" class="empty-message">
+                            {{ showOrganizationField ? 'Please select an organization first' : 'No users available' }}
+                        </div>
+                        <label *ngFor="let user of users" class="checkbox-item">
+                            <input type="checkbox" [value]="user._id" [checked]="isUserSelected(user._id)"
+                                (change)="toggleUser(user._id, $event)">
+                            <span class="checkbox-label">
+                                <strong>{{ user.name }}</strong>
+                                <small>{{ user.email }}</small>
+                            </span>
+                        </label>
+                    </div>
+                    <small class="form-text">At least one user required</small>
+                </div>
+
+                <!-- Managers -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Managers <span class="required">*</span>
+                    </label>
+                    <div class="checkbox-list">
+                        <div *ngIf="getSelectedUsers().length === 0" class="empty-message">
+                            Please select users first
+                        </div>
+                        <label *ngFor="let user of getSelectedUsers()" class="checkbox-item">
+                            <input type="checkbox" [value]="user._id" [checked]="isManagerSelected(user._id)"
+                                (change)="toggleManager(user._id, $event)">
+                            <span class="checkbox-label">
+                                <strong>{{ user.name }}</strong>
+                                <small>{{ user.email }}</small>
+                            </span>
+                        </label>
+                    </div>
+                    <small class="form-text">At least one manager required (must be a member)</small>
+                </div>
+
+                <!-- Status (Super Admin only, if showing organization) -->
+                <div class="form-group" *ngIf="showOrganizationField">
+                    <label for="isActive" class="form-label">Status</label>
+                    <div class="toggle-container">
+                        <label class="toggle-switch">
+                            <input type="checkbox" formControlName="isActive">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">
+                            {{ groupForm.get('isActive')?.value ? 'Active' : 'Inactive' }}
+                        </span>
+                    </div>
+                    <small class="form-text">Inactive groups cannot be assigned to goals</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="cancel()" [disabled]="submitting">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                Cancel
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="submitting">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    *ngIf="!submitting">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span class="spinner-small" *ngIf="submitting"></span>
+                {{ submitting ? 'Saving...' : (isEditMode ? 'Update group' : 'Create group') }}
+            </button>
+        </div>
+    </form>
+</div>

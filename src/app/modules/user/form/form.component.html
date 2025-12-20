@@ -1,0 +1,171 @@
+<div class="user-form-container">
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading user data...</p>
+    </div>
+
+    <!-- Form -->
+    <div *ngIf="!loading" class="form-wrapper">
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
+            <!-- User Information Section -->
+            <div class="form-section">
+                <h3 class="section-title">User Information</h3>
+
+                <!-- Code, Organization, and Profile Image in one row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="code" class="form-label">User Code</label>
+                        <input type="text" id="code" class="form-control" formControlName="code"
+                            placeholder="Auto-generated" readonly>
+                        <small class="form-text">Auto-generated upon creation</small>
+                    </div>
+
+                    <div class="form-group" *ngIf="showOrganizationField">
+                        <label for="organization" class="form-label">Organization <span
+                                style="color: #ff6b6b;">*</span></label>
+                        <select class="form-control" id="organization" formControlName="organization"
+                            [class.invalid]="isFieldInvalid('organization')">
+                            <option value="">Select Organization</option>
+                            <option *ngFor="let org of organizations" [value]="org._id">{{ org.name }}</option>
+                        </select>
+                        <span *ngIf="isFieldInvalid('organization')" class="error-message">
+                            {{ getFieldError('organization') }}
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profileImage" class="form-label">Profile Image (Optional)</label>
+                        <div class="file-upload-box" style="background-color: transparent;">
+                            <input type="file" id="profileImage" class="file-input-hidden"
+                                (change)="onFileSelected($event)" accept="image/*" #fileInput>
+                            <button type="button" class="btn-file-upload" (click)="fileInput.click()"
+                                title="Attach file">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
+                                    </path>
+                                </svg>
+                            </button>
+                            <span class="file-name-display" *ngIf="selectedFile; else noFileSelected">
+                                {{ selectedFile.name }}
+                            </span>
+                            <ng-template #noFileSelected>
+                                <span class="file-name-display placeholder" style="color: #ffffff; opacity: 0.8;">No
+                                    file
+                                    selected</span>
+                            </ng-template>
+                            <button type="button" class="btn-file-cancel" *ngIf="selectedFile" (click)="removeImage()"
+                                title="Remove file">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName" class="form-label">First Name <span
+                                style="color: #ff6b6b;">*</span></label>
+                        <input type="text" id="firstName" class="form-control" formControlName="firstName"
+                            placeholder="Enter first name" [class.invalid]="isFieldInvalid('firstName')"
+                            (keypress)="onlyLettersAndSpaces($event)">
+                        <span *ngIf="isFieldInvalid('firstName')" class="error-message">
+                            {{ getFieldError('firstName') }}
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName" class="form-label">Last Name <span
+                                style="color: #ff6b6b;">*</span></label>
+                        <input type="text" id="lastName" class="form-control" formControlName="lastName"
+                            placeholder="Enter last name" [class.invalid]="isFieldInvalid('lastName')"
+                            (keypress)="onlyLettersAndSpaces($event)">
+                        <span *ngIf="isFieldInvalid('lastName')" class="error-message">
+                            {{ getFieldError('lastName') }}
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email <span style="color: #ff6b6b;">*</span></label>
+                        <input type="email" class="form-control" id="email" formControlName="email"
+                            [class.invalid]="isFieldInvalid('email')" placeholder="user@example.com">
+                        <span *ngIf="isFieldInvalid('email')" class="error-message">
+                            {{ getFieldError('email') }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mobile" class="form-label">Mobile <span style="color: #ff6b6b;">*</span></label>
+                        <input type="tel" class="form-control" id="mobile" formControlName="mobile"
+                            [class.invalid]="isFieldInvalid('mobile')" placeholder="10-digit mobile number"
+                            (keypress)="onlyNumbers($event)" maxlength="10">
+                        <span *ngIf="isFieldInvalid('mobile')" class="error-message">
+                            {{ getFieldError('mobile') }}
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role" class="form-label">Role <span style="color: #ff6b6b;">*</span></label>
+                        <select class="form-control" id="role" formControlName="role"
+                            [class.invalid]="isFieldInvalid('role')">
+                            <option value="">Select Role</option>
+                            <option *ngFor="let role of roles" [value]="role.value">
+                                {{ role.label }}
+                            </option>
+                        </select>
+                        <span *ngIf="isFieldInvalid('role')" class="error-message">
+                            {{ getFieldError('role') }}
+                        </span>
+                        <small class="form-text" *ngIf="userForm.get('role')?.disabled" style="color: #ff6b6b;">
+                            Please select an organization first
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password {{ isEditMode ? '(Optional)' : '' }} <span
+                                style="color: #ff6b6b;" *ngIf="!isEditMode">*</span></label>
+                        <input type="password" class="form-control" id="password" formControlName="password"
+                            [class.invalid]="isFieldInvalid('password')" placeholder="Min 8 characters">
+                        <span *ngIf="isFieldInvalid('password')" class="error-message">
+                            {{ getFieldError('password') }}
+                        </span>
+                        <small class="form-text" *ngIf="isEditMode">Leave blank to keep current password</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="button" class="btn btn-cancel" (click)="onCancel()" [disabled]="submitting">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-submit" [disabled]="submitting || userForm.invalid">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        *ngIf="!submitting">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span *ngIf="!submitting">{{ isEditMode ? 'Update User' : 'Create User' }}</span>
+                    <span *ngIf="submitting" class="loading-content">
+                        <span class="spinner-border-sm"></span>
+                        {{ isEditMode ? 'Updating...' : 'Creating...' }}
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
