@@ -83,15 +83,7 @@
     color: white;
 }
 
-.role-badge.role-manager {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-}
 
-.role-badge.role-sales {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    color: white;
-}
 
 /* Stats Grid */
 .stats-grid {
