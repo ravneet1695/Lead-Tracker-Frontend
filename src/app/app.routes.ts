@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { UserGoalsComponent } from './components/user-goals/user-goals.component';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -16,7 +15,12 @@ export const routes: Routes = [
     },
     {
         path: 'goals',
-        component: UserGoalsComponent,
+        loadChildren: () => import('./modules/goal/goal.module').then(m => m.GoalModule),
+        canActivate: [AuthGuard]
+    },
+    {
+        path: 'leads',
+        loadChildren: () => import('./modules/lead/lead.module').then(m => m.LeadModule),
         canActivate: [AuthGuard]
     },
     {
@@ -55,11 +59,7 @@ export const routes: Routes = [
         canActivate: [AuthGuard],
         data: { permissions: ['groups.read'] }
     },
-    // Redirect old routes to new unified dashboard
-    { path: 'sales/dashboard', redirectTo: '/dashboard', pathMatch: 'full' },
-    { path: 'manager/dashboard', redirectTo: '/dashboard', pathMatch: 'full' },
-    { path: 'admin/dashboard', redirectTo: '/dashboard', pathMatch: 'full' },
-    { path: 'sales/goals', redirectTo: '/goals', pathMatch: 'full' },
-    { path: 'manager/goals', redirectTo: '/goals', pathMatch: 'full' },
+    // Catch-all route - must be last
     { path: '**', redirectTo: '/login' }
 ];
+
