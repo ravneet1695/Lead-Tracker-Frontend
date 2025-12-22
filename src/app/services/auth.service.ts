@@ -81,10 +81,7 @@ export class AuthService {
         // Call backend logout endpoint for audit trail
         const token = this.token;
         if (token) {
-            this.http.post(`${environment.apiUrl}/auth/logout`, {}).subscribe({
-                next: () => console.log('Logout recorded'),
-                error: (err) => console.error('Logout error:', err)
-            });
+            this.http.post(`${environment.apiUrl}/auth/logout`, {}).subscribe();
         }
 
         // Clear local storage and state

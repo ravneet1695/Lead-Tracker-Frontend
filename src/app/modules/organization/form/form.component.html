@@ -57,9 +57,9 @@
 
                 <div class="form-group">
                     <label for="logo" class="form-label">Logo <span style="color: #ff6b6b;">*</span></label>
-                    <div class="file-upload-box" style="background-color: transparent;">
+                    <div class="file-upload-box" style="background-color: transparent;padding: 3px 12px;">
                         <input type="file" id="logo" class="file-input-hidden" (change)="onLogoChange($event)"
-                            accept="image/*" #fileInput>
+                        accept=".jpg,.jpeg,.png" #fileInput>
                         <button type="button" class="btn-file-upload" (click)="fileInput.click()" title="Attach file">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2">
@@ -74,7 +74,7 @@
                             organizationForm.get('logo')?.value : '') }}
                         </span>
                         <ng-template #noFileSelected>
-                            <span class="file-name-display placeholder" style="color: #ffffff; opacity: 0.8;">No file
+                            <span class="file-name-display" style="opacity: 0.8;">No file
                                 selected</span>
                         </ng-template>
                         <button type="button" class="btn-file-cancel" *ngIf="selectedLogoFile"
@@ -157,9 +157,9 @@
                 <!-- Admin Profile Image -->
                 <div class="form-group">
                     <label for="adminProfileImage" class="form-label">Profile Image</label>
-                    <div class="file-upload-box">
+                    <div class="file-upload-box" style="background-color: transparent;padding: 3px 12px;">
                         <input type="file" id="adminProfileImage" class="file-input-hidden"
-                            (change)="onAdminProfileSelected($event)" accept="image/*" #adminFileInput>
+                            (change)="onAdminProfileSelected($event)" accept=".jpg,.jpeg,.png" #adminFileInput>
                         <button type="button" class="btn-file-upload" (click)="adminFileInput.click()"
                             title="Attach file">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -173,7 +173,7 @@
                             {{ selectedAdminProfileFile.name }}
                         </span>
                         <ng-template #noAdminFileSelected>
-                            <span class="file-name-display placeholder" style="color: #ffffff; opacity: 0.8;">No file
+                            <span class="file-name-display" style="opacity: 0.8;">No file
                                 selected</span>
                         </ng-template>
                         <button type="button" class="btn-file-cancel" *ngIf="selectedAdminProfileFile"
@@ -209,7 +209,6 @@
                         <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label for="pincode" class="form-label">Pincode</label>
                     <select id="pincode" class="form-control" formControlName="pincode" [disabled]="!pincodes.length">
