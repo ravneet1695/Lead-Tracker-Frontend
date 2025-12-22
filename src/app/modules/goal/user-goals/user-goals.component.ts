@@ -1557,7 +1557,6 @@ export class UserGoalsComponent implements OnInit {
       return;
     }
 
-    console.log('Navigating to create lead for goal:', goalId);
     this.router.navigate(['/leads/create', goalId])
       .then(success => {
         if (!success) {
