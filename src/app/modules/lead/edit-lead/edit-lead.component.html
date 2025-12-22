@@ -1,0 +1,212 @@
+<div class="create-lead-container">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-left">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <div>
+                <h1>Update Lead</h1>
+                <p *ngIf="goal">{{ goal.title }}</p>
+            </div>
+        </div>
+        <button class="btn-back" (click)="cancel()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Goals
+        </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading goal details...</p>
+    </div>
+
+    <!-- Lead Form -->
+    <form [formGroup]="leadForm" (ngSubmit)="onSubmit()" class="lead-form" *ngIf="!loading && goal">
+
+        <!-- Dynamic Form Fields -->
+        <div class="form-section" *ngIf="goal.formSchema && goal.formSchema.length > 0">
+            <h2 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="9" x2="15" y2="9"></line>
+                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+                Lead Information
+            </h2>
+
+            <div class="form-grid">
+                <div *ngFor="let field of goal.formSchema" [class.col-span-2]="field.fieldType === 'textarea'"
+                    class="form-group">
+
+                    <label [for]="field.fieldName" [class.required]="field.mandatory">
+                        <span class="field-icon">{{ getFieldTypeIcon(field.fieldType) }}</span>
+                        {{ field.alias }}
+                    </label>
+
+                    <!-- Text Input -->
+                    <input *ngIf="field.fieldType === 'text'" [id]="field.fieldName" type="text"
+                        [formControlName]="field.fieldName" (change)="onFieldChange(field)" class="form-control"
+                        [placeholder]="'Enter ' + field.alias">
+
+                    <!-- Number Input -->
+                    <input *ngIf="field.fieldType === 'number'" [id]="field.fieldName" type="number"
+                        [formControlName]="field.fieldName" (change)="onFieldChange(field)" class="form-control"
+                        [placeholder]="'Enter ' + field.alias">
+
+                    <!-- Date Input -->
+                    <input *ngIf="field.fieldType === 'date'" [id]="field.fieldName" type="date"
+                        [formControlName]="field.fieldName" (change)="onFieldChange(field)" class="form-control">
+
+                    <!-- Email Input -->
+                    <input *ngIf="field.fieldType === 'email'" [id]="field.fieldName" type="email"
+                        [formControlName]="field.fieldName" (change)="onFieldChange(field)" class="form-control"
+                        [placeholder]="'Enter ' + field.alias">
+
+                    <!-- Phone Input -->
+                    <input *ngIf="field.fieldType === 'phone'" [id]="field.fieldName" type="tel"
+                        [formControlName]="field.fieldName" (change)="onFieldChange(field)" class="form-control"
+                        placeholder="10-digit phone number">
+
+                    <!-- Dropdown -->
+                    <select *ngIf="field.fieldType === 'dropdown'" [id]="field.fieldName"
+                        [formControlName]="field.fieldName" (change)="onFieldChange(field)" class="form-control">
+                        <option value="">Select {{ field.alias }}</option>
+                        <option *ngFor="let option of field.options" [value]="option">
+                            {{ option }}
+                        </option>
+                    </select>
+
+                    <!-- Textarea -->
+                    <textarea *ngIf="field.fieldType === 'textarea'" [id]="field.fieldName"
+                        [formControlName]="field.fieldName" (change)="onFieldChange(field)" class="form-control"
+                        rows="4" [placeholder]="'Enter ' + field.alias"></textarea>
+
+                    <!-- Auto Number (Read-only) -->
+                    <input *ngIf="field.fieldType === 'autoNumber'" [id]="field.fieldName" type="text"
+                        [formControlName]="field.fieldName" class="form-control" readonly>
+
+                    <!-- Auto Calculate (Read-only) -->
+                    <input *ngIf="field.fieldType === 'autoCalculate'" [id]="field.fieldName" type="text"
+                        [formControlName]="field.fieldName" class="form-control" readonly>
+
+                    <!-- Validation Error -->
+                    <div class="error-message"
+                        *ngIf="leadForm.get(field.fieldName)?.invalid && leadForm.get(field.fieldName)?.touched">
+                        <span *ngIf="leadForm.get(field.fieldName)?.errors?.['required']">
+                            {{ field.alias }} is required
+                        </span>
+                        <span *ngIf="leadForm.get(field.fieldName)?.errors?.['email']">
+                            Please enter a valid email
+                        </span>
+                        <span *ngIf="leadForm.get(field.fieldName)?.errors?.['pattern']">
+                            Please enter a valid 10-digit phone number
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacts Section -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Contacts
+                <span class="badge-count">{{ contactsArray.length }}</span>
+            </h2>
+
+            <div formArrayName="contacts" class="contacts-list">
+                <div *ngFor="let contact of contactsArray.controls; let i = index" [formGroupName]="i"
+                    class="contact-card">
+                    <div class="contact-header">
+                        <h4>Contact {{ i + 1 }}</h4>
+                        <button type="button" class="btn-remove-contact" (click)="removeContact(i)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="contact-grid">
+                        <div class="form-group">
+                            <label>Name *</label>
+                            <input type="text" formControlName="name" class="form-control" placeholder="Contact name">
+                        </div>
+                        <div class="form-group">
+                            <label>Designation</label>
+                            <input type="text" formControlName="designation" class="form-control"
+                                placeholder="Job title">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" formControlName="email" class="form-control"
+                                placeholder="Email address">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" formControlName="phone" class="form-control" placeholder="Phone number">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="btn-add-contact" (click)="addContact()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Contact
+            </button>
+        </div>
+
+        <!-- Status and Remarks -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                Status & Remarks
+            </h2>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="status" class="required">Status</label>
+                    <select id="status" formControlName="status" class="form-control">
+                        <option *ngFor="let status of goal.statusOptions" [value]="status">
+                            {{ status }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group col-span-2">
+                    <label for="remarks">Remarks</label>
+                    <textarea id="remarks" formControlName="remarks" class="form-control" rows="3"
+                        placeholder="Add any additional notes or remarks"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="submitting">
+                <span *ngIf="!submitting">Update Lead</span>
+                <span *ngIf="submitting">Updating...</span>
+            </button>
+        </div>
+    </form>
+</div>

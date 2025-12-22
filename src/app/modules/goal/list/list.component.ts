@@ -77,17 +77,17 @@ export class GoalListComponent implements OnInit {
     }
 
     createGoal(): void {
-        this.router.navigate(['/goal-management/create']);
+        this.router.navigate(['/goals/manage/create']);
     }
 
     viewGoal(id: string | undefined): void {
         if (!id) return;
-        this.router.navigate([`/goal-management/${id}`]);
+        this.router.navigate([`/goals/manage/${id}`]);
     }
 
     editGoal(id: string | undefined): void {
         if (!id) return;
-        this.router.navigate([`/goal-management/${id}/edit`]);
+        this.router.navigate([`/goals/manage/${id}/edit`]);
     }
 
     deleteGoal(id: string | undefined): void {

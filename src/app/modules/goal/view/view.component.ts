@@ -10,7 +10,7 @@ import { RouterModule } from '@angular/router';
         <div class="container">
             <h2>View Goal</h2>
             <p>Goal details view coming soon...</p>
-            <button routerLink="/goal-management">Back to Goals</button>
+            <button routerLink="/goals/manage">Back to Goals</button>
         </div>
     `,
     styles: [`

@@ -5,6 +5,7 @@ import { GoalListComponent } from './list/list.component';
 import { GoalCreateComponent } from './create/create.component';
 import { GoalEditComponent } from './edit/edit.component';
 import { GoalViewComponent } from './view/view.component';
+import { UserGoalsComponent } from './user-goals/user-goals.component';
 
 @NgModule({
     imports: [
@@ -13,7 +14,8 @@ import { GoalViewComponent } from './view/view.component';
         GoalListComponent,
         GoalCreateComponent,
         GoalEditComponent,
-        GoalViewComponent
+        GoalViewComponent,
+        UserGoalsComponent
     ]
 })
 export class GoalModule { }

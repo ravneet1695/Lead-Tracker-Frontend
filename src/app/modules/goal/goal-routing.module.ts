@@ -5,28 +5,37 @@ import { GoalListComponent } from './list/list.component';
 import { GoalCreateComponent } from './create/create.component';
 import { GoalEditComponent } from './edit/edit.component';
 import { GoalViewComponent } from './view/view.component';
+import { UserGoalsComponent } from './user-goals/user-goals.component';
 
 const routes: Routes = [
+    // User routes (no special permissions required)
     {
         path: '',
+        component: UserGoalsComponent,
+        canActivate: [AuthGuard]
+    },
+
+    // Admin routes (require permissions)
+    {
+        path: 'manage',
         component: GoalListComponent,
         canActivate: [AuthGuard],
         data: { permissions: ['goals.read'] }
     },
     {
-        path: 'create',
+        path: 'manage/create',
         component: GoalCreateComponent,
         canActivate: [AuthGuard],
         data: { permissions: ['goals.create'] }
     },
     {
-        path: ':id',
+        path: 'manage/:id',
         component: GoalViewComponent,
         canActivate: [AuthGuard],
         data: { permissions: ['goals.read'] }
     },
     {
-        path: ':id/edit',
+        path: 'manage/:id/edit',
         component: GoalEditComponent,
         canActivate: [AuthGuard],
         data: { permissions: ['goals.update'] }
