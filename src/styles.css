@@ -3,20 +3,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Primary Gradients */
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  --warning-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-  --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-  --info-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  /* Company Brand Colors */
+  --brand-blue: #004C8F;
+  --brand-red: #ED232A;
+  --brand-blue-light: #0066BB;
+  --brand-blue-dark: #003366;
+  --brand-red-light: #FF4D52;
+  --brand-red-dark: #C01E24;
 
-  /* Vibrant Gradients */
-  --neon-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #667eea 100%);
-  --sunset-gradient: linear-gradient(135deg, #ff6b6b 0%, #feca57 50%, #ee5a6f 100%);
-  --ocean-gradient: linear-gradient(135deg, #667eea 0%, #00f2fe 100%);
-  --forest-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
-  --aurora-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #f093fb 100%);
+  /* Primary Gradients - Using Company Colors */
+  --primary-gradient: linear-gradient(135deg, #004C8F 0%, #003366 100%);
+  --secondary-gradient: linear-gradient(135deg, #ED232A 0%, #C01E24 100%);
+  --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --danger-gradient: linear-gradient(135deg, #ED232A 0%, #C01E24 100%);
+  --info-gradient: linear-gradient(135deg, #004C8F 0%, #0066BB 100%);
+
+  /* Vibrant Gradients - Company Theme */
+  --neon-gradient: linear-gradient(135deg, #004C8F 0%, #0066BB 50%, #ED232A 100%);
+  --sunset-gradient: linear-gradient(135deg, #ED232A 0%, #FF4D52 50%, #C01E24 100%);
+  --ocean-gradient: linear-gradient(135deg, #004C8F 0%, #0066BB 100%);
+  --forest-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --aurora-gradient: linear-gradient(135deg, #004C8F 0%, #ED232A 50%, #0066BB 100%);
 
   /* Background Colors */
   --dark-bg: #0f0f1e;
@@ -28,7 +36,7 @@
   --text-primary: #ffffff;
   --text-secondary: #a0aec0;
   --text-muted: #718096;
-  --text-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --text-gradient: linear-gradient(135deg, #004C8F 0%, #ED232A 100%);
 
   /* Border & Divider */
   --border-color: rgba(255, 255, 255, 0.1);
@@ -40,7 +48,7 @@
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
   --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.4);
-  --shadow-glow: 0 0 20px rgba(102, 126, 234, 0.3);
+  --shadow-glow: 0 0 20px rgba(0, 76, 143, 0.3);
 
   /* Glassmorphism */
   --glass-bg: rgba(255, 255, 255, 0.05);

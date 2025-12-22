@@ -15,7 +15,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    background: linear-gradient(135deg, #004C8F 0%, #003366 50%, #ED232A 100%);
     z-index: 0;
 }
 
@@ -142,7 +142,7 @@
 }
 
 .gradient-text {
-    background: linear-gradient(135deg, #667eea 0%, #f093fb 100%);
+    background: linear-gradient(135deg, #004C8F 0%, #ED232A 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -177,7 +177,7 @@
 
 .form-floating input:focus {
     background: rgba(255, 255, 255, 0.12);
-    border-color: #667eea;
+    border-color: #004C8F;
     box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
 }
 
@@ -195,7 +195,7 @@
     left: 48px;
     top: 8px;
     font-size: 0.75rem;
-    color: #667eea;
+    color: #004C8F;
 }
 
 .input-icon {
@@ -209,7 +209,7 @@
 }
 
 .form-floating input:focus~.input-icon {
-    color: #667eea;
+    color: #004C8F;
 }
 
 .password-toggle {
@@ -353,17 +353,12 @@
 }
 
 .badge-admin {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    background: linear-gradient(135deg, #ED232A 0%, #C01E24 100%);
     color: white;
 }
 
-.badge-manager {
-    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-    color: #333;
-}
-
-.badge-sales {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+.badge-org-admin {
+    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
     color: white;
 }
 
