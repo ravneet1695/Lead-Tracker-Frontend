@@ -229,10 +229,18 @@ export class OrganizationFormComponent implements OnInit {
                     // Patch form values after populating dropdowns
                     // Use setTimeout to ensure dropdowns are rendered
                     setTimeout(() => {
+                        console.log('=== PATCHING FORM ===' , org)
                         this.organizationForm.patchValue(org);
                         console.log('Form patched with values');
                         console.log('Current form address:', this.organizationForm.get('address')?.value);
                         console.log('Pincodes array:', this.pincodes);
+                        this.organizationForm.patchValue({
+                            address: {
+                              state: org.address?.state || '',
+                              city: org.address?.city || '',
+                              pincode: org.address?.pincode || ''
+                            }
+                          });
                     }, 100);
                 }
                 this.loading = false;
