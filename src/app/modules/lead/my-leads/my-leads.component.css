@@ -10,9 +10,11 @@
 /* Purple Gradient Header (matching User Management) */
 .page-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px 32px;
+  padding: 14px 24px;
+  /* Reduced from 20px 32px */
   margin-bottom: 0;
-  border-radius: 12px 12px 0 0;
+  border-radius: 10px 10px 0 0;
+  /* Reduced from 12px */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -33,7 +35,8 @@
 
 .page-header .header-left h1 {
   color: white;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+  /* Reduced from 1.25rem */
   font-weight: 600;
   margin: 0;
   letter-spacing: -0.025em;
@@ -48,14 +51,18 @@
 .btn-back-to-goals {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
+  gap: 6px;
+  /* Reduced from 8px */
+  padding: 8px 16px;
+  /* Reduced from 10px 20px */
   background: rgba(255, 255, 255, 0.15);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  border-radius: 6px;
+  /* Reduced from 8px */
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  /* Reduced from 0.9rem */
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -75,11 +82,19 @@
 /* Filters Container (matching User Management) */
 .filters-container {
   background: #1a1d2e;
-  padding: 24px 32px;
+  padding: 16px 24px;
+  /* Reduced from 24px 32px */
   display: flex;
   align-items: center;
   gap: 16px;
+  /* Reduced from 20px */
   border-bottom: 1px solid #2d3142;
+  border-radius: 0 0 10px 10px;
+  /* Reduced from 12px */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+  /* Reduced from 32px */
+  flex-wrap: wrap;
 }
 
 .search-box {
@@ -308,7 +323,7 @@
 }
 
 .goal-title {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
   margin: 0 0 6px 0;
   background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);

@@ -7,9 +7,9 @@
 /* Purple Header */
 .page-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px 32px;
+    padding: 14px 24px;
     margin-bottom: 0;
-    border-radius: 12px 12px 0 0;
+    border-radius: 10px 10px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -30,7 +30,7 @@
 
 .header-left h1 {
     color: white;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 600;
     margin: 0;
     letter-spacing: -0.025em;

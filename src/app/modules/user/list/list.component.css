@@ -7,9 +7,11 @@
 /* Purple Header */
 .page-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px 32px;
+    padding: 14px 24px;
+    /* Reduced from 20px 32px */
     margin-bottom: 0;
-    border-radius: 12px 12px 0 0;
+    border-radius: 10px 10px 0 0;
+    /* Reduced from 12px */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -30,7 +32,8 @@
 
 .header-left h1 {
     color: white;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    /* Reduced from 1.25rem */
     font-weight: 600;
     margin: 0;
     letter-spacing: -0.025em;
@@ -66,7 +69,8 @@
 /* Filters Container - All in One Row */
 .filters-container {
     background: #1a1d2e;
-    padding: 24px 32px;
+    padding: 16px 24px;
+    /* Reduced from 24px 32px */
     display: flex;
     align-items: center;
     gap: 16px;

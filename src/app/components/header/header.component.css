@@ -2,7 +2,7 @@
 .app-header {
     position: fixed;
     top: 0;
-    left: 260px;
+    left: 220px;
     right: 0;
     background: linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(20, 20, 38, 0.98) 100%);
     backdrop-filter: blur(30px) saturate(180%);
@@ -36,7 +36,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 32px;
+    padding: 8px 20px;
+    /* Further reduced from 10px 24px */
     position: relative;
 }
 
@@ -65,14 +66,18 @@
 .breadcrumb-item {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 18px;
-    border-radius: 10px;
+    gap: 8px;
+    /* Reduced from 10px */
+    padding: 6px 14px;
+    /* Reduced from 8px 18px */
+    border-radius: 8px;
+    /* Reduced from 10px */
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
+    /* Reduced from 0.875rem */
     font-weight: 500;
     letter-spacing: 0.01em;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -170,9 +175,12 @@
 /* ===== ACTION BUTTONS ===== */
 .header-action-btn {
     position: relative;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 38px;
+    /* Reduced from 44px */
+    height: 38px;
+    /* Reduced from 44px */
+    border-radius: 10px;
+    /* Reduced from 12px */
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.8);
@@ -255,9 +263,12 @@
 .user-info-container {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 6px 18px 6px 6px;
-    border-radius: 12px;
+    gap: 12px;
+    /* Reduced from 14px */
+    padding: 5px 14px 5px 5px;
+    /* Reduced from 6px 18px 6px 6px */
+    border-radius: 10px;
+    /* Reduced from 12px */
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.1);
     cursor: pointer;
@@ -288,15 +299,18 @@
 }
 
 .user-avatar {
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    /* Reduced from 42px */
+    height: 36px;
+    /* Reduced from 42px */
     border-radius: 50%;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
+    /* Reduced from 0.95rem */
     flex-shrink: 0;
     box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4),
         0 2px 8px rgba(0, 0, 0, 0.2),
