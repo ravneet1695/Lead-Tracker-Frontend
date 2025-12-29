@@ -16,7 +16,37 @@ interface FormField {
     calculation?: string;
     maxContacts?: number;
     order: number;
+    // FormArray properties
+    isArrayField?: boolean;
+    displayMode?: 'cards' | 'table';
+    columnCount?: number;
+    arrayFields?: ArraySubField[];
+    minInstances?: number;
+    maxInstances?: number;
 }
+
+interface ArraySubField {
+    fieldName: string;
+    fieldType: string;
+    alias: string;
+    mandatory: boolean;
+    options?: string[];
+    order: number;
+    columnIndex?: number;
+    dependsOn?: {
+        fieldName: string;
+        mappings: Array<{
+            when: string;
+            then: {
+                label?: string;
+                options?: string[];
+                defaultValue?: any;
+                show?: boolean;
+            }
+        }>;
+    };
+}
+
 
 @Component({
     selector: 'app-goal-create',
@@ -30,6 +60,7 @@ export class GoalCreateComponent implements OnInit {
     groups: any[] = [];
     formFields: FormField[] = [];
     selectedFieldIndex: number | null = null;
+    selectedColumn: number = 0;  // Track selected column for table mode
     loading = false;
     submitting = false;
 
@@ -43,7 +74,8 @@ export class GoalCreateComponent implements OnInit {
         { value: 'textarea', label: 'Text Area', icon: '📄' },
         { value: 'multiContact', label: 'Multi Contact', icon: '👥' },
         { value: 'autoNumber', label: 'Auto Number', icon: '#️⃣' },
-        { value: 'autoCalculate', label: 'Auto Calculate', icon: '🧮' }
+        { value: 'autoCalculate', label: 'Auto Calculate', icon: '🧮' },
+        { value: 'formArray', label: 'Repeatable Group', icon: '🔁' }
     ];
 
     statusOptions: string[] = ['New', 'In Progress', 'Completed', 'Cancelled'];
@@ -130,11 +162,20 @@ export class GoalCreateComponent implements OnInit {
             order: this.formFields.length,
             ...(fieldType === 'dropdown' && { options: [] }),
             ...(fieldType === 'multiContact' && { maxContacts: 5 }),
-            ...(fieldType === 'autoCalculate' && { calculation: '' })
+            ...(fieldType === 'autoCalculate' && { calculation: '' }),
+            ...(fieldType === 'formArray' && {
+                isArrayField: true,
+                displayMode: 'table',
+                columnCount: 2,
+                arrayFields: [],
+                minInstances: 1,
+                maxInstances: 10
+            })
         };
 
         this.formFields.push(newField);
         this.selectedFieldIndex = this.formFields.length - 1;
+        this.selectedColumn = 0;  // Reset selected column
     }
 
     selectField(index: number): void {
@@ -231,6 +272,139 @@ export class GoalCreateComponent implements OnInit {
         this.statusOptions.splice(index, 1);
     }
 
+    // FormArray Management Methods
+    addFieldToArray(arrayFieldIndex: number, fieldType: string): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) {
+            arrayField.arrayFields = [];
+        }
+
+        const newField: FormField = {
+            fieldName: `subfield_${arrayField.arrayFields.length + 1}`,
+            fieldType: fieldType,
+            alias: `Sub Field ${arrayField.arrayFields.length + 1}`,
+            mandatory: false,
+            order: arrayField.arrayFields.length,
+            ...(fieldType === 'dropdown' && { options: [] })
+        };
+
+        arrayField.arrayFields.push(newField);
+    }
+
+    removeFieldFromArray(arrayFieldIndex: number, subfieldIndex: number): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (arrayField.arrayFields) {
+            arrayField.arrayFields.splice(subfieldIndex, 1);
+            // Update order
+            arrayField.arrayFields.forEach((field, idx) => {
+                field.order = idx;
+            });
+        }
+    }
+
+    updateArraySubfieldAlias(arrayFieldIndex: number, subfieldIndex: number, value: string): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (arrayField.arrayFields && arrayField.arrayFields[subfieldIndex]) {
+            arrayField.arrayFields[subfieldIndex].alias = value;
+            // Auto-generate field name from alias
+            const fieldName = value.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+            arrayField.arrayFields[subfieldIndex].fieldName = fieldName || `subfield_${subfieldIndex + 1}`;
+        }
+    }
+
+    updateArraySubfieldMandatory(arrayFieldIndex: number, subfieldIndex: number, value: boolean): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (arrayField.arrayFields && arrayField.arrayFields[subfieldIndex]) {
+            arrayField.arrayFields[subfieldIndex].mandatory = value;
+        }
+    }
+
+    // Column and Dependency Management Methods
+    getColumnArray(count: number): number[] {
+        return Array.from({ length: count }, (_, i) => i);
+    }
+
+    addFieldToArrayColumn(arrayFieldIndex: number, columnIndex: number, fieldType: string): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) {
+            arrayField.arrayFields = [];
+        }
+
+        const newField: ArraySubField = {
+            fieldName: `col${columnIndex}_field_${arrayField.arrayFields.length + 1}`,
+            fieldType: fieldType,
+            alias: `Column ${columnIndex + 1} Field`,
+            mandatory: false,
+            order: arrayField.arrayFields.length,
+            columnIndex: columnIndex,
+            ...(fieldType === 'dropdown' && { options: [] })
+        };
+
+        arrayField.arrayFields.push(newField);
+    }
+
+    getFieldsInColumn(arrayFieldIndex: number, columnIndex: number): ArraySubField[] {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) return [];
+        return arrayField.arrayFields.filter(f => (f.columnIndex || 0) === columnIndex);
+    }
+
+    canHaveDependency(subfield: ArraySubField): boolean {
+        // Only certain field types can have dependencies
+        return ['text', 'number', 'dropdown', 'email', 'phone'].includes(subfield.fieldType);
+    }
+
+    toggleDependency(arrayFieldIndex: number, subfieldIndex: number): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) return;
+
+        const subfield = arrayField.arrayFields[subfieldIndex];
+        if (subfield.dependsOn) {
+            delete subfield.dependsOn;
+        } else {
+            subfield.dependsOn = {
+                fieldName: '',
+                mappings: []
+            };
+        }
+    }
+
+    getPreviousFields(arrayFieldIndex: number, subfieldIndex: number): ArraySubField[] {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) return [];
+
+        // Return fields that come before this one (can be depended upon)
+        return arrayField.arrayFields.slice(0, subfieldIndex);
+    }
+
+    addDependencyMapping(arrayFieldIndex: number, subfieldIndex: number): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) return;
+
+        const subfield = arrayField.arrayFields[subfieldIndex];
+        if (!subfield.dependsOn) return;
+
+        subfield.dependsOn.mappings.push({
+            when: '',
+            then: {
+                label: '',
+                options: [],
+                show: true
+            }
+        });
+    }
+
+    removeMapping(arrayFieldIndex: number, subfieldIndex: number, mappingIndex: number): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) return;
+
+        const subfield = arrayField.arrayFields[subfieldIndex];
+        if (!subfield.dependsOn) return;
+
+        subfield.dependsOn.mappings.splice(mappingIndex, 1);
+    }
+
+
     // Form Submission
     onSubmit(): void {
         if (this.goalForm.invalid) {
@@ -306,5 +480,13 @@ export class GoalCreateComponent implements OnInit {
 
     getFieldTypeLabel(fieldType: string): string {
         return this.fieldTypes.find(ft => ft.value === fieldType)?.label || fieldType;
+    }
+
+    // Helper to get selected field's array fields safely
+    get selectedFieldArrayFields(): ArraySubField[] | undefined {
+        if (this.selectedFieldIndex !== null) {
+            return this.formFields[this.selectedFieldIndex]?.arrayFields;
+        }
+        return undefined;
     }
 }

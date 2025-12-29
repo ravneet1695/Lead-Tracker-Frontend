@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -13,7 +13,8 @@ import Swal from 'sweetalert2';
     standalone: true,
     imports: [CommonModule, FormsModule, RouterModule],
     templateUrl: './list.component.html',
-    styleUrls: ['./list.component.css']
+    styleUrls: ['./list.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush  // Optimize change detection
 })
 export class UserListComponent implements OnInit {
     users: User[] = [];
@@ -37,7 +38,8 @@ export class UserListComponent implements OnInit {
         private organizationService: OrganizationService,
         private authService: AuthService,
         private roleService: RoleService,
-        private router: Router
+        private router: Router,
+        private cdr: ChangeDetectorRef  // For manual change detection with OnPush
     ) { }
 
     ngOnInit(): void {
@@ -53,6 +55,7 @@ export class UserListComponent implements OnInit {
         this.roleService.getRoles().subscribe({
             next: (response) => {
                 this.roles = response.roles || [];
+                this.cdr.markForCheck();  // Trigger change detection
             },
             error: (error) => {
                 console.error('Error loading roles:', error);
@@ -69,6 +72,7 @@ export class UserListComponent implements OnInit {
         this.organizationService.getOrganizations().subscribe({
             next: (response) => {
                 this.organizations = response.organizations || [];
+                this.cdr.markForCheck();  // Trigger change detection
             },
             error: (error) => {
                 console.error('Error loading organizations:', error);
@@ -90,10 +94,12 @@ export class UserListComponent implements OnInit {
                 this.users = response.users || response || [];
                 this.applyFilters();
                 this.loading = false;
+                this.cdr.markForCheck();  // Trigger change detection
             },
             error: (error) => {
                 console.error('Error loading users:', error);
                 this.loading = false;
+                this.cdr.markForCheck();  // Trigger change detection
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',

@@ -61,7 +61,11 @@ export class UserService {
         return this.http.patch<any>(`${this.apiUrl}/${id}/status`, { status: 'active' });
     }
 
-    getNextUserCode(): Observable<any> {
-        return this.http.get<any>(`${this.apiUrl}/next-code`);
+    getNextUserCode(organizationId?: string): Observable<any> {
+        let url = `${this.apiUrl}/next-code`;
+        if (organizationId) {
+            url += `?organization=${organizationId}`;
+        }
+        return this.http.get<any>(url);
     }
 }

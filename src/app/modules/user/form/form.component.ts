@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -33,6 +33,10 @@ export class UserFormComponent implements OnInit {
         { value: 'inactive', label: 'Inactive' }
     ];
 
+    // Track if current user being edited has admin role
+    isAdminRole = false;
+    currentRoleLabel = '';
+
     constructor(
         private fb: FormBuilder,
         private userService: UserService,
@@ -40,7 +44,8 @@ export class UserFormComponent implements OnInit {
         private authService: AuthService,
         private roleService: RoleService,
         private router: Router,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private cdr: ChangeDetectorRef  // For manual change detection
     ) { }
 
     ngOnInit(): void {
@@ -85,6 +90,11 @@ export class UserFormComponent implements OnInit {
                 // Enable role dropdown and load filtered roles
                 roleControl?.enable({ emitEvent: false });
                 this.loadRolesByOrganization(orgId);
+
+                // Regenerate user code for the new organization (only in create mode)
+                if (!this.isEditMode) {
+                    this.fetchNextUserCode();
+                }
             } else {
                 // Disable role dropdown and clear selection
                 roleControl?.disable({ emitEvent: false });
@@ -94,12 +104,13 @@ export class UserFormComponent implements OnInit {
         });
 
         // Initialize role dropdown state based on organization field visibility
-        if (this.showOrganizationField) {
+        // Skip this logic in edit mode - loadUser() will handle role field state
+        if (this.showOrganizationField && !this.isEditMode) {
             const orgValue = this.userForm.get('organization')?.value;
             if (!orgValue) {
                 this.userForm.get('role')?.disable();
             }
-        } else {
+        } else if (!this.showOrganizationField && !this.isEditMode) {
             // For non-Super Admin users, auto-populate organization and load roles
             const user = this.authService.currentUserValue;
             if (user?.organization) {
@@ -148,6 +159,13 @@ export class UserFormComponent implements OnInit {
                     value: r._id,
                     label: r.label
                 }));
+
+                // Reset role selection when organization changes (except in edit mode)
+                if (!this.isEditMode) {
+                    this.userForm.patchValue({ role: '' }, { emitEvent: false });
+                }
+
+                this.cdr.markForCheck();  // Trigger change detection for OnPush
             },
             error: (error) => {
                 console.error('Error loading roles for organization:', error);
@@ -171,7 +189,7 @@ export class UserFormComponent implements OnInit {
 
     loadOrganizations(): void {
         // Only load organizations if user needs to see the organization dropdown
-        // Organization Admins have their organization auto-filled and don't see the dropdown
+        // In edit mode, organization is populated from backend, so no need to load all orgs
         if (!this.showOrganizationField) {
             return;
         }
@@ -189,7 +207,16 @@ export class UserFormComponent implements OnInit {
     }
 
     fetchNextUserCode(): void {
-        this.userService.getNextUserCode().subscribe({
+        // Get organization from form or current user
+        let organizationId = this.userForm.get('organization')?.value;
+
+        // If no organization in form, try to get from current user
+        if (!organizationId && this.authService.currentUserValue?.organization) {
+            const userOrg = this.authService.currentUserValue.organization;
+            organizationId = typeof userOrg === 'object' ? (userOrg as any)._id : userOrg;
+        }
+
+        this.userService.getNextUserCode(organizationId).subscribe({
             next: (response: any) => {
                 this.userForm.patchValue({ code: response.code });
             },
@@ -237,15 +264,76 @@ export class UserFormComponent implements OnInit {
                     const firstName = nameParts[0] || '';
                     const lastName = nameParts.slice(1).join(' ') || '';
 
+                    // Extract IDs from objects if they are populated
+                    const roleId = typeof user.role === 'object' && user.role ? (user.role as any)._id : user.role;
+                    const orgId = typeof user.organization === 'object' && user.organization ? (user.organization as any)._id : user.organization;
+
+                    // Patch form values (except role - will be patched after roles load)
                     this.userForm.patchValue({
+                        code: user.code,
                         firstName: firstName,
                         lastName: lastName,
                         email: user.email,
                         mobile: user.mobile,
-                        role: user.role,
-                        organization: user.organization,
+                        organization: orgId,
                         status: user.status
                     });
+
+                    // Enable role dropdown initially in edit mode
+                    this.userForm.get('role')?.enable({ emitEvent: false });
+
+                    // Load roles for user's organization, then patch role value
+                    if (orgId) {
+                        this.roleService.getRolesByOrganization(orgId).subscribe({
+                            next: (rolesResponse) => {
+                                this.roles = rolesResponse.roles.map(r => ({
+                                    value: r._id,
+                                    label: r.label
+                                }));
+
+                                // NOW patch the role value after options are loaded
+                                this.userForm.patchValue({ role: roleId });
+
+                                // Check if role should be disabled (only for super_admin and org_admin)
+                                if (user.role && typeof user.role === 'object') {
+                                    const roleName = (user.role as any).name;
+                                    const roleLabel = (user.role as any).label;
+                                    if (roleName === 'super_admin' || roleName === 'org_admin') {
+                                        this.isAdminRole = true;
+                                        this.currentRoleLabel = roleLabel;
+                                        this.userForm.get('role')?.disable();
+                                    }
+                                }
+
+                                this.cdr.markForCheck();
+                            },
+                            error: (error) => {
+                                console.error('Error loading roles:', error);
+                                // Fallback to all roles
+                                this.loadRoles();
+                                this.userForm.patchValue({ role: roleId });
+                                this.cdr.markForCheck();
+                            }
+                        });
+                    } else {
+                        // For users without organization (Super Admin), load all roles
+                        this.loadRoles();
+                        this.userForm.patchValue({ role: roleId });
+
+                        // Check if role should be disabled
+                        if (user.role && typeof user.role === 'object') {
+                            const roleName = (user.role as any).name;
+                            const roleLabel = (user.role as any).label;
+                            if (roleName === 'super_admin' || roleName === 'org_admin') {
+                                this.isAdminRole = true;
+                                this.currentRoleLabel = roleLabel;
+                                this.userForm.get('role')?.disable();
+                            }
+                        }
+                    }
+
+                    // Disable organization field in edit mode
+                    this.userForm.get('organization')?.disable();
                 }
                 this.loading = false;
             },

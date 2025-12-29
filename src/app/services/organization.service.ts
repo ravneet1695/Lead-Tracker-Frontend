@@ -18,6 +18,7 @@ export interface Organization {
         pincode?: string;
     };
     logo?: string;
+    website?: string;
     description?: string;
     status?: 'active' | 'inactive';
     admin?: {

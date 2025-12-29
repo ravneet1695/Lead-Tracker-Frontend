@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
 import { ThemeService } from '../../services/theme.service';
-import { filter } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 
@@ -20,11 +21,12 @@ interface Breadcrumb {
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   isDropdownOpen = false;
   breadcrumbs: Breadcrumb[] = [];
   isDarkMode = true;
+  private destroy$ = new Subject<void>();
 
   private routeIcons: { [key: string]: string } = {
     'dashboard': '<path d=\"M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"></path><polyline points=\"9 22 9 12 15 12 15 22\"></polyline>',
@@ -54,21 +56,26 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     // Subscribe to current user changes
-    this.authService.currentUser.subscribe(user => {
-      this.currentUser = user;
-    });
+    this.authService.currentUser
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.currentUser = user;
+      });
 
     // Subscribe to theme changes
-    this.themeService.theme$.subscribe(theme => {
-      this.isDarkMode = theme === 'dark';
-    });
+    this.themeService.theme$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(theme => {
+        this.isDarkMode = theme === 'dark';
+      });
 
     // Generate initial breadcrumbs
     this.generateBreadcrumbs();
 
     // Update breadcrumbs on route changes
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.destroy$)
     ).subscribe(() => {
       this.generateBreadcrumbs();
     });
@@ -156,5 +163,10 @@ export class HeaderComponent implements OnInit {
   logout(): void {
     this.closeDropdown();
     this.authService.logout();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

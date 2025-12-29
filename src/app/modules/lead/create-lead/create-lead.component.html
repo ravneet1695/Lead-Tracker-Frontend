@@ -124,6 +124,182 @@
                     <input *ngIf="field.fieldType === 'autoCalculate'" [id]="field.fieldName" type="text"
                         [formControlName]="field.fieldName" class="form-control" readonly>
 
+                    <!-- FormArray Field -->
+                    <ng-container *ngIf="field.fieldType === 'formArray' && field.arrayFields">
+                        <!-- Table View -->
+                        <div *ngIf="field.displayMode === 'table'" class="form-array-table-container">
+                            <table class="array-table">
+                                <thead>
+                                    <tr>
+                                        <th *ngFor="let subfield of field.arrayFields" [attr.colspan]="1">
+                                            {{ subfield.alias }}
+                                            <span *ngIf="subfield.mandatory" class="required-star">*</span>
+                                        </th>
+                                        <th class="actions-column">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody [formArrayName]="field.fieldName">
+                                    <tr *ngFor="let instance of getFormArray(field.fieldName).controls; let idx = index"
+                                        [formGroupName]="idx">
+                                        <td *ngFor="let subfield of field.arrayFields">
+                                            <ng-container *ngIf="shouldShowField(field, subfield, idx)">
+                                                <!-- Dropdown with dependency support -->
+                                                <select *ngIf="subfield.fieldType === 'dropdown'"
+                                                    [formControlName]="subfield.fieldName"
+                                                    (change)="onParentFieldChange(field, subfield, idx, subfield.fieldName)"
+                                                    class="form-control table-input">
+                                                    <option value="">Select</option>
+                                                    <option
+                                                        *ngFor="let option of getEffectiveOptions(field, subfield, idx)"
+                                                        [value]="option">
+                                                        {{ option }}
+                                                    </option>
+                                                </select>
+
+                                                <!-- Text Input -->
+                                                <input *ngIf="subfield.fieldType === 'text'"
+                                                    [formControlName]="subfield.fieldName" type="text"
+                                                    class="form-control table-input"
+                                                    [placeholder]="getEffectiveLabel(field, subfield, idx)">
+
+                                                <!-- Number Input -->
+                                                <input *ngIf="subfield.fieldType === 'number'"
+                                                    [formControlName]="subfield.fieldName" type="number"
+                                                    class="form-control table-input"
+                                                    [placeholder]="getEffectiveLabel(field, subfield, idx)">
+
+                                                <!-- Date Input -->
+                                                <input *ngIf="subfield.fieldType === 'date'"
+                                                    [formControlName]="subfield.fieldName" type="date"
+                                                    class="form-control table-input">
+
+                                                <!-- Email Input -->
+                                                <input *ngIf="subfield.fieldType === 'email'"
+                                                    [formControlName]="subfield.fieldName" type="email"
+                                                    class="form-control table-input"
+                                                    [placeholder]="getEffectiveLabel(field, subfield, idx)">
+
+                                                <!-- Phone Input -->
+                                                <input *ngIf="subfield.fieldType === 'phone'"
+                                                    [formControlName]="subfield.fieldName" type="tel"
+                                                    class="form-control table-input"
+                                                    placeholder="10-digit phone number">
+
+                                                <!-- Textarea -->
+                                                <textarea *ngIf="subfield.fieldType === 'textarea'"
+                                                    [formControlName]="subfield.fieldName"
+                                                    class="form-control table-input" rows="2"
+                                                    [placeholder]="getEffectiveLabel(field, subfield, idx)"></textarea>
+                                            </ng-container>
+                                        </td>
+                                        <td class="actions-column">
+                                            <button type="button" class="btn-remove-row"
+                                                *ngIf="canRemoveInstance(field)"
+                                                (click)="removeArrayInstance(field.fieldName, idx)">
+                                                ×
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <button type="button" class="btn-add-row" *ngIf="canAddInstance(field)"
+                                (click)="addArrayInstance(field.fieldName, field.arrayFields)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Add Row
+                            </button>
+                        </div>
+
+                        <!-- Card View (existing) -->
+                        <div *ngIf="field.displayMode !== 'table'" class="form-array-container">
+                            <div [formArrayName]="field.fieldName" class="array-instances">
+                                <div *ngFor="let instance of getFormArray(field.fieldName).controls; let idx = index"
+                                    [formGroupName]="idx" class="array-instance-card">
+                                    <div class="array-instance-header">
+                                        <h4>{{ field.alias }} {{ idx + 1 }}</h4>
+                                        <button type="button" class="btn-remove-instance"
+                                            *ngIf="canRemoveInstance(field)"
+                                            (click)="removeArrayInstance(field.fieldName, idx)">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <div class="array-instance-grid">
+                                        <div *ngFor="let subfield of field.arrayFields" class="form-group">
+                                            <label [for]="field.fieldName + '_' + idx + '_' + subfield.fieldName"
+                                                [class.required]="subfield.mandatory">
+                                                {{ subfield.alias }}
+                                            </label>
+
+                                            <!-- Text Input -->
+                                            <input *ngIf="subfield.fieldType === 'text'"
+                                                [id]="field.fieldName + '_' + idx + '_' + subfield.fieldName"
+                                                type="text" [formControlName]="subfield.fieldName" class="form-control"
+                                                [placeholder]="'Enter ' + subfield.alias">
+
+                                            <!-- Number Input -->
+                                            <input *ngIf="subfield.fieldType === 'number'"
+                                                [id]="field.fieldName + '_' + idx + '_' + subfield.fieldName"
+                                                type="number" [formControlName]="subfield.fieldName"
+                                                class="form-control" [placeholder]="'Enter ' + subfield.alias">
+
+                                            <!-- Date Input -->
+                                            <input *ngIf="subfield.fieldType === 'date'"
+                                                [id]="field.fieldName + '_' + idx + '_' + subfield.fieldName"
+                                                type="date" [formControlName]="subfield.fieldName" class="form-control">
+
+                                            <!-- Email Input -->
+                                            <input *ngIf="subfield.fieldType === 'email'"
+                                                [id]="field.fieldName + '_' + idx + '_' + subfield.fieldName"
+                                                type="email" [formControlName]="subfield.fieldName" class="form-control"
+                                                [placeholder]="'Enter ' + subfield.alias">
+
+                                            <!-- Phone Input -->
+                                            <input *ngIf="subfield.fieldType === 'phone'"
+                                                [id]="field.fieldName + '_' + idx + '_' + subfield.fieldName" type="tel"
+                                                [formControlName]="subfield.fieldName" class="form-control"
+                                                placeholder="10-digit phone number">
+
+                                            <!-- Dropdown -->
+                                            <select *ngIf="subfield.fieldType === 'dropdown'"
+                                                [id]="field.fieldName + '_' + idx + '_' + subfield.fieldName"
+                                                [formControlName]="subfield.fieldName" class="form-control">
+                                                <option value="">Select {{ subfield.alias }}</option>
+                                                <option *ngFor="let option of subfield.options" [value]="option">
+                                                    {{ option }}
+                                                </option>
+                                            </select>
+
+                                            <!-- Textarea -->
+                                            <textarea *ngIf="subfield.fieldType === 'textarea'"
+                                                [id]="field.fieldName + '_' + idx + '_' + subfield.fieldName"
+                                                [formControlName]="subfield.fieldName" class="form-control" rows="3"
+                                                [placeholder]="'Enter ' + subfield.alias"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn-add-instance" *ngIf="canAddInstance(field)"
+                                (click)="addArrayInstance(field.fieldName, field.arrayFields)">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Add {{ field.alias }}
+                            </button>
+                        </div>
+                    </ng-container>
+
                     <!-- Validation Error -->
                     <div class="error-message"
                         *ngIf="leadForm.get(field.fieldName)?.invalid && leadForm.get(field.fieldName)?.touched">

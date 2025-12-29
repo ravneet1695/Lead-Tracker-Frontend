@@ -37,15 +37,15 @@
             <option value="inactive">Inactive</option>
         </select>
 
-        <select class="filter-select" [(ngModel)]="roleFilter" (change)="applyFilters()">
-            <option value="">All Roles</option>
-            <option *ngFor="let role of roles" [value]="role._id">{{ role.label }}</option>
-        </select>
-
         <select class="filter-select" [(ngModel)]="organizationFilter" (change)="onFilterChange()"
             *ngIf="canViewAllOrganizations()">
             <option value="all">All Organizations</option>
             <option *ngFor="let org of organizations" [value]="org._id">{{ org.name }}</option>
+        </select>
+
+        <select class="filter-select" [(ngModel)]="roleFilter" (change)="applyFilters()">
+            <option value="">All Roles</option>
+            <option *ngFor="let role of roles" [value]="role._id">{{ role.label }}</option>
         </select>
     </div>
 
