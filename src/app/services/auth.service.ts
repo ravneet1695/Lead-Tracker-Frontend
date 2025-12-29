@@ -163,13 +163,7 @@ export class AuthService {
         return roleName === 'super_admin' || roleName === 'org_admin';
     }
 
-    isManager(): boolean {
-        return this.currentUserValue?.role?.name === 'manager';
-    }
 
-    isSales(): boolean {
-        return this.currentUserValue?.role?.name === 'sales';
-    }
 
     // Permission-based checking methods (NEW)
     hasPermission(permission: string): boolean {

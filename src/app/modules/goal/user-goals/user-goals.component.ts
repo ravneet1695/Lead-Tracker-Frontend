@@ -365,11 +365,11 @@ import Swal from 'sweetalert2';
     .goals-header {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 24px 32px;
+      padding: 20px 24px; /* Reduced from 24px 32px */
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 24px;
+      gap: 20px; /* Reduced from 24px */
     }
 
     .header-content {
@@ -596,10 +596,10 @@ import Swal from 'sweetalert2';
     .goals-grid {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 40px 32px;
+      padding: 24px 20px; /* Reduced from 32px */
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
-      gap: 32px;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); /* Reduced from 420px */
+      gap: 24px; /* Reduced from 32px */
       position: relative;
       z-index: 1;
     }
@@ -607,8 +607,8 @@ import Swal from 'sweetalert2';
     /* Premium Goal Cards */
     .goal-card {
       background: linear-gradient(135deg, rgba(26, 29, 46, 0.95) 0%, rgba(31, 34, 51, 0.95) 100%);
-      border-radius: 20px;
-      padding: 32px;
+      border-radius: 16px; /* Reduced from 20px */
+      padding: 24px; /* Reduced from 32px */
       position: relative;
       overflow: hidden;
       border: 1px solid rgba(102, 126, 234, 0.15);

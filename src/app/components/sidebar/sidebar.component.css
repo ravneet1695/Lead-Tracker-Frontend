@@ -3,7 +3,7 @@
     left: 0;
     top: 0;
     height: 100vh;
-    width: 260px;
+    width: 220px;
     background: rgba(26, 26, 46, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -21,11 +21,14 @@
 
 /* Sidebar Header */
 .sidebar-header {
-    padding: 24px 20px;
+    padding: 8px 16px;
+    /* Reduced from 24px 20px to match main header */
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--border-color);
+    min-height: 52px;
+    /* Match main header height */
 }
 
 .logo {
@@ -36,7 +39,8 @@
 }
 
 .logo-icon {
-    font-size: 3rem;
+    font-size: 2.5rem;
+    /* Reduced from 3rem */
     flex-shrink: 0;
     filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
     display: flex;
@@ -45,8 +49,8 @@
 }
 
 .org-logo {
-    width: 180px;
-    height: 40px;
+    width: 160px;
+    height: 36px;
     object-fit: cover;
     border-radius: var(--radius-md);
     background: rgba(255, 255, 255, 0.05);
