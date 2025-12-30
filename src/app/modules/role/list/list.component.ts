@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { RoleService, Role } from '../../../services/role.service';
+import { OrganizationService } from '../../../services/organization.service';
 import { AuthService } from '../../../services/auth.service';
 import Swal from 'sweetalert2';
 
@@ -16,25 +17,76 @@ import Swal from 'sweetalert2';
 export class RoleListComponent implements OnInit {
     roles: Role[] = [];
     filteredRoles: Role[] = [];
+    organizations: any[] = [];
     loading = false;
     searchTerm = '';
     statusFilter = 'active';
+    organizationFilter = 'all'; // For Super Admin
+    currentUser: any;
 
     constructor(
         private roleService: RoleService,
+        private organizationService: OrganizationService,
         private authService: AuthService,
         private router: Router
     ) { }
 
     ngOnInit(): void {
+        this.currentUser = this.authService.currentUserValue;
+
+        if (this.isSuperAdmin()) {
+            // Super Admin: Load organizations for filter dropdown
+            this.loadOrganizations();
+        } else if (this.isOrgAdmin()) {
+            // Org Admin: Set organization filter to their org (hidden in UI)
+            this.organizationFilter = this.currentUser?.organization?._id || this.currentUser?.organization;
+        }
+
         this.loadRoles();
+    }
+
+    isSuperAdmin(): boolean {
+        return this.currentUser?.role?.name === 'super_admin';
+    }
+
+    isOrgAdmin(): boolean {
+        return this.currentUser?.role?.name === 'org_admin';
+    }
+
+    loadOrganizations(): void {
+        this.organizationService.getOrganizations().subscribe({
+            next: (response: any) => {
+                this.organizations = response.organizations || [];
+            },
+            error: (error) => {
+                console.error('Error loading organizations:', error);
+            }
+        });
     }
 
     loadRoles(): void {
         this.loading = true;
-        const includeInactive = this.statusFilter === 'all';
 
-        this.roleService.getRoles(includeInactive).subscribe({
+        // Build query parameters
+        const params: any = {};
+
+        // Include inactive roles if "All Status" is selected
+        if (this.statusFilter === 'all') {
+            params.includeInactive = true;
+        }
+
+        // Add organization filter
+        if (this.isSuperAdmin()) {
+            // Super Admin: Include organization param only if specific org selected
+            if (this.organizationFilter && this.organizationFilter !== 'all') {
+                params.organization = this.organizationFilter;
+            }
+        } else {
+            // Org Admin: Always filter by their organization
+            params.organization = this.organizationFilter;
+        }
+
+        this.roleService.getRolesByOrganization(params.organization || '', params.includeInactive || false).subscribe({
             next: (response) => {
                 this.roles = response.roles || [];
                 this.applyFilters();
@@ -54,10 +106,12 @@ export class RoleListComponent implements OnInit {
 
     applyFilters(): void {
         this.filteredRoles = this.roles.filter(role => {
+            // Search filter
             const matchesSearch = !this.searchTerm ||
                 role.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
                 role.label.toLowerCase().includes(this.searchTerm.toLowerCase());
 
+            // Status filter (client-side for better UX)
             const matchesStatus = this.statusFilter === 'all' ||
                 (this.statusFilter === 'active' && role.isActive) ||
                 (this.statusFilter === 'inactive' && !role.isActive);
@@ -66,8 +120,19 @@ export class RoleListComponent implements OnInit {
         });
     }
 
-    onFilterChange(): void {
+    onOrganizationChange(): void {
+        // Reload roles when organization filter changes (Super Admin only)
         this.loadRoles();
+    }
+
+    onStatusChange(): void {
+        // Reload roles when status filter changes
+        this.loadRoles();
+    }
+
+    onSearchChange(): void {
+        // Apply client-side filtering for search
+        this.applyFilters();
     }
 
     createRole(): void {
