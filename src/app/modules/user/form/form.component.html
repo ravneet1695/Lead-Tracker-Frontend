@@ -13,16 +13,11 @@
             <div class="form-section">
                 <h3 class="section-title">User Information</h3>
 
-                <!-- Code, Organization, and Profile Image in one row -->
+                <!-- Field order for Super Admin: Organization → User Code → Role -->
+                <!-- Field order for Org Admin: User Code → Role (organization hidden) -->
                 <div class="form-row">
-                    <div class="form-group">
-                        <label for="code" class="form-label">User Code</label>
-                        <input type="text" id="code" class="form-control" formControlName="code"
-                            placeholder="Auto-generated" readonly>
-                        <small class="form-text">Auto-generated upon creation</small>
-                    </div>
-
-                    <div class="form-group" *ngIf="showOrganizationField">
+                    <!-- Organization field - FIRST for Super Admin -->
+                    <div class="form-group" *ngIf="isSuperAdmin">
                         <label for="organization" class="form-label">Organization <span
                                 style="color: #ff6b6b;">*</span></label>
                         <select class="form-control" id="organization" formControlName="organization"
@@ -33,8 +28,18 @@
                         <span *ngIf="isFieldInvalid('organization')" class="error-message">
                             {{ getFieldError('organization') }}
                         </span>
+                        <small class="form-text">Select organization first to load available roles</small>
                     </div>
 
+                    <!-- User Code field - SECOND for Super Admin, FIRST for Org Admin -->
+                    <div class="form-group">
+                        <label for="code" class="form-label">User Code</label>
+                        <input type="text" id="code" class="form-control" formControlName="code"
+                            placeholder="Auto-generated" readonly>
+                        <small class="form-text">Auto-generated upon creation</small>
+                    </div>
+
+                    <!-- Role field - THIRD for Super Admin, SECOND for Org Admin -->
                     <div class="form-group">
                         <label for="role" class="form-label">Role <span style="color: #ff6b6b;">*</span></label>
 
@@ -45,13 +50,9 @@
 
                         <!-- Show dropdown for non-admin roles or create mode -->
                         <select *ngIf="!isEditMode || !isAdminRole" class="form-control" id="role"
-                            formControlName="role" [class.invalid]="isFieldInvalid('role')"
-                            [style.opacity]="userForm.get('role')?.disabled ? '0.7' : '1'"
-                            [style.cursor]="userForm.get('role')?.disabled ? 'not-allowed' : 'pointer'"
-                            [style.background-color]="userForm.get('role')?.disabled ? '#2a2a2a' : ''">
+                            formControlName="role" [class.invalid]="isFieldInvalid('role')">
                             <option value="">Select Role</option>
-                            <option *ngFor="let role of roles" [value]="role.value"
-                                [selected]="role.value === userForm.get('role')?.value">
+                            <option *ngFor="let role of roles" [value]="role.value">
                                 {{ role.label }}
                             </option>
                         </select>
@@ -59,11 +60,6 @@
                         <span *ngIf="isFieldInvalid('role')" class="error-message">
                             {{ getFieldError('role') }}
                         </span>
-                        <small class="form-text"
-                            *ngIf="userForm.get('role')?.disabled && !showOrganizationField && !isEditMode"
-                            style="color: #fbbf24;">
-                            Please select an organization first
-                        </small>
                         <small class="form-text" *ngIf="isEditMode && isAdminRole" style="color: #fbbf24;">
                             🔒 Role is locked for admin users
                         </small>

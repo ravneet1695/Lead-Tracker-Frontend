@@ -84,10 +84,23 @@
                     <td>{{ user.email }}</td>
                     <td>{{ user.mobile }}</td>
                     <td>
-                        <span class="role-badge" [class]="'role-' + getRoleName(user.role)">{{
-                            getRoleDisplayLabel(user.role) }}</span>
+                        <!-- System roles: Red badge -->
+                        <span *ngIf="isSystemRole(user.role)" class="role-badge"
+                            [class]="'role-' + getRoleName(user.role)">
+                            {{ getRoleDisplayLabel(user.role) }}
+                        </span>
+                        <!-- Custom roles: Colored pill -->
+                        <span *ngIf="!isSystemRole(user.role)" class="role-pill"
+                            [style.background-color]="getRoleColor(user.role)" [style.color]="'#1a1d2e'">
+                            {{ getRoleDisplayLabel(user.role) }}
+                        </span>
                     </td>
-                    <td *ngIf="shouldShowOrganizationColumn()">{{ getOrganizationName(user.organization) }}</td>
+                    <td *ngIf="shouldShowOrganizationColumn()">
+                        <span class="org-pill" [style.background-color]="getOrganizationColor(user.organization)"
+                            [style.color]="'white'">
+                            {{ getOrganizationName(user.organization) }}
+                        </span>
+                    </td>
                     <td>
                         <span class="status-badge" [class]="'status-' + user.status">{{ user.status }}</span>
                     </td>

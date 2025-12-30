@@ -26,12 +26,15 @@ export class UserFormComponent implements OnInit {
 
     // Dropdown options
     organizations: any[] = [];
-    showOrganizationField = false;
     roles: { value: string; label: string }[] = [];
     statuses = [
         { value: 'active', label: 'Active' },
         { value: 'inactive', label: 'Inactive' }
     ];
+
+    // User type flags
+    isSuperAdmin = false;
+    isOrgAdmin = false;
 
     // Track if current user being edited has admin role
     isAdminRole = false;
@@ -45,23 +48,19 @@ export class UserFormComponent implements OnInit {
         private roleService: RoleService,
         private router: Router,
         private route: ActivatedRoute,
-        private cdr: ChangeDetectorRef  // For manual change detection
+        private cdr: ChangeDetectorRef
     ) { }
 
     ngOnInit(): void {
-        this.checkCurrentUserRole();
+        this.determineUserType();
         this.initializeForm();
-        this.loadRoles();
-        this.loadOrganizations();
         this.checkEditMode();
     }
 
-    checkCurrentUserRole(): void {
+    determineUserType(): void {
         const currentUser = this.authService.currentUserValue;
-        if (!currentUser) return;
-
-        // Show organization field if user can manage organizations
-        this.showOrganizationField = this.authService.hasPermission('organizations.read');
+        this.isSuperAdmin = this.authService.hasPermission('organizations.read');
+        this.isOrgAdmin = !this.isSuperAdmin && !!currentUser?.organization;
     }
 
     initializeForm(): void {
@@ -72,133 +71,51 @@ export class UserFormComponent implements OnInit {
             email: ['', [Validators.required, Validators.email]],
             mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
             password: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(8)]],
-            role: ['sales', [Validators.required]],
+            role: ['', [Validators.required]],
             organization: [''],
             status: ['active', [Validators.required]]
         });
 
-        // Listen to role changes to handle organization field requirement
-        this.userForm.get('role')?.valueChanges.subscribe(role => {
-            this.onRoleChange(role);
-        });
-
-        // Listen to organization changes to reload roles and enable/disable role dropdown
-        this.userForm.get('organization')?.valueChanges.subscribe(orgId => {
-            const roleControl = this.userForm.get('role');
-
-            if (orgId) {
-                // Enable role dropdown and load filtered roles
-                roleControl?.enable({ emitEvent: false });
-                this.loadRolesByOrganization(orgId);
-
-                // Regenerate user code for the new organization (only in create mode)
-                if (!this.isEditMode) {
-                    this.fetchNextUserCode();
+        // Setup organization change listener for Super Admin
+        if (this.isSuperAdmin) {
+            this.userForm.get('organization')?.valueChanges.subscribe(orgId => {
+                if (orgId && !this.isEditMode) {
+                    this.onOrganizationSelected(orgId);
                 }
-            } else {
-                // Disable role dropdown and clear selection
-                roleControl?.disable({ emitEvent: false });
-                roleControl?.setValue('', { emitEvent: false });
-                this.loadRoles();
-            }
-        });
+            });
+        }
 
-        // Initialize role dropdown state based on organization field visibility
-        // Skip this logic in edit mode - loadUser() will handle role field state
-        if (this.showOrganizationField && !this.isEditMode) {
-            const orgValue = this.userForm.get('organization')?.value;
-            if (!orgValue) {
-                this.userForm.get('role')?.disable();
-            }
-        } else if (!this.showOrganizationField && !this.isEditMode) {
-            // For non-Super Admin users, auto-populate organization and load roles
+        // Setup for Org Admin (auto-populate organization)
+        if (this.isOrgAdmin && !this.isEditMode) {
             const user = this.authService.currentUserValue;
             if (user?.organization) {
                 const orgId = typeof user.organization === 'object'
                     ? (user.organization as any)._id
                     : user.organization;
 
-                // Set organization value
-                this.userForm.patchValue({ organization: orgId });
-
-                // Enable role dropdown and load roles for this organization
-                this.userForm.get('role')?.enable({ emitEvent: false });
-                this.loadRolesByOrganization(orgId);
+                this.userForm.patchValue({ organization: orgId }, { emitEvent: false });
+                this.onOrganizationSelected(orgId);
             }
         }
 
-        // Fetch next user code if not in edit mode
-        if (!this.isEditMode) {
-            this.fetchNextUserCode();
+        // Load organizations for Super Admin
+        if (this.isSuperAdmin) {
+            this.loadOrganizations();
         }
     }
 
-    loadRoles(): void {
-        this.roleService.getRoles().subscribe({
-            next: (response) => {
-                this.roles = response.roles.map(r => ({
-                    value: r._id,
-                    label: r.label
-                }));
-            },
-            error: (error) => {
-                console.error('Error loading roles:', error);
-            }
-        });
-    }
+    onOrganizationSelected(organizationId: string): void {
+        // Load roles for the selected organization
+        this.loadRolesForOrganization(organizationId);
 
-    loadRolesByOrganization(organizationId: string): void {
-        if (!organizationId) {
-            this.loadRoles();
-            return;
-        }
-
-        this.roleService.getRolesByOrganization(organizationId).subscribe({
-            next: (response) => {
-                this.roles = response.roles.map(r => ({
-                    value: r._id,
-                    label: r.label
-                }));
-
-                // Reset role selection when organization changes (except in edit mode)
-                if (!this.isEditMode) {
-                    this.userForm.patchValue({ role: '' }, { emitEvent: false });
-                }
-
-                this.cdr.markForCheck();  // Trigger change detection for OnPush
-            },
-            error: (error) => {
-                console.error('Error loading roles for organization:', error);
-                // Fallback to loading all roles if organization-specific fetch fails
-                this.loadRoles();
-            }
-        });
-    }
-
-    onRoleChange(roleId: string): void {
-        // Organization field validation is handled by form logic
-        // All roles can have organizations assigned
-        const orgControl = this.userForm.get('organization');
-        if (this.showOrganizationField) {
-            orgControl?.setValidators([Validators.required]);
-        } else {
-            orgControl?.clearValidators();
-        }
-        orgControl?.updateValueAndValidity();
+        // Generate user code for the organization
+        this.generateUserCode(organizationId);
     }
 
     loadOrganizations(): void {
-        // Only load organizations if user needs to see the organization dropdown
-        // In edit mode, organization is populated from backend, so no need to load all orgs
-        if (!this.showOrganizationField) {
-            return;
-        }
-
         this.organizationService.getOrganizations().subscribe({
             next: (response) => {
                 this.organizations = response.organizations || [];
-                // Call after organizations are loaded to ensure dropdown is populated
-                this.handleOrganizationFieldByRole();
             },
             error: (error) => {
                 console.error('Error loading organizations:', error);
@@ -206,45 +123,50 @@ export class UserFormComponent implements OnInit {
         });
     }
 
-    fetchNextUserCode(): void {
-        // Get organization from form or current user
-        let organizationId = this.userForm.get('organization')?.value;
+    loadRolesForOrganization(organizationId: string, onComplete?: () => void): void {
+        this.roleService.getRolesByOrganization(organizationId).subscribe({
+            next: (response) => {
+                let roles = response.roles || [];
 
-        // If no organization in form, try to get from current user
-        if (!organizationId && this.authService.currentUserValue?.organization) {
-            const userOrg = this.authService.currentUserValue.organization;
-            organizationId = typeof userOrg === 'object' ? (userOrg as any)._id : userOrg;
-        }
+                // Filter out admin roles for non-super-admin users
+                if (!this.isSuperAdmin) {
+                    roles = roles.filter(r => r.name !== 'super_admin' && r.name !== 'org_admin');
+                }
 
+                this.roles = roles.map(r => ({
+                    value: r._id,
+                    label: r.label
+                }));
+
+                this.cdr.markForCheck();
+
+                // Execute callback if provided
+                if (onComplete) {
+                    onComplete();
+                }
+            },
+            error: (error) => {
+                console.error('Error loading roles:', error);
+                this.roles = [];
+            }
+        });
+    }
+
+    generateUserCode(organizationId?: string): void {
         this.userService.getNextUserCode(organizationId).subscribe({
             next: (response: any) => {
                 this.userForm.patchValue({ code: response.code });
             },
             error: (error: any) => {
-                console.error('Error fetching next user code:', error);
+                console.error('Error fetching user code:', error);
             }
         });
-    }
-
-    handleOrganizationFieldByRole(): void {
-        const currentUser = this.authService.currentUserValue;
-        if (!currentUser) return;
-
-        const orgControl = this.userForm.get('organization');
-
-        // If user doesn't have permission to view all organizations,
-        // auto-select their organization and disable field
-        if (!this.authService.hasPermission('organizations.read') && (currentUser as any).organization) {
-            orgControl?.setValue((currentUser as any).organization);
-            orgControl?.disable();
-        }
     }
 
     checkEditMode(): void {
         this.userId = this.route.snapshot.paramMap.get('id');
         if (this.userId) {
             this.isEditMode = true;
-            // Remove password requirement for edit mode
             this.userForm.get('password')?.clearValidators();
             this.userForm.get('password')?.updateValueAndValidity();
             this.loadUser();
@@ -259,16 +181,14 @@ export class UserFormComponent implements OnInit {
             next: (response) => {
                 if (response.user) {
                     const user = response.user;
-                    // Split name into first and last name
                     const nameParts = user.name.split(' ');
                     const firstName = nameParts[0] || '';
                     const lastName = nameParts.slice(1).join(' ') || '';
 
-                    // Extract IDs from objects if they are populated
                     const roleId = typeof user.role === 'object' && user.role ? (user.role as any)._id : user.role;
                     const orgId = typeof user.organization === 'object' && user.organization ? (user.organization as any)._id : user.organization;
 
-                    // Patch form values (except role - will be patched after roles load)
+                    // Patch basic fields
                     this.userForm.patchValue({
                         code: user.code,
                         firstName: firstName,
@@ -279,57 +199,23 @@ export class UserFormComponent implements OnInit {
                         status: user.status
                     });
 
-                    // Enable role dropdown initially in edit mode
-                    this.userForm.get('role')?.enable({ emitEvent: false });
-
-                    // Load roles for user's organization, then patch role value
+                    // Load roles for the user's organization, then set role
                     if (orgId) {
-                        this.roleService.getRolesByOrganization(orgId).subscribe({
-                            next: (rolesResponse) => {
-                                this.roles = rolesResponse.roles.map(r => ({
-                                    value: r._id,
-                                    label: r.label
-                                }));
+                        this.loadRolesForOrganization(orgId, () => {
+                            // Set role after roles are loaded
+                            this.userForm.patchValue({ role: roleId });
 
-                                // NOW patch the role value after options are loaded
-                                this.userForm.patchValue({ role: roleId });
-
-                                // Check if role should be disabled (only for super_admin and org_admin)
-                                if (user.role && typeof user.role === 'object') {
-                                    const roleName = (user.role as any).name;
-                                    const roleLabel = (user.role as any).label;
-                                    if (roleName === 'super_admin' || roleName === 'org_admin') {
-                                        this.isAdminRole = true;
-                                        this.currentRoleLabel = roleLabel;
-                                        this.userForm.get('role')?.disable();
-                                    }
+                            // Check if role should be disabled (admin roles)
+                            if (user.role && typeof user.role === 'object') {
+                                const roleName = (user.role as any).name;
+                                const roleLabel = (user.role as any).label;
+                                if (roleName === 'super_admin' || roleName === 'org_admin') {
+                                    this.isAdminRole = true;
+                                    this.currentRoleLabel = roleLabel;
+                                    this.userForm.get('role')?.disable();
                                 }
-
-                                this.cdr.markForCheck();
-                            },
-                            error: (error) => {
-                                console.error('Error loading roles:', error);
-                                // Fallback to all roles
-                                this.loadRoles();
-                                this.userForm.patchValue({ role: roleId });
-                                this.cdr.markForCheck();
                             }
                         });
-                    } else {
-                        // For users without organization (Super Admin), load all roles
-                        this.loadRoles();
-                        this.userForm.patchValue({ role: roleId });
-
-                        // Check if role should be disabled
-                        if (user.role && typeof user.role === 'object') {
-                            const roleName = (user.role as any).name;
-                            const roleLabel = (user.role as any).label;
-                            if (roleName === 'super_admin' || roleName === 'org_admin') {
-                                this.isAdminRole = true;
-                                this.currentRoleLabel = roleLabel;
-                                this.userForm.get('role')?.disable();
-                            }
-                        }
                     }
 
                     // Disable organization field in edit mode
@@ -358,10 +244,8 @@ export class UserFormComponent implements OnInit {
         }
 
         this.submitting = true;
-        // Use getRawValue() to include disabled fields
         const formData = this.userForm.getRawValue();
 
-        // Combine firstName and lastName into name
         const userData = {
             ...formData,
             name: `${formData.firstName} ${formData.lastName}`.trim()
@@ -369,15 +253,10 @@ export class UserFormComponent implements OnInit {
         delete userData.firstName;
         delete userData.lastName;
 
-        // Remove password if empty in edit mode
         if (this.isEditMode && !userData.password) {
             delete userData.password;
         }
 
-        // Organization is optional for all roles now
-        // Backend will handle organization assignment logic
-
-        // Create FormData for file upload
         const formDataToSend = new FormData();
         Object.keys(userData).forEach(key => {
             if (userData[key] !== null && userData[key] !== undefined) {
@@ -385,7 +264,6 @@ export class UserFormComponent implements OnInit {
             }
         });
 
-        // Add profile image if selected
         if (this.selectedFile) {
             formDataToSend.append('profileImage', this.selectedFile);
         }
@@ -474,7 +352,6 @@ export class UserFormComponent implements OnInit {
     onlyLettersAndSpaces(event: KeyboardEvent): boolean {
         const charCode = event.which || event.keyCode;
         const char = String.fromCharCode(charCode);
-        // Allow letters (a-z, A-Z) and space
         if (!/^[a-zA-Z\s]$/.test(char)) {
             event.preventDefault();
             return false;
@@ -485,7 +362,6 @@ export class UserFormComponent implements OnInit {
     onlyNumbers(event: KeyboardEvent): boolean {
         const charCode = event.which || event.keyCode;
         const char = String.fromCharCode(charCode);
-        // Allow only digits (0-9)
         if (!/^[0-9]$/.test(char)) {
             event.preventDefault();
             return false;
@@ -496,7 +372,6 @@ export class UserFormComponent implements OnInit {
     onFileSelected(event: any): void {
         const file = event.target.files[0];
         if (file) {
-            // Validate file type
             const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
             if (!allowedTypes.includes(file.type)) {
                 Swal.fire({
@@ -507,7 +382,6 @@ export class UserFormComponent implements OnInit {
                 return;
             }
 
-            // Validate file size (5MB)
             if (file.size > 5 * 1024 * 1024) {
                 Swal.fire({
                     icon: 'error',
@@ -519,7 +393,6 @@ export class UserFormComponent implements OnInit {
 
             this.selectedFile = file;
 
-            // Create image preview
             const reader = new FileReader();
             reader.onload = (e: any) => {
                 this.imagePreview = e.target.result;
