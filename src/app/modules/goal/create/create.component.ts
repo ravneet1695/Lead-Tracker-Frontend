@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { GoalService } from '../../../services/goal.service';
 import { GroupService } from '../../../services/group.service';
+import { OrganizationService } from '../../../services/organization.service';
 import { AuthService } from '../../../services/auth.service';
 import Swal from 'sweetalert2';
 
@@ -58,11 +59,13 @@ interface ArraySubField {
 export class GoalCreateComponent implements OnInit {
     goalForm!: FormGroup;
     groups: any[] = [];
+    organizations: any[] = [];
     formFields: FormField[] = [];
     selectedFieldIndex: number | null = null;
     selectedColumn: number = 0;  // Track selected column for table mode
     loading = false;
     submitting = false;
+    isSuperAdmin = false;
 
     fieldTypes = [
         { value: 'text', label: 'Text', icon: '📝' },
@@ -85,29 +88,36 @@ export class GoalCreateComponent implements OnInit {
         private fb: FormBuilder,
         private goalService: GoalService,
         private groupService: GroupService,
+        private organizationService: OrganizationService,
         private authService: AuthService,
         private router: Router
     ) { }
 
     ngOnInit(): void {
+        this.checkUserRole();
         this.initializeForm();
+        this.loadOrganizations();
         this.loadGroups();
+    }
+
+    checkUserRole(): void {
+        this.isSuperAdmin = this.authService.hasPermission('organizations.read');
     }
 
     initializeForm(): void {
         this.goalForm = this.fb.group({
+            organization: [''],
             title: ['', [Validators.required, Validators.minLength(3)]],
-            description: [''],
-            target: [null],
             completionStatus: ['Approved'], // Status that indicates lead counts toward goal
-            startDate: [''],
-            endDate: [''],
-            status: ['active'],
-            groups: [[], Validators.required],
-            pointsEntryCreation: [10],
-            pointsStatusUpdate: [5],
-            pointsFieldCompletion: [2]
+            startDate: ['', Validators.required],
+            endDate: ['', Validators.required],
+            groups: [[], Validators.required]
         });
+
+        // Make organization required for Super Admins
+        if (this.isSuperAdmin) {
+            this.goalForm.get('organization')?.setValidators([Validators.required]);
+        }
     }
 
     loadGroups(): void {
@@ -427,8 +437,6 @@ export class GoalCreateComponent implements OnInit {
 
         const goalData = {
             title: formValue.title,
-            description: formValue.description,
-            target: formValue.target,
             completionStatus: formValue.completionStatus || 'Approved',
             timeline: {
                 startDate: formValue.startDate || null,
@@ -436,13 +444,7 @@ export class GoalCreateComponent implements OnInit {
             },
             groups: formValue.groups,
             formSchema: this.formFields,
-            statusOptions: this.statusOptions,
-            pointsConfig: {
-                entryCreation: formValue.pointsEntryCreation,
-                statusUpdate: formValue.pointsStatusUpdate,
-                fieldCompletion: formValue.pointsFieldCompletion
-            },
-            status: formValue.status
+            statusOptions: this.statusOptions
         };
 
         this.submitting = true;
@@ -488,5 +490,25 @@ export class GoalCreateComponent implements OnInit {
             return this.formFields[this.selectedFieldIndex]?.arrayFields;
         }
         return undefined;
+    }
+
+    loadOrganizations(): void {
+        if (!this.isSuperAdmin) {
+            return;
+        }
+
+        this.organizationService.getOrganizations().subscribe({
+            next: (response) => {
+                this.organizations = response.organizations || [];
+            },
+            error: (error) => {
+                console.error('Error loading organizations:', error);
+            }
+        });
+    }
+
+    isFieldInvalid(fieldName: string): boolean {
+        const field = this.goalForm.get(fieldName);
+        return !!(field && field.invalid && (field.dirty || field.touched));
     }
 }

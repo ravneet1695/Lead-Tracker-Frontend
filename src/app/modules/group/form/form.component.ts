@@ -59,6 +59,12 @@ export class GroupFormComponent implements OnInit {
             isActive: [true]
         });
 
+        // For Super Admin in create mode, make organization required
+        if (this.showOrganizationField && !this.isEditMode) {
+            this.groupForm.get('organization')?.setValidators([Validators.required]);
+            this.groupForm.get('organization')?.updateValueAndValidity();
+        }
+
         // For non-Super Admin users, auto-populate organization
         if (!this.showOrganizationField) {
             const user = this.authService.currentUserValue;
@@ -74,10 +80,18 @@ export class GroupFormComponent implements OnInit {
         this.groupForm.get('organization')?.valueChanges.subscribe(orgId => {
             if (orgId) {
                 this.loadUsersByOrganization(orgId);
-                // Fetch new code for the selected organization (for Super Admin)
-                if (this.showOrganizationField && !this.isEditMode) {
+                // Fetch new code for the selected organization
+                if (!this.isEditMode) {
                     this.fetchNextGroupCodeForOrganization(orgId);
                 }
+            } else {
+                // Clear users and code when organization is deselected
+                this.users = [];
+                this.groupForm.patchValue({
+                    code: '',
+                    users: [],
+                    managers: []
+                });
             }
         });
     }
@@ -89,26 +103,28 @@ export class GroupFormComponent implements OnInit {
         if (this.isEditMode && this.groupId) {
             this.loadGroup(this.groupId);
         } else {
-            this.fetchNextGroupCode();
+            // Only fetch code for non-Super Admin (Org Admin)
+            // Super Admin must select organization first
+            if (!this.showOrganizationField) {
+                this.fetchNextGroupCode();
+            }
         }
     }
 
     fetchNextGroupCode(): void {
+        // This is only called for Org Admin (non-Super Admin)
         this.groupService.getNextGroupCode().subscribe({
             next: (response) => {
                 this.groupForm.patchValue({ code: response.code });
             },
             error: (error) => {
                 console.error('Error fetching next code:', error);
-                // Fallback to GRP0001 if API fails
-                this.groupForm.patchValue({ code: 'GRP0001' });
-
-                // Show error to user if it's a permission issue
+                // Show error to user
                 if (error.status === 403 || error.status === 400) {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Code Generation Issue',
-                        text: error.error?.message || 'Using default code GRP0001. Please update if needed.',
+                        text: error.error?.message || 'Failed to generate group code. Please contact administrator.',
                         timer: 3000
                     });
                 }

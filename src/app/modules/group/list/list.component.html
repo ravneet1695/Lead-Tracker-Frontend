@@ -30,16 +30,16 @@
                 (input)="applyFilters()">
         </div>
 
-        <select class="filter-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
-            <option value="">All status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-        </select>
-
         <select class="filter-select" [(ngModel)]="organizationFilter" (change)="onFilterChange()"
             *ngIf="canViewAllOrganizations()">
             <option value="all">All organizations</option>
             <option *ngFor="let org of organizations" [value]="org._id">{{ org.name }}</option>
+        </select>
+
+        <select class="filter-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+            <option value="">All status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
         </select>
     </div>
 
