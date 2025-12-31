@@ -335,6 +335,26 @@
                                                     <button type="button" class="btn-sub-delete"
                                                         (click)="removeFieldFromArray(selectedFieldIndex, idx)">×</button>
                                                 </div>
+
+                                                <!-- Subfield Dropdown Options -->
+                                                <div class="sub-field-options"
+                                                    *ngIf="subfield.fieldType === 'dropdown'">
+                                                    <div class="options-manager mini">
+                                                        <div *ngFor="let option of subfield.options; let optIdx = index"
+                                                            class="option-row">
+                                                            <input type="text" class="form-control mini"
+                                                                [value]="option"
+                                                                (input)="updateArraySubfieldOption(selectedFieldIndex, idx, optIdx, $any($event.target).value)"
+                                                                placeholder="Option {{ optIdx + 1 }}">
+                                                            <button type="button" class="btn-icon-remove mini"
+                                                                (click)="removeArraySubfieldOption(selectedFieldIndex, idx, optIdx)">×</button>
+                                                        </div>
+                                                        <button type="button" class="btn-add-item mini"
+                                                            (click)="addArraySubfieldOption(selectedFieldIndex, idx)">
+                                                            + Add Option
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

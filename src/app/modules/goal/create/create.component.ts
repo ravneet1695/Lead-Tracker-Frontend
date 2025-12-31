@@ -97,7 +97,23 @@ export class GoalCreateComponent implements OnInit {
         this.checkUserRole();
         this.initializeForm();
         this.loadOrganizations();
-        this.loadGroups();
+
+        // Load groups immediately for regular users who can't select organization
+        if (!this.isSuperAdmin) {
+            this.loadGroups();
+        }
+
+        // Listen for organization changes for Super Admins
+        if (this.isSuperAdmin) {
+            this.goalForm.get('organization')?.valueChanges.subscribe(orgId => {
+                if (orgId) {
+                    this.loadGroups(orgId);
+                } else {
+                    this.groups = [];
+                    this.goalForm.patchValue({ groups: [] });
+                }
+            });
+        }
     }
 
     checkUserRole(): void {
@@ -120,11 +136,20 @@ export class GoalCreateComponent implements OnInit {
         }
     }
 
-    loadGroups(): void {
+    loadGroups(organizationId?: string): void {
         this.loading = true;
-        this.groupService.getGroups().subscribe({
+
+        // Prepare params
+        const params: any = {};
+        if (organizationId) {
+            params.organization = organizationId;
+        }
+
+        this.groupService.getGroups(params).subscribe({
             next: (response) => {
                 this.groups = response.groups || [];
+                // Clear selected groups when reloading
+                this.goalForm.patchValue({ groups: [] });
                 this.loading = false;
             },
             error: (error) => {
@@ -265,6 +290,31 @@ export class GoalCreateComponent implements OnInit {
         const field = this.formFields[fieldIndex];
         if (field.options) {
             field.options[optionIndex] = value;
+        }
+    }
+
+    // Array Subfield Option Management
+    addArraySubfieldOption(arrayFieldIndex: number, subFieldIndex: number): void {
+        const field = this.formFields[arrayFieldIndex];
+        if (field.fieldType === 'formArray' && field.arrayFields) {
+            if (!field.arrayFields[subFieldIndex].options) {
+                field.arrayFields[subFieldIndex].options = [];
+            }
+            field.arrayFields[subFieldIndex].options?.push(`Option ${field.arrayFields[subFieldIndex].options!.length + 1}`);
+        }
+    }
+
+    updateArraySubfieldOption(arrayFieldIndex: number, subFieldIndex: number, optionIndex: number, value: string): void {
+        const field = this.formFields[arrayFieldIndex];
+        if (field.fieldType === 'formArray' && field.arrayFields && field.arrayFields[subFieldIndex].options) {
+            field.arrayFields[subFieldIndex].options![optionIndex] = value;
+        }
+    }
+
+    removeArraySubfieldOption(arrayFieldIndex: number, subFieldIndex: number, optionIndex: number): void {
+        const field = this.formFields[arrayFieldIndex];
+        if (field.fieldType === 'formArray' && field.arrayFields && field.arrayFields[subFieldIndex].options) {
+            field.arrayFields[subFieldIndex].options!.splice(optionIndex, 1);
         }
     }
 

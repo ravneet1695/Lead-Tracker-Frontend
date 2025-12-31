@@ -645,6 +645,31 @@
     border-style: solid;
 }
 
+/* Mini Options Manager (for Form Array) */
+.options-manager.mini {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.form-control.mini {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    height: auto;
+}
+
+.btn-icon-remove.mini {
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
+}
+
+.btn-add-item.mini {
+    font-size: 0.75rem;
+    padding: 8px 12px;
+}
+
 
 /* Switches */
 .switch-label {
