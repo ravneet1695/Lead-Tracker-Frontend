@@ -1478,3 +1478,54 @@ h6 {
     font-size: 1.25rem;
   }
 }
+/* ============================================
+   LIGHT THEME CONTAINER BORDERS
+   ============================================ */
+
+/* Main page containers */
+body.light-theme .goals-container,
+body.light-theme .users-container,
+body.light-theme .groups-container,
+body.light-theme .organizations-container,
+body.light-theme .roles-container,
+body.light-theme .audit-logs-container,
+body.light-theme .my-leads-container,
+body.light-theme .dashboard-container,
+body.light-theme .create-lead-container,
+body.light-theme .edit-lead-container {
+  border: 2px solid rgba(0, 76, 143, 0.15) !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  padding: 0 !important;
+}
+
+/* Filter containers */
+body.light-theme .filters-container,
+body.light-theme .filters-section {
+  border: 1px solid rgba(0, 76, 143, 0.25) !important;
+  background: #ffffff !important;
+}
+
+/* Table wrappers */
+body.light-theme .table-wrapper,
+body.light-theme .table-container {
+  border: 1px solid rgba(0, 76, 143, 0.25) !important;
+  background: #ffffff !important;
+}
+
+/* Cards */
+body.light-theme .card,
+body.light-theme .stat-card,
+body.light-theme .metric-card,
+body.light-theme .dashboard-card,
+body.light-theme .lead-card {
+  border: 1px solid rgba(0, 76, 143, 0.25) !important;
+  background: #ffffff !important;
+}
+
+/* Form sections */
+body.light-theme .form-section,
+body.light-theme .form-group {
+  border: 1px solid rgba(0, 76, 143, 0.2) !important;
+  background: #ffffff !important;
+}
