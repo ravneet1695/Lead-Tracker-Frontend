@@ -169,13 +169,13 @@
 .nav-icon svg {
     width: 20px;
     height: 20px;
-    stroke: currentColor;
+    stroke: rgba(255, 255, 255, 0.7); fill: none; stroke-width: 2;
 }
 
 .nav-icon::ng-deep svg {
     width: 20px;
     height: 20px;
-    stroke: currentColor;
+    stroke: rgba(255, 255, 255, 0.7); fill: none; stroke-width: 2;
 }
 
 .nav-label {
@@ -235,4 +235,12 @@
     .toggle-btn {
         display: none;
     }
+}
+/* Explicit icon visibility for hover and active states */
+.nav-item:hover .nav-icon svg {
+    stroke: #ffffff;
+}
+
+.nav-item.active .nav-icon svg {
+    stroke: #004C8F;
 }
