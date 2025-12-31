@@ -194,7 +194,7 @@
 }
 
 .users-table tbody tr:hover {
-    background-color: var(--darker-bg);
+    background-color: var(--table-row-hover);
 }
 
 .users-table td {
@@ -225,7 +225,7 @@
 
 .user-name {
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .user-code {
@@ -362,7 +362,7 @@
 
 .empty-state h3 {
     font-size: 1.5rem;
-    color: #f1f5f9;
+    color: var(--text-primary);
     margin: 0 0 12px 0;
 }
 
