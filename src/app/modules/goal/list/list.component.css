@@ -65,12 +65,12 @@
 
 /* Filters Container - All in One Row */
 .filters-container {
-    background: #1a1d2e;
+    background: var(--card-bg);
     padding: 16px 24px;
     display: flex;
     align-items: center;
     gap: 16px;
-    border-bottom: 1px solid #2d3142;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .search-section,
@@ -92,39 +92,39 @@
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8;
+    color: var(--text-secondary);
     pointer-events: none;
 }
 
 .search-input {
     width: 100%;
     padding: 12px 14px 12px 42px;
-    background: #0f1117;
-    border: 1px solid #2d3142;
+    background: var(--darker-bg);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-size: 0.95rem;
     transition: all 0.3s ease;
 }
 
 .search-input:focus {
     outline: none;
-    background: #0f1117;
+    background: var(--darker-bg);
     border-color: #004C8F;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .search-input::placeholder {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .filter-select {
     min-width: 180px;
     padding: 12px 14px;
-    background: #0f1117;
-    border: 1px solid #2d3142;
+    background: var(--darker-bg);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -132,7 +132,7 @@
 
 .filter-select:focus {
     outline: none;
-    background: #0f1117;
+    background: var(--darker-bg);
     border-color: #004C8F;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -146,7 +146,7 @@
 .loading-container {
     text-align: center;
     padding: 80px 20px;
-    background: #1a1d2e;
+    background: var(--card-bg);
 }
 
 .spinner {
@@ -167,7 +167,7 @@
 
 /* Table Wrapper */
 .table-wrapper {
-    background: #1a1d2e;
+    background: var(--card-bg);
     overflow-x: auto;
 }
 
@@ -175,12 +175,12 @@
 .goals-table {
     width: 100%;
     border-collapse: collapse;
-    background: #1a1d2e;
+    background: var(--card-bg);
 }
 
 .goals-table thead {
-    background: #0f1117;
-    border-bottom: 2px solid #2d3142;
+    background: var(--darker-bg);
+    border-bottom: 2px solid var(--border-color);
 }
 
 .goals-table th {
@@ -190,11 +190,11 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 .goals-table tbody tr {
-    border-bottom: 1px solid #2d3142;
+    border-bottom: 1px solid var(--border-color);
     transition: all 0.2s ease;
 }
 
@@ -204,7 +204,7 @@
 
 .goals-table td {
     padding: 16px 20px;
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-size: 0.95rem;
 }
 
@@ -223,7 +223,7 @@
 
 /* Goal Description */
 .goal-description {
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 0.875rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -254,7 +254,7 @@
 
 .group-more {
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-style: italic;
 }
 
@@ -287,7 +287,7 @@
 }
 
 .timeline-cell small {
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 0.75rem;
 }
 
@@ -328,7 +328,7 @@
 .btn-action {
     padding: 8px;
     background: transparent;
-    border: 1px solid #2d3142;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -371,23 +371,23 @@
 .empty-state {
     text-align: center;
     padding: 80px 20px;
-    background: #1a1d2e;
+    background: var(--card-bg);
     border-radius: 0 0 12px 12px;
 }
 
 .empty-state svg {
-    color: #64748b;
+    color: var(--text-muted);
     margin-bottom: 20px;
 }
 
 .empty-state p {
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 1rem;
     margin: 0 0 24px 0;
 }
 
 .empty-state h3 {
-    color: #e2e8f0;
+    color: var(--text-primary);
     margin-bottom: 12px;
 }
 

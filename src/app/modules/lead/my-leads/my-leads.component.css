@@ -81,14 +81,14 @@
 
 /* Filters Container (matching User Management) */
 .filters-container {
-  background: #1a1d2e;
+  background: var(--card-bg);
   padding: 16px 24px;
   /* Reduced from 24px 32px */
   display: flex;
   align-items: center;
   gap: 16px;
   /* Reduced from 20px */
-  border-bottom: 1px solid #2d3142;
+  border-bottom: 1px solid var(--border-color);
   border-radius: 0 0 10px 10px;
   /* Reduced from 12px */
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
@@ -108,39 +108,39 @@
   left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: var(--text-secondary);
   pointer-events: none;
 }
 
 .search-input {
   width: 100%;
   padding: 12px 14px 12px 42px;
-  background: #0f1117;
-  border: 1px solid #2d3142;
+  background: var(--darker-bg);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  color: #e2e8f0;
+  color: var(--text-primary);
   font-size: 0.95rem;
   transition: all 0.3s ease;
 }
 
 .search-input:focus {
   outline: none;
-  background: #0f1117;
+  background: var(--darker-bg);
   border-color: #004C8F;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .search-input::placeholder {
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .filter-select {
   min-width: 180px;
   padding: 12px 14px;
-  background: #0f1117;
-  border: 1px solid #2d3142;
+  background: var(--darker-bg);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  color: #e2e8f0;
+  color: var(--text-primary);
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -148,7 +148,7 @@
 
 .filter-select:focus {
   outline: none;
-  background: #0f1117;
+  background: var(--darker-bg);
   border-color: #004C8F;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -178,7 +178,7 @@
 .loading-state {
   text-align: center;
   padding: 80px 20px;
-  background: #1a1d2e;
+  background: var(--card-bg);
   border-radius: 0 0 12px 12px;
 }
 
@@ -209,7 +209,7 @@
 }
 
 .loading-text {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 1rem;
 }
 
@@ -217,7 +217,7 @@
 .empty-state {
   text-align: center;
   padding: 80px 20px;
-  background: #1a1d2e;
+  background: var(--card-bg);
   border-radius: 0 0 12px 12px;
 }
 
@@ -227,14 +227,14 @@
 }
 
 .empty-state p {
-  color: #94a3b8;
+  color: var(--text-secondary);
   margin: 0;
   font-size: 1rem;
 }
 
 /* Accordion Container */
 .accordion-container {
-  background: #1a1d2e;
+  background: var(--card-bg);
   border-radius: 0 0 12px 12px;
   padding: 0;
 }
@@ -244,8 +244,8 @@
   margin-bottom: 16px;
   border-radius: 12px;
   overflow: hidden;
-  background: #0f1117;
-  border: 1px solid #2d3142;
+  background: var(--darker-bg);
+  border: 1px solid var(--border-color);
   transition: all 0.3s ease;
 }
 
@@ -326,7 +326,7 @@
   font-size: 1.1rem;
   font-weight: 600;
   margin: 0 0 6px 0;
-  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  background: linear-gradient(135deg, var(--text-primary) 0%, #cbd5e1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -345,7 +345,7 @@
   align-items: center;
   gap: 5px;
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -451,13 +451,13 @@
   transform: translate(-50%, -50%);
   font-size: 0.95rem;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-primary);
 }
 
 /* Expand Icon - Sleeker */
 .expand-icon {
   transition: transform 0.3s ease;
-  color: #94a3b8;
+  color: var(--text-secondary);
   opacity: 0.7;
 }
 
@@ -481,7 +481,7 @@
 .no-leads-message {
   text-align: center;
   padding: 40px 20px;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 .no-leads-message p {
@@ -618,14 +618,14 @@
 
 .detail-label {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
 }
 
 .detail-value {
-  color: #e2e8f0;
+  color: var(--text-primary);
   font-weight: 500;
   font-size: 0.9rem;
 }
@@ -716,7 +716,7 @@
 
 .btn-secondary {
   background: rgba(255, 255, 255, 0.1);
-  color: #e2e8f0;
+  color: var(--text-primary);
   border: 1px solid rgba(102, 126, 234, 0.2);
 }
 

@@ -68,13 +68,13 @@
 
 /* Filters Container - All in One Row */
 .filters-container {
-    background: #1a1d2e;
+    background: var(--card-bg);
     padding: 16px 24px;
     /* Reduced from 24px 32px */
     display: flex;
     align-items: center;
     gap: 16px;
-    border-bottom: 1px solid #2d3142;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .search-box {
@@ -88,39 +88,39 @@
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8;
+    color: var(--text-secondary);
     pointer-events: none;
 }
 
 .search-input {
     width: 100%;
     padding: 12px 14px 12px 42px;
-    background: #0f1117;
-    border: 1px solid #2d3142;
+    background: var(--darker-bg);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-size: 0.95rem;
     transition: all 0.3s ease;
 }
 
 .search-input:focus {
     outline: none;
-    background: #0f1117;
+    background: var(--darker-bg);
     border-color: #004C8F;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .search-input::placeholder {
-    color: #64748b;
+    color: var(--text-muted);
 }
 
 .filter-select {
     min-width: 180px;
     padding: 12px 14px;
-    background: #0f1117;
-    border: 1px solid #2d3142;
+    background: var(--darker-bg);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -128,7 +128,7 @@
 
 .filter-select:focus {
     outline: none;
-    background: #0f1117;
+    background: var(--darker-bg);
     border-color: #004C8F;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -142,7 +142,7 @@
 .loading-container {
     text-align: center;
     padding: 80px 20px;
-    background: #1a1d2e;
+    background: var(--card-bg);
 }
 
 .spinner {
@@ -163,7 +163,7 @@
 
 /* Table Wrapper */
 .table-wrapper {
-    background: #1a1d2e;
+    background: var(--card-bg);
     overflow-x: auto;
     border-radius: 0 0 12px 12px;
 }
@@ -174,8 +174,8 @@
 }
 
 .users-table thead {
-    background: #0f1117;
-    border-bottom: 2px solid #2d3142;
+    background: var(--darker-bg);
+    border-bottom: 2px solid var(--border-color);
 }
 
 .users-table th {
@@ -185,22 +185,22 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 .users-table tbody tr {
-    border-bottom: 1px solid #2d3142;
+    border-bottom: 1px solid var(--border-color);
     transition: background-color 0.2s ease;
 }
 
 .users-table tbody tr:hover {
-    background-color: #0f1117;
+    background-color: var(--darker-bg);
 }
 
 .users-table td {
     padding: 16px 24px;
     font-size: 0.95rem;
-    color: #e2e8f0;
+    color: var(--text-primary);
 }
 
 /* User Info */
@@ -229,7 +229,7 @@
 }
 
 .user-code {
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 0.875rem;
 }
 
@@ -268,7 +268,7 @@
 
 .status-badge.status-inactive {
     background: rgba(100, 116, 139, 0.1);
-    color: #94a3b8;
+    color: var(--text-secondary);
 }
 
 /* Organization Pill */
@@ -310,9 +310,9 @@
     justify-content: center;
     width: 36px;
     height: 36px;
-    border: 1px solid #2d3142;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    background: #0f1117;
+    background: var(--darker-bg);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -351,7 +351,7 @@
 .empty-state {
     text-align: center;
     padding: 80px 20px;
-    background: #1a1d2e;
+    background: var(--card-bg);
     border-radius: 0 0 12px 12px;
 }
 
@@ -367,7 +367,7 @@
 }
 
 .empty-state p {
-    color: #94a3b8;
+    color: var(--text-secondary);
     margin: 0 0 24px 0;
 }
 

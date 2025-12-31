@@ -88,8 +88,8 @@
 
 /* Form Card */
 .form-card {
-    background: #1a1d2e;
-    border: 1px solid #2d3142;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 32px;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
@@ -98,7 +98,7 @@
 .card-header {
     margin-bottom: 24px;
     padding-bottom: 16px;
-    border-bottom: 1px solid #2d3142;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .card-header h2 {
@@ -109,7 +109,7 @@
 }
 
 .card-header p {
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 0.875rem;
     margin: 0;
 }
@@ -173,7 +173,7 @@
 }
 
 .form-group label {
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-weight: 500;
     font-size: 0.875rem;
 }
@@ -183,17 +183,17 @@
 }
 
 .hint {
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-weight: 400;
     font-size: 0.75rem;
 }
 
 .form-control {
     padding: 12px 16px;
-    background: #0f1117;
-    border: 1px solid #2d3142;
+    background: var(--darker-bg);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-size: 0.95rem;
     transition: all 0.3s ease;
 }
@@ -224,7 +224,7 @@ textarea.form-control {
 }
 
 .help-text {
-    color: #94a3b8;
+    color: var(--text-secondary);
     font-size: 0.75rem;
 }
 
@@ -243,7 +243,7 @@ textarea.form-control {
 }
 
 .checkbox-label span {
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-weight: 500;
 }
 
@@ -255,8 +255,8 @@ textarea.form-control {
 }
 
 .permission-category {
-    background: #0f1117;
-    border: 1px solid #2d3142;
+    background: var(--darker-bg);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
 }
@@ -269,7 +269,7 @@ textarea.form-control {
     letter-spacing: 0.5px;
     margin: 0 0 16px 0;
     padding-bottom: 12px;
-    border-bottom: 1px solid #2d3142;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .permission-list {
@@ -359,8 +359,8 @@ textarea.form-control {
 }
 
 .btn-secondary {
-    background: #2d3142;
-    color: #e2e8f0;
+    background: var(--border-color);
+    color: var(--text-primary);
 }
 
 .btn-secondary:hover:not(:disabled) {
