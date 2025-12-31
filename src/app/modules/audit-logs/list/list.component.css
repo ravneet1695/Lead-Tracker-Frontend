@@ -187,7 +187,7 @@
 }
 
 .audit-logs-table tbody tr:hover {
-    background-color: var(--darker-bg);
+    background-color: var(--table-row-hover);
 }
 
 .audit-logs-table td {
@@ -226,7 +226,7 @@
 
 .user-name {
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .user-email {
@@ -288,7 +288,7 @@
 
 .resource-type {
     font-weight: 500;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .resource-name {
@@ -299,7 +299,7 @@
 /* Description */
 .description {
     max-width: 300px;
-    color: #cbd5e1;
+    color: var(--text-secondary);
 }
 
 /* IP Address */
@@ -350,7 +350,7 @@
 
 .empty-state h3 {
     font-size: 1.5rem;
-    color: #f1f5f9;
+    color: var(--text-primary);
     margin: 0 0 12px 0;
 }
 

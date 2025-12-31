@@ -191,7 +191,7 @@
 }
 
 .roles-table tbody tr:hover {
-    background-color: var(--darker-bg);
+    background-color: var(--table-row-hover);
 }
 
 .roles-table td {
@@ -209,11 +209,11 @@
 
 .role-label {
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--text-primary);
 }
 
 .role-description {
-    color: #cbd5e1;
+    color: var(--text-secondary);
     font-size: 0.875rem;
 }
 
@@ -377,7 +377,7 @@
 
 .empty-state h3 {
     font-size: 1.5rem;
-    color: #f1f5f9;
+    color: var(--text-primary);
     margin: 0 0 12px 0;
 }
 
