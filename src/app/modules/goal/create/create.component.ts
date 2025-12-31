@@ -294,27 +294,25 @@ export class GoalCreateComponent implements OnInit {
     }
 
     // Array Subfield Option Management
-    addArraySubfieldOption(arrayFieldIndex: number, subFieldIndex: number): void {
-        const field = this.formFields[arrayFieldIndex];
-        if (field.fieldType === 'formArray' && field.arrayFields) {
-            if (!field.arrayFields[subFieldIndex].options) {
-                field.arrayFields[subFieldIndex].options = [];
+    // Array Subfield Option Management
+    addArraySubfieldOption(arrayFieldIndex: number, subfield: ArraySubField): void {
+        if (subfield) {
+            if (!subfield.options) {
+                subfield.options = [];
             }
-            field.arrayFields[subFieldIndex].options?.push(`Option ${field.arrayFields[subFieldIndex].options!.length + 1}`);
+            subfield.options.push(`Option ${subfield.options.length + 1}`);
         }
     }
 
-    updateArraySubfieldOption(arrayFieldIndex: number, subFieldIndex: number, optionIndex: number, value: string): void {
-        const field = this.formFields[arrayFieldIndex];
-        if (field.fieldType === 'formArray' && field.arrayFields && field.arrayFields[subFieldIndex].options) {
-            field.arrayFields[subFieldIndex].options![optionIndex] = value;
+    updateArraySubfieldOption(arrayFieldIndex: number, subfield: ArraySubField, optionIndex: number, value: string): void {
+        if (subfield && subfield.options) {
+            subfield.options[optionIndex] = value;
         }
     }
 
-    removeArraySubfieldOption(arrayFieldIndex: number, subFieldIndex: number, optionIndex: number): void {
-        const field = this.formFields[arrayFieldIndex];
-        if (field.fieldType === 'formArray' && field.arrayFields && field.arrayFields[subFieldIndex].options) {
-            field.arrayFields[subFieldIndex].options!.splice(optionIndex, 1);
+    removeArraySubfieldOption(arrayFieldIndex: number, subfield: ArraySubField, optionIndex: number): void {
+        if (subfield && subfield.options) {
+            subfield.options.splice(optionIndex, 1);
         }
     }
 
@@ -351,33 +349,35 @@ export class GoalCreateComponent implements OnInit {
         arrayField.arrayFields.push(newField);
     }
 
-    removeFieldFromArray(arrayFieldIndex: number, subfieldIndex: number): void {
+    removeFieldFromArray(arrayFieldIndex: number, subfield: ArraySubField): void {
         const arrayField = this.formFields[arrayFieldIndex];
         if (arrayField.arrayFields) {
-            arrayField.arrayFields.splice(subfieldIndex, 1);
-            // Update order
-            arrayField.arrayFields.forEach((field, idx) => {
-                field.order = idx;
-            });
+            const index = arrayField.arrayFields.indexOf(subfield);
+            if (index > -1) {
+                arrayField.arrayFields.splice(index, 1);
+                // Update order
+                arrayField.arrayFields.forEach((field, idx) => {
+                    field.order = idx;
+                });
+            }
         }
     }
 
-    updateArraySubfieldAlias(arrayFieldIndex: number, subfieldIndex: number, value: string): void {
-        const arrayField = this.formFields[arrayFieldIndex];
-        if (arrayField.arrayFields && arrayField.arrayFields[subfieldIndex]) {
-            arrayField.arrayFields[subfieldIndex].alias = value;
+    updateArraySubfieldAlias(arrayFieldIndex: number, subfield: ArraySubField, value: string): void {
+        if (subfield) {
+            subfield.alias = value;
             // Auto-generate field name from alias
             const fieldName = value.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
-            arrayField.arrayFields[subfieldIndex].fieldName = fieldName || `subfield_${subfieldIndex + 1}`;
+            subfield.fieldName = fieldName || `subfield_${Date.now()}`;
         }
     }
 
-    updateArraySubfieldMandatory(arrayFieldIndex: number, subfieldIndex: number, value: boolean): void {
-        const arrayField = this.formFields[arrayFieldIndex];
-        if (arrayField.arrayFields && arrayField.arrayFields[subfieldIndex]) {
-            arrayField.arrayFields[subfieldIndex].mandatory = value;
+    updateArraySubfieldMandatory(arrayFieldIndex: number, subfield: ArraySubField, value: boolean): void {
+        if (subfield) {
+            subfield.mandatory = value;
         }
     }
+
 
     // Column and Dependency Management Methods
     getColumnArray(count: number): number[] {

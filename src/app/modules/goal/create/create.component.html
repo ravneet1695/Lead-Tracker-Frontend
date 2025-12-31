@@ -331,9 +331,9 @@
                                                     <input type="text" class="sub-field-input"
                                                         [(ngModel)]="subfield.alias"
                                                         [ngModelOptions]="{standalone: true}"
-                                                        (ngModelChange)="updateArraySubfieldAlias(selectedFieldIndex, idx, subfield.alias)">
+                                                        (ngModelChange)="updateArraySubfieldAlias(selectedFieldIndex, subfield, subfield.alias)">
                                                     <button type="button" class="btn-sub-delete"
-                                                        (click)="removeFieldFromArray(selectedFieldIndex, idx)">×</button>
+                                                        (click)="removeFieldFromArray(selectedFieldIndex, subfield)">×</button>
                                                 </div>
 
                                                 <!-- Subfield Dropdown Options -->
@@ -344,16 +344,17 @@
                                                             class="option-row">
                                                             <input type="text" class="form-control mini"
                                                                 [value]="option"
-                                                                (input)="updateArraySubfieldOption(selectedFieldIndex, idx, optIdx, $any($event.target).value)"
+                                                                (input)="updateArraySubfieldOption(selectedFieldIndex, subfield, optIdx, $any($event.target).value)"
                                                                 placeholder="Option {{ optIdx + 1 }}">
                                                             <button type="button" class="btn-icon-remove mini"
-                                                                (click)="removeArraySubfieldOption(selectedFieldIndex, idx, optIdx)">×</button>
+                                                                (click)="removeArraySubfieldOption(selectedFieldIndex, subfield, optIdx)">×</button>
                                                         </div>
                                                         <button type="button" class="btn-add-item mini"
-                                                            (click)="addArraySubfieldOption(selectedFieldIndex, idx)">
+                                                            (click)="addArraySubfieldOption(selectedFieldIndex, subfield)">
                                                             + Add Option
                                                         </button>
                                                     </div>
+
                                                 </div>
                                             </div>
                                         </div>
