@@ -109,7 +109,7 @@
 }
 
 .card-header p {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     font-size: 0.875rem;
     margin: 0;
 }
@@ -183,14 +183,14 @@
 }
 
 .hint {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     font-weight: 400;
     font-size: 0.75rem;
 }
 
 .form-control {
     padding: 12px 16px;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     color: var(--text-primary);
@@ -224,7 +224,7 @@ textarea.form-control {
 }
 
 .help-text {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     font-size: 0.75rem;
 }
 
@@ -255,7 +255,7 @@ textarea.form-control {
 }
 
 .permission-category {
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
@@ -289,7 +289,7 @@ textarea.form-control {
 }
 
 .permission-item:hover {
-    background: rgba(102, 126, 234, 0.05);
+    background: var(--table-row-hover);
 }
 
 .permission-item input[type="checkbox"] {

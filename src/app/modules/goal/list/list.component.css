@@ -92,14 +92,14 @@
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     pointer-events: none;
 }
 
 .search-input {
     width: 100%;
     padding: 12px 14px 12px 42px;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     color: var(--text-primary);
@@ -109,7 +109,7 @@
 
 .search-input:focus {
     outline: none;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border-color: #004C8F;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -121,7 +121,7 @@
 .filter-select {
     min-width: 180px;
     padding: 12px 14px;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     color: var(--text-primary);
@@ -132,7 +132,7 @@
 
 .filter-select:focus {
     outline: none;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border-color: #004C8F;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -179,7 +179,7 @@
 }
 
 .goals-table thead {
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border-bottom: 2px solid var(--border-color);
 }
 
@@ -190,7 +190,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--text-secondary);
+    color: var(--table-header-text);
 }
 
 .goals-table tbody tr {
@@ -199,7 +199,7 @@
 }
 
 .goals-table tbody tr:hover {
-    background: rgba(102, 126, 234, 0.05);
+    background: var(--table-row-hover);
 }
 
 .goals-table td {
@@ -223,7 +223,7 @@
 
 /* Goal Description */
 .goal-description {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     font-size: 0.875rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -254,7 +254,7 @@
 
 .group-more {
     font-size: 0.75rem;
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     font-style: italic;
 }
 
@@ -381,7 +381,7 @@
 }
 
 .empty-state p {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     font-size: 1rem;
     margin: 0 0 24px 0;
 }

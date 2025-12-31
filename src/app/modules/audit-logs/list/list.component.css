@@ -88,14 +88,14 @@
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     pointer-events: none;
 }
 
 .search-input {
     width: 100%;
     padding: 12px 14px 12px 42px;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     color: var(--text-primary);
@@ -105,7 +105,7 @@
 
 .search-input:focus {
     outline: none;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border-color: #004C8F;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -116,7 +116,7 @@
 
 .filter-select {
     padding: 12px 14px;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     color: var(--text-primary);
@@ -127,7 +127,7 @@
 
 .filter-select:focus {
     outline: none;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border-color: #004C8F;
 }
 
@@ -167,7 +167,7 @@
 }
 
 .audit-logs-table thead {
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border-bottom: 2px solid var(--border-color);
 }
 
@@ -178,7 +178,7 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--text-secondary);
+    color: var(--table-header-text);
 }
 
 .audit-logs-table tbody tr {
@@ -198,7 +198,7 @@
 
 /* Timestamp */
 .timestamp {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     font-size: 0.875rem;
     white-space: nowrap;
 }
@@ -231,7 +231,7 @@
 
 .user-email {
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    color: var(--table-header-text);
 }
 
 /* Action Badge */
@@ -267,7 +267,7 @@
 
 .action-badge.action-logout {
     background: rgba(100, 116, 139, 0.1);
-    color: var(--text-secondary);
+    color: var(--table-header-text);
 }
 
 .action-badge.action-view,
@@ -293,7 +293,7 @@
 
 .resource-name {
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    color: var(--table-header-text);
 }
 
 /* Description */
@@ -306,7 +306,7 @@
 .ip-address {
     font-family: monospace;
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: var(--table-header-text);
 }
 
 /* Status Badge */
@@ -355,7 +355,7 @@
 }
 
 .empty-state p {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     margin: 0;
 }
 
@@ -375,7 +375,7 @@
     align-items: center;
     gap: 6px;
     padding: 8px 16px;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     color: var(--text-primary);
@@ -407,7 +407,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     color: var(--text-primary);

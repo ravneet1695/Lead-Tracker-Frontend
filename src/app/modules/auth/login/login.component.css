@@ -153,7 +153,7 @@
 }
 
 .subtitle {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     margin: 0;
     font-size: 0.95rem;
 }
@@ -370,7 +370,7 @@
 }
 
 .credential-info small {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     font-size: 0.8rem;
 }
 

@@ -88,14 +88,14 @@
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     pointer-events: none;
 }
 
 .search-input {
     width: 100%;
     padding: 12px 14px 12px 42px;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     color: var(--text-primary);
@@ -105,7 +105,7 @@
 
 .search-input:focus {
     outline: none;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border-color: #004C8F;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -117,7 +117,7 @@
 .filter-select {
     min-width: 180px;
     padding: 12px 14px;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     color: var(--text-primary);
@@ -128,7 +128,7 @@
 
 .filter-select:focus {
     outline: none;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border-color: #004C8F;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -174,7 +174,7 @@
 }
 
 .users-table thead {
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border-bottom: 2px solid var(--border-color);
 }
 
@@ -185,7 +185,7 @@
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--text-secondary);
+    color: var(--table-header-text);
 }
 
 .users-table tbody tr {
@@ -229,7 +229,7 @@
 }
 
 .user-code {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     font-size: 0.875rem;
 }
 
@@ -268,7 +268,7 @@
 
 .status-badge.status-inactive {
     background: rgba(100, 116, 139, 0.1);
-    color: var(--text-secondary);
+    color: var(--table-header-text);
 }
 
 /* Organization Pill */
@@ -312,7 +312,7 @@
     height: 36px;
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -367,7 +367,7 @@
 }
 
 .empty-state p {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     margin: 0 0 24px 0;
 }
 

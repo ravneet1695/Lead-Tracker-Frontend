@@ -66,7 +66,7 @@
     align-items: center;
     justify-content: center;
     padding: 60px 20px;
-    color: var(--text-secondary);
+    color: var(--table-header-text);
 }
 
 .spinner {
@@ -143,7 +143,7 @@
 .form-group label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -160,7 +160,7 @@
 
 .form-control {
     padding: 12px;
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     color: var(--text-primary);
@@ -204,7 +204,7 @@ textarea.form-control {
 }
 
 .contact-card {
-    background: var(--darker-bg);
+    background: var(--table-header-bg);
     border-radius: 12px;
     padding: 20px;
     border: 1px solid var(--border-color);

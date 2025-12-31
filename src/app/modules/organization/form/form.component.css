@@ -22,7 +22,7 @@
 }
 
 .form-subtitle {
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     margin: 0;
     font-size: 0.95rem;
 }
@@ -136,7 +136,7 @@ textarea.form-control {
 .form-text {
     display: block;
     margin-top: 6px;
-    color: var(--text-secondary);
+    color: var(--table-header-text);
     font-size: 0.85rem;
 }
 
