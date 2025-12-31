@@ -74,60 +74,66 @@
   --radius-lg: 16px;
   --radius-xl: 24px;
   --radius-full: 9999px;
+
+  /* ===== COMPONENT-SPECIFIC VARIABLES (DARK THEME) ===== */
+
+  /* Tables */
+  --table-bg: transparent;
+  --table-header-bg: rgba(255, 255, 255, 0.05);
+  --table-header-text: #667eea;
+  --table-row-hover: rgba(255, 255, 255, 0.03);
+  --table-border: rgba(255, 255, 255, 0.1);
+  --table-text: #ffffff;
+
+  /* Forms & Inputs */
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-border: rgba(255, 255, 255, 0.15);
+  --input-text: #ffffff;
+  --input-placeholder: #718096;
+  --input-focus-border: #004C8F;
+  --input-focus-shadow: 0 0 0 3px rgba(0, 76, 143, 0.2);
+
+  /* Buttons */
+  --button-secondary-bg: rgba(255, 255, 255, 0.1);
+  --button-secondary-hover: rgba(255, 255, 255, 0.15);
+  --button-secondary-text: #ffffff;
+
+  /* Navigation */
+  --nav-item-text: #a0aec0;
+  --nav-item-hover-bg: rgba(255, 255, 255, 0.05);
+  --nav-item-hover-text: #ffffff;
+  --nav-item-active-bg: rgba(0, 76, 143, 0.15);
+  --nav-item-active-text: #004C8F;
+
+  /* Sidebar */
+  --sidebar-bg: rgba(26, 26, 46, 0.95);
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+
+  /* Badges */
+  --badge-bg: rgba(0, 76, 143, 0.15);
+  --badge-text: #004C8F;
+  --badge-border: rgba(0, 76, 143, 0.3);
 }
 
-/* Light Theme */
+/* ===== LIGHT THEME ===== */
 body.light-theme {
-  /* Background Colors */
-  --dark-bg: #f7fafc;
-  --darker-bg: #edf2f7;
-  --card-bg: #ffffff;
-  --card-hover-bg: #f7fafc;
-
-  /* Text Colors */
-  --text-primary: #1a202c;
-  --text-secondary: #4a5568;
-  --text-muted: #718096;
-
-  /* Border & Divider */
-  --border-color: rgba(0, 0, 0, 0.1);
-  --border-color-light: rgba(0, 0, 0, 0.05);
-  --divider-color: rgba(0, 0, 0, 0.08);
-
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.15);
-  --shadow-glow: 0 0 20px rgba(102, 126, 234, 0.2);
-
-  /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.1);
-  --glass-blur: blur(10px);
-}
-
-/* Light Theme - GMoney Brand Colors */
-body.light-theme {
-  /* Background Colors - Clean and Professional */
+  /* Backgrounds - GMoney Brand */
   --dark-bg: #f8f9fa;
   --darker-bg: #ffffff;
   --card-bg: #ffffff;
   --card-hover-bg: #f8f9fa;
 
-  /* Text Colors - High Contrast */
+  /* Text - High Contrast */
   --text-primary: #1a202c;
-  --text-secondary: #004C8F;
-  /* GMoney Blue for secondary text */
-  --text-muted: #6c757d;
+  --text-secondary: #4a5568;
+  --text-muted: #718096;
 
-  /* Border & Divider - Subtle Brand Blue */
-  --border-color: rgba(0, 76, 143, 0.15);
-  /* Light GMoney Blue */
+  /* Borders - GMoney Brand Blue */
+  --border-color: rgba(0, 76, 143, 0.25);
   --border-color-light: rgba(0, 76, 143, 0.08);
-  --divider-color: rgba(0, 76, 143, 0.1);
+  --divider-color: rgba(0, 76, 143, 0.15);
 
-  /* Shadows - Soft and Elegant */
+  /* Shadows - Soft Blue Tint */
   --shadow-sm: 0 2px 4px rgba(0, 76, 143, 0.08);
   --shadow-md: 0 4px 8px rgba(0, 76, 143, 0.12);
   --shadow-lg: 0 8px 16px rgba(0, 76, 143, 0.15);
@@ -138,7 +144,47 @@ body.light-theme {
   --glass-bg: rgba(255, 255, 255, 0.9);
   --glass-border: rgba(0, 76, 143, 0.2);
   --glass-blur: blur(10px);
+
+  /* ===== COMPONENT-SPECIFIC VARIABLES (LIGHT THEME) ===== */
+
+  /* Tables */
+  --table-bg: #ffffff;
+  --table-header-bg: rgba(0, 76, 143, 0.08);
+  --table-header-text: #004C8F;
+  --table-row-hover: rgba(0, 76, 143, 0.05);
+  --table-border: rgba(0, 76, 143, 0.25);
+  --table-text: #1a202c;
+
+  /* Forms & Inputs */
+  --input-bg: #ffffff;
+  --input-border: rgba(0, 76, 143, 0.3);
+  --input-text: #1a202c;
+  --input-placeholder: #718096;
+  --input-focus-border: #004C8F;
+  --input-focus-shadow: 0 0 0 3px rgba(0, 76, 143, 0.15);
+
+  /* Buttons */
+  --button-secondary-bg: #ffffff;
+  --button-secondary-hover: rgba(0, 76, 143, 0.08);
+  --button-secondary-text: #004C8F;
+
+  /* Navigation */
+  --nav-item-text: #2d3748;
+  --nav-item-hover-bg: rgba(0, 76, 143, 0.08);
+  --nav-item-hover-text: #004C8F;
+  --nav-item-active-bg: rgba(0, 76, 143, 0.12);
+  --nav-item-active-text: #004C8F;
+
+  /* Sidebar */
+  --sidebar-bg: #ffffff;
+  --sidebar-border: rgba(0, 76, 143, 0.25);
+
+  /* Badges */
+  --badge-bg: rgba(0, 76, 143, 0.12);
+  --badge-text: #004C8F;
+  --badge-border: rgba(0, 76, 143, 0.3);
 }
+
 
 /* ============================================
    LIGHT THEME - GMONEY BRAND STYLING
