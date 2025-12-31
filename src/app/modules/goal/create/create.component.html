@@ -93,341 +93,255 @@
             </div>
 
             <!-- Dynamic Form Builder Section -->
-            <div class="form-section">
+            <div class="form-section builder-section">
                 <h3 class="section-title">
                     Dynamic Form Builder
                     <span class="badge-count">{{ formFields.length }} fields</span>
                 </h3>
 
-                <!-- Field Type Selector -->
-                <div class="field-type-selector">
-                    <button type="button" *ngFor="let fieldType of fieldTypes" class="field-type-btn"
-                        (click)="addFormField(fieldType.value)">
-                        <span class="field-icon">{{ fieldType.icon }}</span>
-                        <span>{{ fieldType.label }}</span>
-                    </button>
-                </div>
+                <div class="builder-container" *ngIf="formFields.length >= 0">
+                    <!-- Left Sidebar: Field Type Selector -->
+                    <aside class="field-types-sidebar">
+                        <div class="sidebar-header">
+                            <h4>Add Fields</h4>
+                            <p>Select a field type to add</p>
+                        </div>
+                        <div class="field-type-list">
+                            <button type="button" *ngFor="let fieldType of fieldTypes" class="field-type-card"
+                                (click)="addFormField(fieldType.value)">
+                                <span class="field-icon-box">{{ fieldType.icon }}</span>
+                                <div class="field-label-group">
+                                    <span class="field-label">{{ fieldType.label }}</span>
+                                </div>
+                                <span class="add-btn">+</span>
+                            </button>
+                        </div>
+                    </aside>
 
-                <!-- Form Fields List with Drag & Drop -->
-                <div class="form-builder-layout" *ngIf="formFields.length > 0">
-                    <div class="fields-list">
-                        <h3>Form Fields</h3>
-                        <div class="fields-container">
-                            <div *ngFor="let field of formFields; let i = index" class="field-item"
-                                [class.selected]="selectedFieldIndex === i" (click)="selectField(i)">
-                                <div class="field-reorder-buttons">
-                                    <button type="button" class="btn-reorder" [disabled]="i === 0"
-                                        (click)="moveFieldUp(i); $event.stopPropagation()" title="Move up">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2">
-                                            <polyline points="18 15 12 9 6 15"></polyline>
-                                        </svg>
-                                    </button>
-                                    <button type="button" class="btn-reorder" [disabled]="i === formFields.length - 1"
-                                        (click)="moveFieldDown(i); $event.stopPropagation()" title="Move down">
-                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2">
-                                            <polyline points="6 9 12 15 18 9"></polyline>
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div class="field-info">
-                                    <span class="field-icon">{{ getFieldTypeIcon(field.fieldType) }}</span>
-                                    <div>
-                                        <div class="field-alias">{{ field.alias }}</div>
-                                        <div class="field-name">{{ field.fieldName }}</div>
-                                    </div>
-                                </div>
-                                <span class="required-badge" *ngIf="field.mandatory">Required</span>
-                                <button type="button" class="btn-delete-field"
-                                    (click)="deleteField(i); $event.stopPropagation()">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
+                    <!-- Center Panel: Form Canvas -->
+                    <main class="form-canvas">
+                        <div class="canvas-header">
+                            <h4>Form Preview</h4>
+                            <div class="canvas-actions">
+                                <span class="status-indicator" [class.has-fields]="formFields.length > 0">
+                                    {{ formFields.length > 0 ? 'Live Preview' : 'Empty Canvas' }}
+                                </span>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Field Configuration Panel -->
-                    <div class="field-config-panel" *ngIf="selectedFieldIndex !== null">
-                        <h3>Configure Field</h3>
-                        <div class="config-form">
-                            <div class="form-group">
-                                <label>Field Label (Alias)</label>
-                                <input type="text" class="form-control"
-                                    [(ngModel)]="formFields[selectedFieldIndex].alias"
-                                    [ngModelOptions]="{standalone: true}"
-                                    (ngModelChange)="updateFieldName(selectedFieldIndex, formFields[selectedFieldIndex].alias)"
-                                    placeholder="Enter field label">
+                        <div class="canvas-body" [class.empty]="formFields.length === 0">
+                            <div *ngIf="formFields.length === 0" class="empty-canvas-state">
+                                <div class="empty-icon">✨</div>
+                                <h4>Start Building Your Form</h4>
+                                <p>Select fields from the left sidebar to add them here.</p>
                             </div>
 
-                            <div class="form-group">
-                                <label>Field Name (Database Key)</label>
-                                <input type="text" class="form-control"
-                                    [(ngModel)]="formFields[selectedFieldIndex].fieldName"
-                                    [ngModelOptions]="{standalone: true}" placeholder="field_name">
-                                <small>Auto-generated from alias, can be edited</small>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Field Type</label>
-                                <div class="field-type-display">
-                                    <span class="field-icon">{{
-                                        getFieldTypeIcon(formFields[selectedFieldIndex].fieldType)
-                                        }}</span>
-                                    <span>{{ getFieldTypeLabel(formFields[selectedFieldIndex].fieldType) }}</span>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" [(ngModel)]="formFields[selectedFieldIndex].mandatory"
-                                        [ngModelOptions]="{standalone: true}">
-                                    <span>Required Field</span>
-                                </label>
-                            </div>
-
-                            <!-- Dropdown Options -->
-                            <div class="form-group" *ngIf="formFields[selectedFieldIndex].fieldType === 'dropdown'">
-                                <label>Dropdown Options</label>
-                                <div class="options-list">
-                                    <div *ngFor="let option of formFields[selectedFieldIndex].options; let optIdx = index"
-                                        class="option-item">
-                                        <input type="text" class="form-control" [value]="option"
-                                            (input)="updateOption(selectedFieldIndex, optIdx, $any($event.target).value)"
-                                            placeholder="Option {{ optIdx + 1 }}">
-                                        <button type="button" class="btn-remove-option"
-                                            (click)="removeOption(selectedFieldIndex, optIdx)">
-                                            ×
-                                        </button>
+                            <div *ngFor="let field of formFields; let i = index" class="canvas-field-item"
+                                [class.selected]="selectedFieldIndex === i" (click)="selectField(i)">
+                                <div class="field-drag-handle">
+                                    <div class="reorder-arrows">
+                                        <button type="button" class="btn-arrow" [disabled]="i === 0"
+                                            (click)="moveFieldUp(i); $event.stopPropagation()">▲</button>
+                                        <button type="button" class="btn-arrow" [disabled]="i === formFields.length - 1"
+                                            (click)="moveFieldDown(i); $event.stopPropagation()">▼</button>
                                     </div>
-                                    <button type="button" class="btn-add-option"
-                                        (click)="addOption(selectedFieldIndex)">
-                                        + Add Option
+                                </div>
+                                <div class="field-preview-content">
+                                    <div class="field-header">
+                                        <span class="field-type-tag">{{ getFieldTypeLabel(field.fieldType) }}</span>
+                                        <span class="required-dot" *ngIf="field.mandatory">*</span>
+                                    </div>
+                                    <div class="field-label-preview">{{ field.alias || 'Unnamed Field' }}</div>
+                                    <div class="field-input-placeholder">
+                                        {{ getFieldTypeIcon(field.fieldType) }} {{ field.fieldName }}
+                                    </div>
+                                </div>
+                                <div class="field-actions-overlay">
+                                    <button type="button" class="btn-canvas-action delete"
+                                        (click)="deleteField(i); $event.stopPropagation()" title="Delete Field">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <path
+                                                d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                            </path>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </main>
 
-                            <!-- Multi Contact Max -->
-                            <div class="form-group" *ngIf="formFields[selectedFieldIndex].fieldType === 'multiContact'">
-                                <label>Maximum Contacts</label>
-                                <input type="number" class="form-control"
-                                    [(ngModel)]="formFields[selectedFieldIndex].maxContacts"
-                                    [ngModelOptions]="{standalone: true}" min="1" max="10">
-                            </div>
+                    <!-- Right Sidebar: Configuration Panel -->
+                    <aside class="field-settings-sidebar">
+                        <div class="sidebar-header">
+                            <h4>Field Settings</h4>
+                            <p *ngIf="selectedFieldIndex !== null">Configure selected field attributes</p>
+                        </div>
 
-                            <!-- Auto Calculate Formula -->
-                            <div class="form-group"
-                                *ngIf="formFields[selectedFieldIndex].fieldType === 'autoCalculate'">
-                                <label>Calculation Formula</label>
-                                <textarea class="form-control" [(ngModel)]="formFields[selectedFieldIndex].calculation"
-                                    [ngModelOptions]="{standalone: true}" rows="3"
-                                    placeholder="e.g., field1 + field2 * 0.1"></textarea>
-                                <small>Use field names in your formula</small>
-                            </div>
+                        <div *ngIf="selectedFieldIndex === null" class="no-selection-state">
+                            <div class="no-selection-icon">⚙️</div>
+                            <p>Select a field from the preview to edit its properties</p>
+                        </div>
 
-
-                            <!-- FormArray Configuration -->
-                            <div *ngIf="formFields[selectedFieldIndex].fieldType === 'formArray'">
-                                <!-- Display Mode Selection -->
-                                <div class="form-group">
-                                    <label>Display Mode</label>
-                                    <select class="form-control"
-                                        [(ngModel)]="formFields[selectedFieldIndex].displayMode"
-                                        [ngModelOptions]="{standalone: true}">
-                                        <option value="cards">Card View</option>
-                                        <option value="table">Table View</option>
-                                    </select>
-                                    <small>Choose how to display the repeatable group</small>
+                        <div class="settings-scroll-area" *ngIf="selectedFieldIndex !== null">
+                            <div class="settings-form">
+                                <div class="settings-group">
+                                    <label>Display Label (Alias)</label>
+                                    <input type="text" class="form-control"
+                                        [(ngModel)]="formFields[selectedFieldIndex].alias"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (ngModelChange)="updateFieldName(selectedFieldIndex, formFields[selectedFieldIndex].alias)"
+                                        placeholder="Enter field label">
                                 </div>
 
-                                <!-- Column Count (for table mode) -->
-                                <div class="form-group" *ngIf="formFields[selectedFieldIndex].displayMode === 'table'">
-                                    <label>Number of Columns</label>
+                                <div class="settings-group">
+                                    <label>Database Key (Field Name)</label>
+                                    <div class="key-input-wrapper">
+                                        <input type="text" class="form-control"
+                                            [(ngModel)]="formFields[selectedFieldIndex].fieldName"
+                                            [ngModelOptions]="{standalone: true}" placeholder="field_name">
+                                        <span class="key-lock">🔒</span>
+                                    </div>
+                                    <small>Unique identifier for this field</small>
+                                </div>
+
+                                <div class="settings-row">
+                                    <div class="settings-group">
+                                        <label class="switch-label">
+                                            <input type="checkbox"
+                                                [(ngModel)]="formFields[selectedFieldIndex].mandatory"
+                                                [ngModelOptions]="{standalone: true}">
+                                            <span class="switch-custom"></span>
+                                            <span>Required Field</span>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <hr class="settings-divider">
+
+                                <!-- Dropdown Options -->
+                                <div class="settings-group"
+                                    *ngIf="formFields[selectedFieldIndex].fieldType === 'dropdown'">
+                                    <label>Dropdown Options</label>
+                                    <div class="options-manager">
+                                        <div *ngFor="let option of formFields[selectedFieldIndex].options; let optIdx = index"
+                                            class="option-row">
+                                            <input type="text" class="form-control" [value]="option"
+                                                (input)="updateOption(selectedFieldIndex, optIdx, $any($event.target).value)"
+                                                placeholder="Option {{ optIdx + 1 }}">
+                                            <button type="button" class="btn-icon-remove"
+                                                (click)="removeOption(selectedFieldIndex, optIdx)">×</button>
+                                        </div>
+                                        <button type="button" class="btn-add-item"
+                                            (click)="addOption(selectedFieldIndex)">
+                                            + Add Option
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Multi Contact Max -->
+                                <div class="settings-group"
+                                    *ngIf="formFields[selectedFieldIndex].fieldType === 'multiContact'">
+                                    <label>Maximum Contacts</label>
                                     <input type="number" class="form-control"
-                                        [(ngModel)]="formFields[selectedFieldIndex].columnCount"
+                                        [(ngModel)]="formFields[selectedFieldIndex].maxContacts"
                                         [ngModelOptions]="{standalone: true}" min="1" max="10">
-                                    <small>How many columns in the table</small>
                                 </div>
 
-                                <div class="form-group">
-                                    <label>Minimum Instances</label>
-                                    <input type="number" class="form-control"
-                                        [(ngModel)]="formFields[selectedFieldIndex].minInstances"
-                                        [ngModelOptions]="{standalone: true}" min="0" max="10">
-                                    <small>Minimum number of entries required</small>
+                                <!-- Auto Calculate Formula -->
+                                <div class="settings-group"
+                                    *ngIf="formFields[selectedFieldIndex].fieldType === 'autoCalculate'">
+                                    <label>Calculation Formula</label>
+                                    <textarea class="form-control"
+                                        [(ngModel)]="formFields[selectedFieldIndex].calculation"
+                                        [ngModelOptions]="{standalone: true}" rows="3"
+                                        placeholder="e.g., field1 + field2 * 0.1"></textarea>
+                                    <small>Use field names in your formula</small>
                                 </div>
 
-                                <div class="form-group">
-                                    <label>Maximum Instances</label>
-                                    <input type="number" class="form-control"
-                                        [(ngModel)]="formFields[selectedFieldIndex].maxInstances"
-                                        [ngModelOptions]="{standalone: true}" min="1" max="20">
-                                    <small>Maximum number of entries allowed</small>
-                                </div>
+                                <!-- FormArray Configuration -->
+                                <div *ngIf="formFields[selectedFieldIndex].fieldType === 'formArray'"
+                                    class="array-config-group">
+                                    <div class="settings-group">
+                                        <label>Display Mode</label>
+                                        <div class="display-mode-toggle">
+                                            <button type="button"
+                                                [class.active]="formFields[selectedFieldIndex].displayMode === 'cards'"
+                                                (click)="formFields[selectedFieldIndex].displayMode = 'cards'">Cards</button>
+                                            <button type="button"
+                                                [class.active]="formFields[selectedFieldIndex].displayMode === 'table'"
+                                                (click)="formFields[selectedFieldIndex].displayMode = 'table'">Table</button>
+                                        </div>
+                                    </div>
 
-                                <div class="form-group">
-                                    <label>Configure Columns</label>
-                                    <small style="display: block; margin-bottom: 10px;">
-                                        {{ formFields[selectedFieldIndex].displayMode === 'table' ? 'Add fields to each
-                                        column' : 'Add fields that will repeat in each instance' }}
-                                    </small>
-
-                                    <!-- Column Tabs (for table mode) -->
-                                    <div class="column-tabs"
+                                    <div class="settings-row"
                                         *ngIf="formFields[selectedFieldIndex].displayMode === 'table'">
-                                        <button type="button"
-                                            *ngFor="let col of getColumnArray(formFields[selectedFieldIndex].columnCount || 2); let i = index"
-                                            class="column-tab" [class.active]="selectedColumn === i"
-                                            (click)="selectedColumn = i">
-                                            Column {{ i + 1 }}
-                                            <span class="field-count">{{ getFieldsInColumn(selectedFieldIndex, i).length
-                                                }}</span>
-                                        </button>
+                                        <div class="settings-group">
+                                            <label>Columns</label>
+                                            <input type="number" class="form-control"
+                                                [(ngModel)]="formFields[selectedFieldIndex].columnCount"
+                                                [ngModelOptions]="{standalone: true}" min="1" max="5">
+                                        </div>
                                     </div>
 
-                                    <!-- Mini field type selector -->
-                                    <div class="mini-field-selector">
-                                        <button type="button" *ngFor="let ft of fieldTypes.slice(0, 7)"
-                                            class="mini-field-btn"
-                                            (click)="formFields[selectedFieldIndex].displayMode === 'table' ? addFieldToArrayColumn(selectedFieldIndex, selectedColumn, ft.value) : addFieldToArray(selectedFieldIndex, ft.value)"
-                                            [title]="'Add ' + ft.label">
-                                            <span>{{ ft.icon }}</span>
-                                            <span>{{ ft.label }}</span>
-                                        </button>
+                                    <div class="settings-row">
+                                        <div class="settings-group">
+                                            <label>Min</label>
+                                            <input type="number" class="form-control"
+                                                [(ngModel)]="formFields[selectedFieldIndex].minInstances"
+                                                [ngModelOptions]="{standalone: true}" min="0">
+                                        </div>
+                                        <div class="settings-group">
+                                            <label>Max</label>
+                                            <input type="number" class="form-control"
+                                                [(ngModel)]="formFields[selectedFieldIndex].maxInstances"
+                                                [ngModelOptions]="{standalone: true}" min="1">
+                                        </div>
                                     </div>
 
-                                    <!-- List of fields in current column (table mode) or all fields (card mode) -->
-                                    <ng-container *ngIf="selectedFieldIndex !== null">
-                                        <div class="array-fields-list"
-                                            *ngIf="formFields[selectedFieldIndex].displayMode === 'table' ? getFieldsInColumn(selectedFieldIndex, selectedColumn).length > 0 : selectedFieldArrayFields && selectedFieldArrayFields.length > 0">
+                                    <div class="sub-fields-section">
+                                        <label>Repeatable Fields</label>
 
-                                            <!-- Table Mode: Show fields in selected column -->
+                                        <!-- Column Tabs for Table Mode -->
+                                        <div class="mini-column-tabs"
+                                            *ngIf="formFields[selectedFieldIndex].displayMode === 'table'">
+                                            <button type="button"
+                                                *ngFor="let col of getColumnArray(formFields[selectedFieldIndex].columnCount || 2); let i = index"
+                                                class="mini-tab" [class.active]="selectedColumn === i"
+                                                (click)="selectedColumn = i">
+                                                C{{ i + 1 }}
+                                            </button>
+                                        </div>
+
+                                        <div class="mini-field-adder">
+                                            <button type="button" *ngFor="let ft of fieldTypes.slice(0, 6)"
+                                                class="btn-mini-add"
+                                                (click)="formFields[selectedFieldIndex].displayMode === 'table' ? addFieldToArrayColumn(selectedFieldIndex, selectedColumn, ft.value) : addFieldToArray(selectedFieldIndex, ft.value)"
+                                                [title]="ft.label">
+                                                {{ ft.icon }}
+                                            </button>
+                                        </div>
+
+                                        <div class="sub-fields-list">
                                             <div *ngFor="let subfield of (formFields[selectedFieldIndex].displayMode === 'table' ? getFieldsInColumn(selectedFieldIndex, selectedColumn) : selectedFieldArrayFields); let idx = index"
-                                                class="array-field-item enhanced">
-                                                <div class="array-field-header">
-                                                    <span class="field-icon">{{ getFieldTypeIcon(subfield.fieldType)
+                                                class="sub-field-card">
+                                                <div class="sub-field-header">
+                                                    <span class="sub-field-icon">{{ getFieldTypeIcon(subfield.fieldType)
                                                         }}</span>
-                                                    <div class="array-field-info">
-                                                        <input type="text" class="form-control form-control-sm"
-                                                            [(ngModel)]="subfield.alias"
-                                                            [ngModelOptions]="{standalone: true}"
-                                                            (ngModelChange)="updateArraySubfieldAlias(selectedFieldIndex, idx, subfield.alias)"
-                                                            placeholder="Column header / Field label">
-                                                        <small>{{ subfield.fieldName }} ({{ subfield.fieldType
-                                                            }})</small>
-                                                    </div>
-                                                    <label class="checkbox-label-inline">
-                                                        <input type="checkbox" [(ngModel)]="subfield.mandatory"
-                                                            [ngModelOptions]="{standalone: true}">
-                                                        <span>Required</span>
-                                                    </label>
-                                                    <button type="button" class="btn-remove-subfield"
-                                                        (click)="removeFieldFromArray(selectedFieldIndex, idx)"
-                                                        title="Remove field">
-                                                        ×
-                                                    </button>
-                                                </div>
-
-                                                <!-- Dropdown Options -->
-                                                <div class="subfield-config" *ngIf="subfield.fieldType === 'dropdown'">
-                                                    <label class="config-label">Dropdown Options</label>
-                                                    <div class="options-mini-list">
-                                                        <div *ngFor="let option of subfield.options; let optIdx = index"
-                                                            class="option-mini-item">
-                                                            <input type="text" class="form-control form-control-sm"
-                                                                [(ngModel)]="subfield.options![optIdx]"
-                                                                [ngModelOptions]="{standalone: true}"
-                                                                placeholder="Option value">
-                                                            <button type="button"
-                                                                (click)="subfield.options!.splice(optIdx, 1)">×</button>
-                                                        </div>
-                                                        <button type="button" class="btn-add-mini"
-                                                            (click)="subfield.options!.push('')">+ Add Option</button>
-                                                    </div>
-                                                </div>
-
-                                                <!-- Dependency Configuration -->
-                                                <div class="subfield-config" *ngIf="canHaveDependency(subfield)">
-                                                    <label class="checkbox-label-inline">
-                                                        <input type="checkbox" [checked]="!!subfield.dependsOn"
-                                                            (change)="toggleDependency(selectedFieldIndex, idx)">
-                                                        <span>Depends on another field</span>
-                                                    </label>
-
-                                                    <div *ngIf="subfield.dependsOn" class="dependency-settings">
-                                                        <label class="config-label">Parent Field</label>
-                                                        <select class="form-control form-control-sm"
-                                                            [(ngModel)]="subfield.dependsOn.fieldName"
-                                                            [ngModelOptions]="{standalone: true}">
-                                                            <option value="">Select field</option>
-                                                            <option
-                                                                *ngFor="let f of getPreviousFields(selectedFieldIndex, idx)"
-                                                                [value]="f.fieldName">
-                                                                {{ f.alias }}
-                                                            </option>
-                                                        </select>
-
-                                                        <!-- Dependency Mappings -->
-                                                        <div class="mappings-section">
-                                                            <label class="config-label">Value Mappings</label>
-                                                            <div *ngFor="let mapping of subfield.dependsOn.mappings; let mIdx = index"
-                                                                class="mapping-item">
-                                                                <div class="mapping-row">
-                                                                    <input type="text"
-                                                                        class="form-control form-control-sm"
-                                                                        [(ngModel)]="mapping.when"
-                                                                        [ngModelOptions]="{standalone: true}"
-                                                                        placeholder="When value is...">
-                                                                    <span class="arrow">→</span>
-                                                                    <input type="text"
-                                                                        class="form-control form-control-sm"
-                                                                        [(ngModel)]="mapping.then.label"
-                                                                        [ngModelOptions]="{standalone: true}"
-                                                                        placeholder="Change label to...">
-                                                                    <button type="button" class="btn-remove-mapping"
-                                                                        (click)="removeMapping(selectedFieldIndex, idx, mIdx)">×</button>
-                                                                </div>
-                                                            </div>
-                                                            <button type="button" class="btn-add-mapping"
-                                                                (click)="addDependencyMapping(selectedFieldIndex, idx)">
-                                                                + Add Mapping
-                                                            </button>
-                                                        </div>
-                                                    </div>
+                                                    <input type="text" class="sub-field-input"
+                                                        [(ngModel)]="subfield.alias"
+                                                        [ngModelOptions]="{standalone: true}"
+                                                        (ngModelChange)="updateArraySubfieldAlias(selectedFieldIndex, idx, subfield.alias)">
+                                                    <button type="button" class="btn-sub-delete"
+                                                        (click)="removeFieldFromArray(selectedFieldIndex, idx)">×</button>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        <div class="empty-state"
-                                            *ngIf="formFields[selectedFieldIndex].displayMode === 'table' ? getFieldsInColumn(selectedFieldIndex, selectedColumn).length === 0 : !selectedFieldArrayFields || selectedFieldArrayFields.length === 0">
-                                            <p>{{ formFields[selectedFieldIndex].displayMode === 'table' ? 'No fields in
-                                                Column ' + (selectedColumn + 1) + ' yet.' : 'No fields in this group
-                                                yet.'
-                                                }} Click a field type above to add.</p>
-                                        </div>
-                                    </ng-container>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="field-config-panel empty" *ngIf="selectedFieldIndex === null">
-                        <div class="empty-state">
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="1.5">
-                                <path d="M12 2v20M2 12h20"></path>
-                            </svg>
-                            <p>Select a field to configure</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="empty-state" *ngIf="formFields.length === 0">
-                    <p>No form fields added yet. Click a field type above to add fields.</p>
+                    </aside>
                 </div>
             </div>
 
@@ -436,45 +350,81 @@
                 <h3 class="section-title">Status Options</h3>
 
                 <div class="status-options-container">
-                    <div class="status-chips">
-                        <div *ngFor="let status of statusOptions; let i = index" class="status-chip"
-                            [class.completion-status]="goalForm.get('completionStatus')?.value === status">
-                            <div class="status-chip-content">
-                                <label class="radio-label">
-                                    <input type="radio" name="completionStatus" [value]="status"
-                                        [formControl]="$any(goalForm.get('completionStatus'))"
-                                        title="Mark as completion status">
-                                    <span class="radio-indicator"></span>
-                                </label>
-                                <span class="status-name">{{ status }}</span>
-                                <span *ngIf="goalForm.get('completionStatus')?.value === status"
-                                    class="completion-badge">✓
-                                    Completion</span>
-                            </div>
-                            <button type="button" class="btn-remove-status" (click)="removeStatusOption(i)">
-                                ×
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="add-status-form">
-                        <input type="text" [(ngModel)]="customStatusInput" [ngModelOptions]="{standalone: true}"
-                            class="form-control" placeholder="Add custom status option"
-                            (keyup.enter)="addStatusOption()">
-                        <button type="button" class="btn-add-status" (click)="addStatusOption()">
-                            + Add Status
-                        </button>
-                    </div>
-
-                    <small class="help-text">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    <!-- Help Text at Top -->
+                    <div class="status-help-banner">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="12" y1="16" x2="12" y2="12"></line>
                             <line x1="12" y1="8" x2="12.01" y2="8"></line>
                         </svg>
-                        Select which status indicates goal completion (counts toward achievement)
-                    </small>
+                        <span>Define custom status options for your goal and select which one indicates
+                            completion</span>
+                    </div>
+
+                    <!-- Add Status Form -->
+                    <div class="add-status-form">
+                        <div class="add-status-input-group">
+                            <input type="text" [(ngModel)]="customStatusInput" [ngModelOptions]="{standalone: true}"
+                                class="form-control"
+                                placeholder="Enter new status (e.g., Pending, In Progress, Completed)"
+                                (keyup.enter)="addStatusOption()">
+                            <button type="button" class="btn-add-status" (click)="addStatusOption()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Add Status
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Status Chips List -->
+                    <div class="status-chips-wrapper">
+                        <div class="status-chips-header">
+                            <span class="chips-label">Status Options ({{ statusOptions.length }})</span>
+                            <span class="completion-label">Completion Status</span>
+                        </div>
+
+                        <div class="status-chips-list">
+                            <div *ngFor="let status of statusOptions; let i = index" class="status-chip-item"
+                                [class.is-completion]="goalForm.get('completionStatus')?.value === status">
+
+                                <div class="status-chip-main">
+                                    <span class="status-name">{{ status }}</span>
+                                </div>
+
+                                <div class="status-chip-actions">
+                                    <label class="radio-wrapper" title="Mark as completion status">
+                                        <input type="radio" name="completionStatus" [value]="status"
+                                            [formControl]="$any(goalForm.get('completionStatus'))">
+                                        <span class="radio-custom"></span>
+                                    </label>
+
+                                    <button type="button" class="btn-remove-status" (click)="removeStatusOption(i)"
+                                        title="Remove status">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div *ngIf="statusOptions.length === 0" class="empty-status-state">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="9" y1="9" x2="15" y2="9"></line>
+                                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                                </svg>
+                                <p>No status options yet</p>
+                                <small>Add your first status option above to get started</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

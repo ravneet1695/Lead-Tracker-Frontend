@@ -437,6 +437,7 @@ export class GoalCreateComponent implements OnInit {
 
         const goalData = {
             title: formValue.title,
+            organization: formValue.organization || null,
             completionStatus: formValue.completionStatus || 'Approved',
             timeline: {
                 startDate: formValue.startDate || null,
