@@ -19,7 +19,7 @@
     width: 50px;
     height: 50px;
     border: 4px solid rgba(255, 255, 255, 0.1);
-    border-top-color: #667eea;
+    border-top-color: #004C8F;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -74,24 +74,16 @@
 }
 
 .role-badge.role-super_admin {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
     color: white;
 }
 
 .role-badge.role-org_admin {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: linear-gradient(135deg, #ED232A 0%, #C01E24 100%);
     color: white;
 }
 
-.role-badge.role-manager {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-}
 
-.role-badge.role-sales {
-    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-    color: white;
-}
 
 /* Stats Grid */
 .stats-grid {
@@ -317,7 +309,7 @@
 
 .points {
     font-weight: 700;
-    color: #667eea;
+    color: #004C8F;
     font-size: 1rem;
 }
 

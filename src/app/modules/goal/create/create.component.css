@@ -4,16 +4,16 @@
     padding: 32px;
 }
 
-/* Header */
+/* Purple Header */
 .page-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px 32px;
-    margin-bottom: 32px;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
+    padding: 14px 24px;
+    margin-bottom: 0;
+    border-radius: 10px 10px 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .header-left {
@@ -39,7 +39,7 @@
     gap: 6px;
     padding: 8px 16px;
     background: rgba(255, 255, 255, 0.95);
-    color: #667eea;
+    color: #004C8F;
     border: none;
     border-radius: 8px;
     font-weight: 600;
@@ -70,14 +70,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #e2e8f0;
     margin-bottom: 20px;
 }
 
 .section-title svg {
-    color: #667eea;
+    color: #004C8F;
 }
 
 .badge-count {
@@ -130,7 +130,7 @@
 
 .form-control:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #004C8F;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -169,12 +169,12 @@ textarea.form-control {
 }
 
 .group-card:hover {
-    border-color: #667eea;
+    border-color: #004C8F;
     background: rgba(102, 126, 234, 0.05);
 }
 
 .group-card.selected {
-    border-color: #667eea;
+    border-color: #004C8F;
     background: rgba(102, 126, 234, 0.1);
 }
 
@@ -228,7 +228,7 @@ textarea.form-control {
 }
 
 .field-type-btn:hover {
-    border-color: #667eea;
+    border-color: #004C8F;
     background: rgba(102, 126, 234, 0.05);
     transform: translateY(-2px);
 }
@@ -271,11 +271,11 @@ textarea.form-control {
 }
 
 .field-item:hover {
-    border-color: #667eea;
+    border-color: #004C8F;
 }
 
 .field-item.selected {
-    border-color: #667eea;
+    border-color: #004C8F;
     background: rgba(102, 126, 234, 0.1);
 }
 
@@ -300,7 +300,7 @@ textarea.form-control {
 
 .btn-reorder:hover:not(:disabled) {
     background: rgba(102, 126, 234, 0.2);
-    border-color: #667eea;
+    border-color: #004C8F;
 }
 
 .btn-reorder:disabled {
@@ -413,7 +413,7 @@ textarea.form-control {
     border-radius: 6px;
     color: #ef4444;
     cursor: pointer;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     line-height: 1;
 }
 
@@ -467,7 +467,7 @@ textarea.form-control {
     border: none;
     color: #4ade80;
     cursor: pointer;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     line-height: 1;
     padding: 0;
 }
@@ -483,7 +483,7 @@ textarea.form-control {
 
 .btn-add-status {
     padding: 12px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
     color: white;
     border: none;
     border-radius: 8px;
@@ -551,7 +551,7 @@ textarea.form-control {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
     color: white;
 }
 
