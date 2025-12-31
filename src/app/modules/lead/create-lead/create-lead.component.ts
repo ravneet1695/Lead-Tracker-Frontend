@@ -21,7 +21,7 @@ export class CreateLeadComponent implements OnInit {
     loading = true;
     submitting = false;
     userGroups: any[] = [];
-    selectedGroup: string = '';
+    selectedGroups: string[] = [];
     autoNumberCounters: { [key: string]: number } = {};
 
     constructor(
@@ -71,28 +71,46 @@ export class CreateLeadComponent implements OnInit {
             );
 
             // DEVELOPMENT MODE: If user has no matching groups, use all goal groups
-            // This allows testing without proper group assignments
             if (this.userGroups.length === 0) {
                 console.warn('User not assigned to goal groups - using all goal groups for development');
                 this.userGroups = this.goal.groups;
             }
 
+            // Auto-select if only one group
             if (this.userGroups.length === 1) {
-                this.selectedGroup = this.userGroups[0]._id || this.userGroups[0];
+                const groupId = this.userGroups[0]._id || this.userGroups[0];
+                this.selectedGroups = [groupId];
             }
         } else if (this.goal.groups) {
             // If user has no groups at all, use all goal groups
             console.warn('User has no groups - using all goal groups for development');
             this.userGroups = this.goal.groups;
             if (this.userGroups.length === 1) {
-                this.selectedGroup = this.userGroups[0]._id || this.userGroups[0];
+                const groupId = this.userGroups[0]._id || this.userGroups[0];
+                this.selectedGroups = [groupId];
             }
         }
     }
 
+    toggleGroup(groupId: string): void {
+        const index = this.selectedGroups.indexOf(groupId);
+        if (index > -1) {
+            this.selectedGroups.splice(index, 1);
+        } else {
+            this.selectedGroups.push(groupId);
+        }
+        // Update form control
+        this.leadForm.patchValue({ groups: this.selectedGroups });
+        this.leadForm.get('groups')?.markAsTouched();
+    }
+
+    isGroupSelected(groupId: string): boolean {
+        return this.selectedGroups.includes(groupId);
+    }
+
     initializeForm(): void {
         const formControls: any = {
-            group: [this.selectedGroup, Validators.required],
+            groups: [this.selectedGroups, Validators.required],
             status: [this.goal.statusOptions?.[0] || 'New', Validators.required],
             remarks: ['']
         };
@@ -100,6 +118,13 @@ export class CreateLeadComponent implements OnInit {
         // Add dynamic form fields
         if (this.goal.formSchema) {
             this.goal.formSchema.forEach((field: any) => {
+                // Handle FormArray fields separately
+                if (field.fieldType === 'formArray' && field.arrayFields) {
+                    // Initialize as FormArray
+                    formControls[field.fieldName] = this.fb.array([]);
+                    return; // Skip regular field processing
+                }
+
                 const validators = field.mandatory ? [Validators.required] : [];
 
                 // Add specific validators based on field type
@@ -117,6 +142,18 @@ export class CreateLeadComponent implements OnInit {
         formControls.contacts = this.fb.array([]);
 
         this.leadForm = this.fb.group(formControls);
+
+        // Add minimum required instances for FormArray fields
+        if (this.goal.formSchema) {
+            this.goal.formSchema.forEach((field: any) => {
+                if (field.fieldType === 'formArray' && field.arrayFields) {
+                    const minInstances = field.minInstances || 0;
+                    for (let i = 0; i < minInstances; i++) {
+                        this.addArrayInstance(field.fieldName, field.arrayFields);
+                    }
+                }
+            });
+        }
     }
 
     initializeAutoNumbers(): void {
@@ -148,6 +185,94 @@ export class CreateLeadComponent implements OnInit {
 
     removeContact(index: number): void {
         this.contactsArray.removeAt(index);
+    }
+
+    // FormArray Management Methods
+    getFormArray(fieldName: string): FormArray {
+        return this.leadForm.get(fieldName) as FormArray;
+    }
+
+    addArrayInstance(fieldName: string, arrayFields: any[]): void {
+        const formArray = this.getFormArray(fieldName);
+        const group: any = {};
+
+        arrayFields.forEach((subfield: any) => {
+            const validators = subfield.mandatory ? [Validators.required] : [];
+
+            if (subfield.fieldType === 'email') {
+                validators.push(Validators.email);
+            } else if (subfield.fieldType === 'phone') {
+                validators.push(Validators.pattern(/^[0-9]{10}$/));
+            }
+
+            group[subfield.fieldName] = ['', validators];
+        });
+
+        formArray.push(this.fb.group(group));
+    }
+
+    removeArrayInstance(fieldName: string, index: number): void {
+        const formArray = this.getFormArray(fieldName);
+        formArray.removeAt(index);
+    }
+
+    canAddInstance(field: any): boolean {
+        const formArray = this.getFormArray(field.fieldName);
+        const maxInstances = field.maxInstances || 10;
+        return formArray.length < maxInstances;
+    }
+
+    canRemoveInstance(field: any): boolean {
+        const formArray = this.getFormArray(field.fieldName);
+        const minInstances = field.minInstances || 0;
+        return formArray.length > minInstances;
+    }
+
+    // Dependency Handling Methods
+    getDependentConfig(field: any, subfield: any, instanceIndex: number): any {
+        if (!subfield.dependsOn) return null;
+
+        const formArray = this.getFormArray(field.fieldName);
+        const instance = formArray.at(instanceIndex);
+        const parentValue = instance.get(subfield.dependsOn.fieldName)?.value;
+
+        if (!parentValue) return null;
+
+        const mapping = subfield.dependsOn.mappings?.find((m: any) => m.when === parentValue);
+        return mapping?.then || null;
+    }
+
+    getEffectiveLabel(field: any, subfield: any, instanceIndex: number): string {
+        const config = this.getDependentConfig(field, subfield, instanceIndex);
+        return config?.label || subfield.alias;
+    }
+
+    getEffectiveOptions(field: any, subfield: any, instanceIndex: number): string[] {
+        const config = this.getDependentConfig(field, subfield, instanceIndex);
+        return config?.options || subfield.options || [];
+    }
+
+    shouldShowField(field: any, subfield: any, instanceIndex: number): boolean {
+        const config = this.getDependentConfig(field, subfield, instanceIndex);
+        return config?.show !== false;
+    }
+
+    onParentFieldChange(field: any, subfield: any, instanceIndex: number, parentFieldName: string): void {
+        // Find the dependent subfield
+        const dependentSubfield = field.arrayFields.find((f: any) =>
+            f.dependsOn?.fieldName === parentFieldName
+        );
+
+        if (!dependentSubfield) return;
+
+        const config = this.getDependentConfig(field, dependentSubfield, instanceIndex);
+        if (config?.defaultValue !== undefined) {
+            const formArray = this.getFormArray(field.fieldName);
+            const instance = formArray.at(instanceIndex);
+            instance.patchValue({
+                [dependentSubfield.fieldName]: config.defaultValue
+            });
+        }
     }
 
     getFieldValue(fieldName: string): any {
@@ -220,7 +345,7 @@ export class CreateLeadComponent implements OnInit {
 
         const entryData = {
             goal: this.goalId,
-            group: formValue.group,
+            groups: formValue.groups,
             data: data,
             status: formValue.status,
             contacts: formValue.contacts || [],
@@ -286,7 +411,8 @@ export class CreateLeadComponent implements OnInit {
             'textarea': '📄',
             'multiContact': '👥',
             'autoNumber': '#️⃣',
-            'autoCalculate': '🧮'
+            'autoCalculate': '🧮',
+            'formArray': '🔁'
         };
         return icons[fieldType] || '📝';
     }

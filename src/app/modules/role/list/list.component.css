@@ -67,16 +67,20 @@
 .filters-container {
     background: #1a1d2e;
     padding: 24px 32px;
-    display: grid;
-    grid-template-columns: 1fr 200px;
+    display: flex;
+    align-items: center;
     gap: 16px;
     border-bottom: 1px solid #2d3142;
 }
 
-.search-section,
+.search-section {
+    flex: 1;
+}
+
 .filter-section {
     display: flex;
-    flex-direction: column;
+    gap: 12px;
+    align-items: center;
 }
 
 .search-box {

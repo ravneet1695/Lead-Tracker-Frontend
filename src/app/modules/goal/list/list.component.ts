@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { GoalService } from '../../../services/goal.service';
+import { OrganizationService } from '../../../services/organization.service';
 import { AuthService } from '../../../services/auth.service';
 import Swal from 'sweetalert2';
 
@@ -16,17 +17,21 @@ import Swal from 'sweetalert2';
 export class GoalListComponent implements OnInit {
     goals: any[] = [];
     filteredGoals: any[] = [];
+    organizations: any[] = [];
     loading = true;
     searchTerm = '';
     statusFilter = '';
+    organizationFilter = 'all';
 
     constructor(
         private goalService: GoalService,
+        private organizationService: OrganizationService,
         private authService: AuthService,
         private router: Router
     ) { }
 
     ngOnInit(): void {
+        this.loadOrganizations();
         this.loadGoals();
     }
 
@@ -38,7 +43,11 @@ export class GoalListComponent implements OnInit {
             params.status = this.statusFilter;
         }
 
-        this.goalService.getGoals().subscribe({
+        if (this.organizationFilter && this.organizationFilter !== 'all') {
+            params.organization = this.organizationFilter;
+        }
+
+        this.goalService.getGoals(params).subscribe({
             next: (response) => {
                 this.goals = response.goals || [];
                 this.applyFilters();
@@ -168,5 +177,24 @@ export class GoalListComponent implements OnInit {
 
     canDeleteGoal(): boolean {
         return this.hasPermission('goals.delete');
+    }
+
+    loadOrganizations(): void {
+        if (!this.canViewAllOrganizations()) {
+            return;
+        }
+
+        this.organizationService.getOrganizations().subscribe({
+            next: (response) => {
+                this.organizations = response.organizations || [];
+            },
+            error: (error) => {
+                console.error('Error loading organizations:', error);
+            }
+        });
+    }
+
+    canViewAllOrganizations(): boolean {
+        return this.hasPermission('organizations.read');
     }
 }

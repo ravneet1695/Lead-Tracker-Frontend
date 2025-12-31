@@ -30,16 +30,16 @@
                 (input)="applyFilters()">
         </div>
 
-        <select class="filter-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
-            <option value="">All status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-        </select>
-
         <select class="filter-select" [(ngModel)]="organizationFilter" (change)="onFilterChange()"
             *ngIf="canViewAllOrganizations()">
             <option value="all">All organizations</option>
             <option *ngFor="let org of organizations" [value]="org._id">{{ org.name }}</option>
+        </select>
+
+        <select class="filter-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+            <option value="">All status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
         </select>
     </div>
 
@@ -138,6 +138,6 @@
             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
         </svg>
         <p>No groups found</p>
-        <button *ngIf="canCreateGroup()" class="btn-primary" (click)="createGroup()">Create your first group</button>
+
     </div>
 </div>

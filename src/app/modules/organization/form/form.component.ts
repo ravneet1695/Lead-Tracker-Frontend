@@ -40,8 +40,9 @@ export class OrganizationFormComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.initializeForm();
+        // Check edit mode FIRST before initializing form
         this.checkEditMode();
+        this.initializeForm();
         this.initializeStates();
         this.setupAddressChangeListeners();
 
@@ -49,6 +50,7 @@ export class OrganizationFormComponent implements OnInit {
         if (!this.isEditMode) {
             this.fetchNextOrgCode();
         }
+        // Note: In edit mode, loadOrganization() is called after location data loads
     }
 
     fetchNextOrgCode(): void {
@@ -71,6 +73,11 @@ export class OrganizationFormComponent implements OnInit {
                 if (response.success && response.data) {
                     this.locationData = response.data;
                     this.states = Object.keys(this.locationData);
+
+                    // If in edit mode, load organization data after location data is ready
+                    if (this.isEditMode && this.organizationId) {
+                        this.loadOrganization();
+                    }
                 }
             },
             error: (error) => {
@@ -154,7 +161,7 @@ export class OrganizationFormComponent implements OnInit {
                 state: [''],
                 pincode: ['']
             }),
-            logo: ['', [Validators.required]],
+            logo: ['', this.isEditMode ? [] : [Validators.required]],
             description: [''],
             // Admin user fields (only for create mode)
             adminUser: this.fb.group({
@@ -178,7 +185,7 @@ export class OrganizationFormComponent implements OnInit {
         this.organizationId = this.route.snapshot.paramMap.get('id');
         if (this.organizationId) {
             this.isEditMode = true;
-            this.loadOrganization();
+            // Don't load organization here - will be called after form init
         }
     }
 
@@ -209,14 +216,24 @@ export class OrganizationFormComponent implements OnInit {
                     // Patch form values after populating dropdowns
                     // Use setTimeout to ensure dropdowns are rendered
                     setTimeout(() => {
-                        this.organizationForm.patchValue(org);
+                        console.log('Patching organization data:', org);
                         this.organizationForm.patchValue({
+                            code: org.code || '',
+                            name: org.name || '',
+                            email: org.email || '',
+                            website: org.website || '',
+                            alias: org.alias || '',
+                            phone: org.phone || '',
+                            logo: org.logo || '',
+                            description: org.description || '',
                             address: {
                                 state: org.address?.state || '',
                                 city: org.address?.city || '',
-                                pincode: org.address?.pincode || ''
+                                pincode: org.address?.pincode || '',
+                                street: org.address?.street || ''
                             }
                         });
+                        console.log('Form values after patch:', this.organizationForm.value);
                     }, 100);
                 }
                 this.loading = false;
@@ -300,7 +317,12 @@ export class OrganizationFormComponent implements OnInit {
     }
 
     onSubmit(): void {
+        console.log('Form submission started. Edit mode:', this.isEditMode);
+        console.log('Form valid:', this.organizationForm.valid);
+
         if (this.organizationForm.invalid) {
+            console.log('Form is invalid. Errors:', this.organizationForm.errors);
+            console.log('Logo field errors:', this.organizationForm.get('logo')?.errors);
             this.markFormGroupTouched(this.organizationForm);
             return;
         }
@@ -309,11 +331,22 @@ export class OrganizationFormComponent implements OnInit {
         // Use getRawValue() to include disabled fields (like code)
         const formData = this.organizationForm.getRawValue();
 
-
+        // Prepare data based on mode
+        let dataToSend;
+        if (this.isEditMode) {
+            // Exclude adminUser for updates - backend doesn't expect it
+            const { adminUser, ...orgData } = formData;
+            dataToSend = orgData;
+            console.log('Update payload:', dataToSend);
+        } else {
+            // Include everything for creation
+            dataToSend = formData;
+            console.log('Create payload:', dataToSend);
+        }
 
         const request = this.isEditMode
-            ? this.organizationService.updateOrganization(this.organizationId!, formData)
-            : this.organizationService.createOrganization(formData);
+            ? this.organizationService.updateOrganization(this.organizationId!, dataToSend)
+            : this.organizationService.createOrganization(dataToSend);
 
         request.subscribe({
             next: (response) => {

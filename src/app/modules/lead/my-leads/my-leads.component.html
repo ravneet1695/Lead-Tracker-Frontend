@@ -163,11 +163,13 @@
 
             <!-- Lead Details -->
             <div class="lead-details">
-              <div class="detail-row" *ngIf="lead.group?.name">
+              <div class="detail-row" *ngIf="lead.groups && lead.groups.length > 0">
                 <div class="detail-icon">👥</div>
                 <div class="detail-content">
-                  <span class="detail-label">Group</span>
-                  <span class="detail-value">{{ lead.group.name }}</span>
+                  <span class="detail-label">Groups</span>
+                  <span class="detail-value">
+                    <span *ngFor="let g of lead.groups; let last = last">{{ g.name || g }}{{ !last ? ', ' : '' }}</span>
+                  </span>
                 </div>
               </div>
 

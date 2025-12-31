@@ -30,12 +30,20 @@
                     <path d="m21 21-4.35-4.35"></path>
                 </svg>
                 <input type="text" class="search-input" placeholder="Search by name or label..."
-                    [(ngModel)]="searchTerm" (input)="applyFilters()">
+                    [(ngModel)]="searchTerm" (input)="onSearchChange()">
             </div>
         </div>
 
         <div class="filter-section">
-            <select class="filter-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+            <!-- Organization Filter - Only for Super Admin -->
+            <select *ngIf="isSuperAdmin()" class="filter-select" [(ngModel)]="organizationFilter"
+                (change)="onOrganizationChange()">
+                <option value="all">All Organizations</option>
+                <option *ngFor="let org of organizations" [value]="org._id">{{ org.name }}</option>
+            </select>
+
+            <!-- Status Filter - Always visible -->
+            <select class="filter-select" [(ngModel)]="statusFilter" (change)="onStatusChange()">
                 <option value="active">Active Only</option>
                 <option value="all">All Status</option>
                 <option value="inactive">Inactive Only</option>
@@ -54,7 +62,6 @@
         <table class="roles-table">
             <thead>
                 <tr>
-                    <th>Name</th>
                     <th>Label</th>
                     <th>Description</th>
                     <th>Organization</th>
@@ -66,9 +73,6 @@
             </thead>
             <tbody>
                 <tr *ngFor="let role of filteredRoles">
-                    <td>
-                        <span class="role-name">{{ role.name }}</span>
-                    </td>
                     <td>
                         <span class="role-label">{{ role.label }}</span>
                     </td>

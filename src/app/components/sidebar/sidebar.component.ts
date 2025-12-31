@@ -1,9 +1,10 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { SidebarService } from '../../services/sidebar.service';
-import { filter } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 interface MenuItem {
   label: string;
@@ -20,7 +21,7 @@ interface MenuItem {
   styleUrls: ['./sidebar.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   isCollapsed = false;
   isMobile = false;
   currentUser: any = null;
@@ -28,6 +29,7 @@ export class SidebarComponent implements OnInit {
   organizationName: string = 'Lead Management';
   organizationLogo: string | null = null;
   loadingOrganization = true;
+  private destroy$ = new Subject<void>();
 
   menuItems: MenuItem[] = [
     {
@@ -171,26 +173,26 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     // Get current user
-    this.authService.currentUser.subscribe(user => {
-      this.currentUser = user;
-      if (user && user.organization) {
-        // Use organization data directly from user object
-        this.organizationLogo = user.organization.logo || null;
-        this.loadingOrganization = false;
-      } else {
-        this.loadingOrganization = false;
-      }
-    });
+    this.authService.currentUser
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        this.currentUser = user;
+        if (user && user.organization) {
+          // Use organization data directly from user object
+          this.organizationLogo = user.organization.logo || null;
+          this.loadingOrganization = false;
+        } else {
+          this.loadingOrganization = false;
+        }
+      });
 
     // Track current route
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.destroy$)
     ).subscribe((event: any) => {
       this.currentRoute = event.url;
     });
-
-    // Listen for window resize
-    window.addEventListener('resize', () => this.checkMobile());
   }
 
   checkMobile(): void {
@@ -228,5 +230,10 @@ export class SidebarComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

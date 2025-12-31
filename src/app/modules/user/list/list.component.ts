@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -13,7 +13,8 @@ import Swal from 'sweetalert2';
     standalone: true,
     imports: [CommonModule, FormsModule, RouterModule],
     templateUrl: './list.component.html',
-    styleUrls: ['./list.component.css']
+    styleUrls: ['./list.component.css'],
+    changeDetection: ChangeDetectionStrategy.OnPush  // Optimize change detection
 })
 export class UserListComponent implements OnInit {
     users: User[] = [];
@@ -37,7 +38,8 @@ export class UserListComponent implements OnInit {
         private organizationService: OrganizationService,
         private authService: AuthService,
         private roleService: RoleService,
-        private router: Router
+        private router: Router,
+        private cdr: ChangeDetectorRef  // For manual change detection with OnPush
     ) { }
 
     ngOnInit(): void {
@@ -53,6 +55,7 @@ export class UserListComponent implements OnInit {
         this.roleService.getRoles().subscribe({
             next: (response) => {
                 this.roles = response.roles || [];
+                this.cdr.markForCheck();  // Trigger change detection
             },
             error: (error) => {
                 console.error('Error loading roles:', error);
@@ -69,6 +72,7 @@ export class UserListComponent implements OnInit {
         this.organizationService.getOrganizations().subscribe({
             next: (response) => {
                 this.organizations = response.organizations || [];
+                this.cdr.markForCheck();  // Trigger change detection
             },
             error: (error) => {
                 console.error('Error loading organizations:', error);
@@ -90,10 +94,12 @@ export class UserListComponent implements OnInit {
                 this.users = response.users || response || [];
                 this.applyFilters();
                 this.loading = false;
+                this.cdr.markForCheck();  // Trigger change detection
             },
             error: (error) => {
                 console.error('Error loading users:', error);
                 this.loading = false;
+                this.cdr.markForCheck();  // Trigger change detection
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -277,5 +283,83 @@ export class UserListComponent implements OnInit {
     shouldShowOrganizationColumn(): boolean {
         // Show organization column if user can view multiple organizations
         return this.canViewAllOrganizations();
+    }
+
+    // Generate consistent color for organization pill based on organization ID
+    getOrganizationColor(organization: string | { _id: string; name: string } | undefined): string {
+        if (!organization) return '#6b7280'; // Gray for N/A
+
+        const orgId = typeof organization === 'string' ? organization : organization._id;
+
+        // Predefined color palette for organizations
+        const colors = [
+            '#8b5cf6', // Purple
+            '#3b82f6', // Blue
+            '#10b981', // Green
+            '#f59e0b', // Amber
+            '#ef4444', // Red
+            '#ec4899', // Pink
+            '#06b6d4', // Cyan
+            '#f97316', // Orange
+            '#84cc16', // Lime
+            '#6366f1', // Indigo
+        ];
+
+        // Generate a consistent index based on organization ID
+        let hash = 0;
+        for (let i = 0; i < orgId.length; i++) {
+            hash = orgId.charCodeAt(i) + ((hash << 5) - hash);
+        }
+
+        const index = Math.abs(hash) % colors.length;
+        return colors[index];
+    }
+
+    // Check if a role is a system role
+    isSystemRole(role: string | { _id: string; name: string; label: string; isSystem?: boolean }): boolean {
+        if (typeof role === 'object' && role !== null) {
+            // Check if role object has isSystem property
+            if (role.hasOwnProperty('isSystem')) {
+                return role.isSystem === true;
+            }
+            // Fallback to checking role name
+            const roleName = role.name || '';
+            return roleName === 'super_admin' || roleName === 'org_admin';
+        }
+        // If role is a string, check against known system roles
+        return role === 'super_admin' || role === 'org_admin';
+    }
+
+    // Generate consistent color for custom role pill based on role ID
+    getRoleColor(role: string | { _id: string; name: string; label: string }): string {
+        // System roles don't need custom colors (they use badge styling)
+        if (this.isSystemRole(role)) {
+            return '#ef4444'; // Red for system roles (fallback)
+        }
+
+        const roleId = typeof role === 'object' ? role._id : role;
+
+        // Predefined light/pastel color palette for custom roles
+        const colors = [
+            '#c4b5fd', // Light Purple
+            '#93c5fd', // Light Blue
+            '#86efac', // Light Green
+            '#fcd34d', // Light Amber
+            '#f9a8d4', // Light Pink
+            '#67e8f9', // Light Cyan
+            '#fdba74', // Light Orange
+            '#bef264', // Light Lime
+            '#a5b4fc', // Light Indigo
+            '#5eead4', // Light Teal
+        ];
+
+        // Generate a consistent index based on role ID
+        let hash = 0;
+        for (let i = 0; i < roleId.length; i++) {
+            hash = roleId.charCodeAt(i) + ((hash << 5) - hash);
+        }
+
+        const index = Math.abs(hash) % colors.length;
+        return colors[index];
     }
 }

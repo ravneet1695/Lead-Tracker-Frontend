@@ -17,28 +17,30 @@
         </button>
     </div>
 
-    <!-- Filters Section -->
+    <!-- Filters Section - All in One Row -->
     <div class="filters-container">
-        <div class="search-section">
-            <div class="search-box">
-                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
-                </svg>
-                <input type="text" class="search-input" placeholder="Search by title or description..."
-                    [(ngModel)]="searchTerm" (input)="onSearch()">
-            </div>
+        <div class="search-box">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" class="search-input" placeholder="Search by title or description..."
+                [(ngModel)]="searchTerm" (input)="onSearch()">
         </div>
 
-        <div class="filter-section">
-            <select class="filter-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="completed">Completed</option>
-            </select>
-        </div>
+        <select class="filter-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="completed">Completed</option>
+        </select>
+
+        <select class="filter-select" [(ngModel)]="organizationFilter" (change)="onFilterChange()"
+            *ngIf="canViewAllOrganizations()">
+            <option value="all">All Organizations</option>
+            <option *ngFor="let org of organizations" [value]="org._id">{{ org.name }}</option>
+        </select>
     </div>
 
     <!-- Loading State -->
@@ -54,9 +56,10 @@
                 <tr>
                     <th>Title</th>
                     <th>Description</th>
-                    <th>Groups</th>
                     <th>Target</th>
                     <th>Timeline</th>
+                    <th>Groups</th>
+                    <th *ngIf="canViewAllOrganizations()">Organization</th>
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -77,16 +80,6 @@
                         <span class="goal-description">{{ goal.description || 'No description' }}</span>
                     </td>
                     <td>
-                        <div class="groups-cell">
-                            <span class="group-badge" *ngFor="let group of goal.groups?.slice(0, 2)">
-                                {{ group.name || group }}
-                            </span>
-                            <span class="group-more" *ngIf="goal.groups?.length > 2">
-                                +{{ goal.groups.length - 2 }} more
-                            </span>
-                        </div>
-                    </td>
-                    <td>
                         <span class="target-value">{{ goal.target || 'N/A' }}</span>
                     </td>
                     <td>
@@ -101,6 +94,19 @@
                                 N/A
                             </div>
                         </div>
+                    </td>
+                    <td>
+                        <div class="groups-cell">
+                            <span class="group-badge" *ngFor="let group of goal.groups?.slice(0, 2)">
+                                {{ group.name || group }}
+                            </span>
+                            <span class="group-more" *ngIf="goal.groups?.length > 2">
+                                +{{ goal.groups.length - 2 }} more
+                            </span>
+                        </div>
+                    </td>
+                    <td *ngIf="canViewAllOrganizations()">
+                        <span class="org-badge">{{ goal.organization?.name || 'N/A' }}</span>
                     </td>
                     <td>
                         <span class="status-badge" [class]="getStatusBadgeClass(goal.status)">{{ goal.status }}</span>
@@ -147,12 +153,6 @@
         </svg>
         <h3>No Goals Found</h3>
         <p>{{ searchTerm ? 'Try adjusting your search' : 'Get started by creating your first goal' }}</p>
-        <button *ngIf="canCreateGoal()" class="btn-create" (click)="createGoal()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            Create Goal
-        </button>
+
     </div>
 </div>

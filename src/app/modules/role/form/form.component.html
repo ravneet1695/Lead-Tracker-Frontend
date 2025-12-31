@@ -27,6 +27,17 @@
                 <p>Define the role's name, label, and description</p>
             </div>
 
+            <!-- Info for Org Admins -->
+            <div class="info-box" *ngIf="!isSuperAdmin()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>You are creating a custom role for your organization. This role will only be available to users in
+                    your organization.</span>
+            </div>
+
             <div class="form-grid">
                 <div class="form-group">
                     <label for="name">
