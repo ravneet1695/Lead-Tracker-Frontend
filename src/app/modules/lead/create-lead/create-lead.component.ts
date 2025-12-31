@@ -21,7 +21,7 @@ export class CreateLeadComponent implements OnInit {
     loading = true;
     submitting = false;
     userGroups: any[] = [];
-    selectedGroup: string = '';
+    selectedGroups: string[] = [];
     autoNumberCounters: { [key: string]: number } = {};
 
     constructor(
@@ -71,28 +71,46 @@ export class CreateLeadComponent implements OnInit {
             );
 
             // DEVELOPMENT MODE: If user has no matching groups, use all goal groups
-            // This allows testing without proper group assignments
             if (this.userGroups.length === 0) {
                 console.warn('User not assigned to goal groups - using all goal groups for development');
                 this.userGroups = this.goal.groups;
             }
 
+            // Auto-select if only one group
             if (this.userGroups.length === 1) {
-                this.selectedGroup = this.userGroups[0]._id || this.userGroups[0];
+                const groupId = this.userGroups[0]._id || this.userGroups[0];
+                this.selectedGroups = [groupId];
             }
         } else if (this.goal.groups) {
             // If user has no groups at all, use all goal groups
             console.warn('User has no groups - using all goal groups for development');
             this.userGroups = this.goal.groups;
             if (this.userGroups.length === 1) {
-                this.selectedGroup = this.userGroups[0]._id || this.userGroups[0];
+                const groupId = this.userGroups[0]._id || this.userGroups[0];
+                this.selectedGroups = [groupId];
             }
         }
     }
 
+    toggleGroup(groupId: string): void {
+        const index = this.selectedGroups.indexOf(groupId);
+        if (index > -1) {
+            this.selectedGroups.splice(index, 1);
+        } else {
+            this.selectedGroups.push(groupId);
+        }
+        // Update form control
+        this.leadForm.patchValue({ groups: this.selectedGroups });
+        this.leadForm.get('groups')?.markAsTouched();
+    }
+
+    isGroupSelected(groupId: string): boolean {
+        return this.selectedGroups.includes(groupId);
+    }
+
     initializeForm(): void {
         const formControls: any = {
-            group: [this.selectedGroup, Validators.required],
+            groups: [this.selectedGroups, Validators.required],
             status: [this.goal.statusOptions?.[0] || 'New', Validators.required],
             remarks: ['']
         };
@@ -327,7 +345,7 @@ export class CreateLeadComponent implements OnInit {
 
         const entryData = {
             goal: this.goalId,
-            group: formValue.group,
+            groups: formValue.groups,
             data: data,
             status: formValue.status,
             contacts: formValue.contacts || [],

@@ -202,7 +202,7 @@ export class MyLeadsComponent implements OnInit {
             filtered = filtered.map(goalGroup => {
                 const filteredLeads = goalGroup.leads.filter(lead => {
                     const matchesSearch = !this.searchTerm ||
-                        lead.group?.name?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+                        lead.groups?.some((g: any) => g.name?.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
                         lead.remarks?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
                         lead.status?.toLowerCase().includes(this.searchTerm.toLowerCase());
 

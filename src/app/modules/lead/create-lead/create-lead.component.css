@@ -545,8 +545,63 @@ textarea.form-control {
         padding: 8px;
     }
 
-    .table-input {
-        font-size: 0.8rem !important;
-        padding: 6px 8px !important;
-    }
+
+}
+
+/* Group Selection Styling */
+.groups-selection-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.group-checkbox-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: #0f1117;
+    border: 1px solid #2d3142;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.group-checkbox-item:hover {
+    background-color: rgba(99, 102, 241, 0.05);
+    border-color: #6366f1;
+}
+
+.group-checkbox-item.active {
+    background-color: rgba(99, 102, 241, 0.1);
+    border-color: #6366f1;
+}
+
+.custom-check-box {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #64748b;
+    border-radius: 4px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: white;
+}
+
+.group-checkbox-item.active .custom-check-box {
+    background-color: #6366f1;
+    border-color: #6366f1;
+}
+
+.custom-check-box span {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.group-label {
+    font-weight: 500;
+    color: #e2e8f0;
+    font-size: 0.95rem;
 }

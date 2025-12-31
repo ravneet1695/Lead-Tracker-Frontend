@@ -45,15 +45,18 @@
             </h2>
 
             <div class="form-group">
-                <label for="group" class="required">Group</label>
-                <select id="group" formControlName="group" class="form-control">
-                    <option value="">Select a group</option>
-                    <option *ngFor="let group of userGroups" [value]="group._id || group">
-                        {{ group.name || group }}
-                    </option>
-                </select>
-                <div class="error-message" *ngIf="leadForm.get('group')?.invalid && leadForm.get('group')?.touched">
-                    Please select a group
+                <label class="required">Assign Groups (Select Multiple)</label>
+                <div class="groups-selection-container">
+                    <div *ngFor="let group of userGroups" class="group-checkbox-item"
+                        [class.active]="isGroupSelected(group._id || group)" (click)="toggleGroup(group._id || group)">
+                        <div class="custom-check-box">
+                            <span *ngIf="isGroupSelected(group._id || group)">✓</span>
+                        </div>
+                        <span class="group-label">{{ group.name || group }}</span>
+                    </div>
+                </div>
+                <div class="error-message" *ngIf="leadForm.get('groups')?.invalid && leadForm.get('groups')?.touched">
+                    Please select at least one group
                 </div>
             </div>
         </div>
