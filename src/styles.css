@@ -1580,3 +1580,26 @@ body.light-theme .status-badge.inactive {
   background: rgba(100, 116, 139, 0.15) !important;
   color: #475569 !important;
 }
+
+/* Fix navigation icon visibility in light mode */
+body.light-theme .nav-icon,
+body.light-theme .nav-icon svg,
+body.light-theme .nav-item svg {
+  color: #4a5568 !important;
+  stroke: #4a5568 !important;
+  fill: none !important;
+}
+
+body.light-theme .nav-item:hover .nav-icon,
+body.light-theme .nav-item:hover .nav-icon svg,
+body.light-theme .nav-item:hover svg {
+  color: #004C8F !important;
+  stroke: #004C8F !important;
+}
+
+body.light-theme .nav-item.active .nav-icon,
+body.light-theme .nav-item.active .nav-icon svg,
+body.light-theme .nav-item.active svg {
+  color: #004C8F !important;
+  stroke: #004C8F !important;
+}
