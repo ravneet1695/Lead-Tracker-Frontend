@@ -109,13 +109,13 @@
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
-    margin: 4px 12px;
-    border-radius: var(--radius-md);
+    gap: 14px;
+    padding: 14px 20px;
+    margin: 6px 12px;
+    border-radius: 10px;
     color: var(--text-secondary);
     text-decoration: none;
-    transition: all var(--transition-base);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     border: 1px solid transparent;
     position: relative;
@@ -124,8 +124,8 @@
 
 .sidebar.collapsed .nav-item {
     justify-content: center;
-    padding: 12px;
-    margin: 4px 8px;
+    padding: 14px;
+    margin: 6px 8px;
 }
 
 .nav-item::before {
@@ -134,23 +134,26 @@
     left: 0;
     top: 0;
     bottom: 0;
-    width: 3px;
-    background: var(--primary-gradient);
+    width: 4px;
+    background: linear-gradient(135deg, #004C8F 0%, #667eea 100%);
     opacity: 0;
-    transition: opacity var(--transition-base);
+    transition: opacity 0.25s ease;
+    border-radius: 0 4px 4px 0;
 }
 
 .nav-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
     color: var(--text-primary);
-    border-color: rgba(102, 126, 234, 0.3);
+    border-color: rgba(102, 126, 234, 0.2);
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .nav-item.active {
-    background: rgba(102, 126, 234, 0.15);
-    color: var(--text-primary);
-    border-color: rgba(102, 126, 234, 0.5);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+    background: linear-gradient(135deg, rgba(0, 76, 143, 0.15) 0%, rgba(102, 126, 234, 0.15) 100%);
+    color: #ffffff;
+    border-color: rgba(0, 76, 143, 0.4);
+    box-shadow: 0 4px 16px rgba(0, 76, 143, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .nav-item.active::before {
@@ -162,20 +165,19 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .nav-icon svg {
-    width: 20px;
-    height: 20px;
-    stroke: rgba(255, 255, 255, 0.7); fill: none; stroke-width: 2;
-}
-
-.nav-icon::ng-deep svg {
-    width: 20px;
-    height: 20px;
-    stroke: rgba(255, 255, 255, 0.7); fill: none; stroke-width: 2;
+    width: 22px;
+    height: 22px;
+    stroke: rgba(255, 255, 255, 0.7);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .nav-label {
@@ -236,6 +238,7 @@
         display: none;
     }
 }
+
 /* Explicit icon visibility for hover and active states */
 .nav-item:hover .nav-icon svg {
     stroke: #ffffff;
@@ -243,4 +246,34 @@
 
 .nav-item.active .nav-icon svg {
     stroke: #004C8F;
+}
+/* Light theme icon colors */
+body.light-theme .nav-icon svg {
+    stroke: #4a5568;
+}
+
+body.light-theme .nav-item:hover .nav-icon svg {
+    stroke: #004C8F;
+}
+
+body.light-theme .nav-item.active .nav-icon svg {
+    stroke: #004C8F;
+}
+
+/* Light theme nav item styling */
+body.light-theme .nav-item {
+    color: #4a5568;
+}
+
+body.light-theme .nav-item:hover {
+    background: rgba(0, 76, 143, 0.08);
+    color: #004C8F;
+    border-color: rgba(0, 76, 143, 0.2);
+}
+
+body.light-theme .nav-item.active {
+    background: linear-gradient(135deg, rgba(0, 76, 143, 0.12) 0%, rgba(0, 76, 143, 0.08) 100%);
+    color: #004C8F;
+    border-color: rgba(0, 76, 143, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 76, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
