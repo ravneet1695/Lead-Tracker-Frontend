@@ -39,9 +39,9 @@
   --text-gradient: linear-gradient(135deg, #004C8F 0%, #ED232A 100%);
 
   /* Border & Divider */
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-color-light: rgba(255, 255, 255, 0.05);
-  --divider-color: rgba(255, 255, 255, 0.08);
+  --border-color: rgba(255, 255, 255, 0.25);
+  --border-color-light: rgba(255, 255, 255, 0.15);
+  --divider-color: rgba(255, 255, 255, 0.2);
 
   /* Shadows */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -87,7 +87,7 @@
 
   /* Forms & Inputs */
   --input-bg: rgba(255, 255, 255, 0.05);
-  --input-border: rgba(255, 255, 255, 0.15);
+  --input-border: rgba(255, 255, 255, 0.4);
   --input-text: #ffffff;
   --input-placeholder: #718096;
   --input-focus-border: #004C8F;
@@ -117,72 +117,72 @@
 
 /* ===== LIGHT THEME ===== */
 body.light-theme {
-  /* Backgrounds - GMoney Brand */
-  --dark-bg: #f8f9fa;
+  /* Backgrounds - Clean and Modern */
+  --dark-bg: #f9fafb;
   --darker-bg: #ffffff;
   --card-bg: #ffffff;
-  --card-hover-bg: #f8f9fa;
+  --card-hover-bg: #f9fafb;
 
-  /* Text - High Contrast */
-  --text-primary: #1a202c;
-  --text-secondary: #4a5568;
-  --text-muted: #718096;
+  /* Text - High Contrast for Readability */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
 
-  /* Borders - GMoney Brand Blue */
-  --border-color: rgba(0, 76, 143, 0.25);
-  --border-color-light: rgba(0, 76, 143, 0.08);
-  --divider-color: rgba(0, 76, 143, 0.15);
+  /* Borders - SOLID GRAY for VISIBILITY */
+  --border-color: #d1d5db;
+  --border-color-light: #e5e7eb;
+  --divider-color: #e5e7eb;
 
-  /* Shadows - Soft Blue Tint */
-  --shadow-sm: 0 2px 4px rgba(0, 76, 143, 0.08);
-  --shadow-md: 0 4px 8px rgba(0, 76, 143, 0.12);
-  --shadow-lg: 0 8px 16px rgba(0, 76, 143, 0.15);
-  --shadow-xl: 0 12px 24px rgba(0, 76, 143, 0.18);
-  --shadow-glow: 0 0 20px rgba(0, 76, 143, 0.25);
+  /* Shadows - Neutral Gray */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  --shadow-glow: 0 0 15px rgba(0, 0, 0, 0.1);
 
   /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(0, 76, 143, 0.2);
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: #d1d5db;
   --glass-blur: blur(10px);
 
   /* ===== COMPONENT-SPECIFIC VARIABLES (LIGHT THEME) ===== */
 
-  /* Tables */
+  /* Tables - Visible Borders */
   --table-bg: #ffffff;
-  --table-header-bg: rgba(0, 76, 143, 0.08);
+  --table-header-bg: #f9fafb;
   --table-header-text: #004C8F;
-  --table-row-hover: rgba(0, 76, 143, 0.05);
-  --table-border: rgba(0, 76, 143, 0.25);
-  --table-text: #1a202c;
+  --table-row-hover: #f3f4f6;
+  --table-border: #e5e7eb;
+  --table-text: #111827;
 
-  /* Forms & Inputs */
+  /* Forms & Inputs - Clear Borders */
   --input-bg: #ffffff;
-  --input-border: rgba(0, 76, 143, 0.3);
-  --input-text: #1a202c;
-  --input-placeholder: #718096;
+  --input-border: #d1d5db;
+  --input-text: #111827;
+  --input-placeholder: #9ca3af;
   --input-focus-border: #004C8F;
-  --input-focus-shadow: 0 0 0 3px rgba(0, 76, 143, 0.15);
+  --input-focus-shadow: 0 0 0 3px rgba(0, 76, 143, 0.1);
 
   /* Buttons */
   --button-secondary-bg: #ffffff;
-  --button-secondary-hover: rgba(0, 76, 143, 0.08);
+  --button-secondary-hover: #f9fafb;
   --button-secondary-text: #004C8F;
 
   /* Navigation */
-  --nav-item-text: #2d3748;
-  --nav-item-hover-bg: rgba(0, 76, 143, 0.08);
+  --nav-item-text: #374151;
+  --nav-item-hover-bg: #f3f4f6;
   --nav-item-hover-text: #004C8F;
-  --nav-item-active-bg: rgba(0, 76, 143, 0.12);
+  --nav-item-active-bg: #e5e7eb;
   --nav-item-active-text: #004C8F;
 
-  /* Sidebar */
+  /* Sidebar - Visible Border */
   --sidebar-bg: #ffffff;
-  --sidebar-border: rgba(0, 76, 143, 0.25);
+  --sidebar-border: #e5e7eb;
 
   /* Badges */
-  --badge-bg: rgba(0, 76, 143, 0.12);
+  --badge-bg: #e0f2fe;
   --badge-text: #004C8F;
-  --badge-border: rgba(0, 76, 143, 0.3);
+  --badge-border: #bae6fd;
 }
 
 
@@ -232,8 +232,21 @@ body.light-theme .empty-state {
 /* Fix field preview and canvas items */
 body.light-theme .field-preview-content,
 body.light-theme .field-input-placeholder,
-body.light-theme .canvas-body {
+body.light-theme .canvas-body,
+body.light-theme .form-canvas {
   background: #f7fafc !important;
+}
+
+body.light-theme .canvas-field-item {
+  background: #ffffff !important;
+  border-color: #d1d5db !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-theme .canvas-field-item.selected {
+  background: #f0f9ff !important;
+  border-color: #004C8F !important;
+  box-shadow: 0 4px 12px rgba(0, 76, 143, 0.1) !important;
 }
 
 /* Fix status badges and indicators */
@@ -246,15 +259,114 @@ body.light-theme .badge-count {
 /* Fix dropdown and select options */
 body.light-theme .dropdown-option-item,
 body.light-theme .status-option-item,
-body.light-theme .permission-item {
+body.light-theme .permission-item,
+body.light-theme .field-settings-sidebar,
+body.light-theme .field-types-sidebar {
   background: #ffffff !important;
   border-color: #e2e8f0 !important;
+}
+
+/* Fix Switches in Light Theme */
+body.light-theme .switch-custom {
+  background: #edf2f7 !important;
+  border: 2px solid #cbd5e0 !important;
+}
+
+body.light-theme .switch-label span {
+  color: #2d3748 !important;
+}
+
+body.light-theme .switch-label input:checked+.switch-custom {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  border-color: #2563eb !important;
+}
+
+/* Fix Key Wrapper and Monospace inputs */
+body.light-theme .key-input-wrapper .form-control {
+  background: #f8fafc !important;
+  color: #1e293b !important;
+  border-color: #cbd5e0 !important;
+}
+
+body.light-theme .key-lock {
+  color: #64748b !important;
+  opacity: 0.8 !important;
 }
 
 body.light-theme .dropdown-option-item:hover,
 body.light-theme .status-option-item:hover,
 body.light-theme .permission-item:hover {
   background: #f7fafc !important;
+}
+
+/* Fix Status Options in Light Theme */
+body.light-theme .status-options-container {
+  background: #ffffff !important;
+  border-color: #d1d5db !important;
+}
+
+body.light-theme .status-help-banner {
+  background: rgba(0, 76, 143, 0.05) !important;
+  border-bottom-color: rgba(0, 76, 143, 0.1) !important;
+}
+
+body.light-theme .status-help-banner svg {
+  color: #004C8F !important;
+}
+
+body.light-theme .add-status-form {
+  background: #fdfdfd !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+body.light-theme .add-status-input-group .form-control {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-color: #d1d5db !important;
+}
+
+body.light-theme .status-chip-item {
+  background: #f8fafc !important;
+  border-color: #d1d5db !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-theme .status-chip-item:hover {
+  background: #ffffff !important;
+  border-color: #004C8F !important;
+  box-shadow: 0 4px 10px rgba(0, 76, 143, 0.1) !important;
+}
+
+body.light-theme .status-chip-item.is-completion {
+  background: #f0fdf4 !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.1) !important;
+}
+
+body.light-theme .chips-label,
+body.light-theme .completion-label {
+  color: #4b5563 !important;
+}
+
+body.light-theme .radio-custom {
+  background: #ffffff !important;
+  border-color: #cbd5e0 !important;
+}
+
+body.light-theme .radio-wrapper:hover .radio-custom {
+  border-color: #004C8F !important;
+}
+
+body.light-theme .radio-wrapper input[type="radio"]:checked+.radio-custom {
+  border-color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.05) !important;
+}
+
+/* Fix badge counts in light theme */
+body.light-theme .badge-count {
+  background: rgba(0, 76, 143, 0.1) !important;
+  color: #004C8F !important;
+  border-color: rgba(0, 76, 143, 0.2) !important;
 }
 
 /* Fix table inputs and cells */
@@ -1478,106 +1590,154 @@ h6 {
     font-size: 1.25rem;
   }
 }
+
 /* ============================================
-   LIGHT THEME CONTAINER BORDERS
+   GLOBAL THEME APPLICATION
    ============================================ */
 
-/* Main page containers */
-body.light-theme .goals-container,
-body.light-theme .users-container,
-body.light-theme .groups-container,
-body.light-theme .organizations-container,
-body.light-theme .roles-container,
-body.light-theme .audit-logs-container,
-body.light-theme .my-leads-container,
-body.light-theme .dashboard-container,
-body.light-theme .create-lead-container,
-body.light-theme .edit-lead-container {
-  border: 2px solid rgba(0, 76, 143, 0.15) !important;
-  border-radius: 12px !important;
-  background: #ffffff !important;
+/* Page Containers */
+.goals-container,
+.users-container,
+.groups-container,
+.organizations-container,
+.roles-container,
+.audit-logs-container,
+.my-leads-container,
+.dashboard-container,
+.create-lead-container,
+.edit-lead-container {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
 }
 
-/* Filter containers */
-body.light-theme .filters-container,
-body.light-theme .filters-section {
-  border: 1px solid rgba(0, 76, 143, 0.25) !important;
-  background: #ffffff !important;
+/* Filter sections */
+.filters-container,
+.filters-section {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
 }
 
-/* Table wrappers */
-body.light-theme .table-wrapper,
-body.light-theme .table-container {
-  border: 1px solid rgba(0, 76, 143, 0.25) !important;
-  background: #ffffff !important;
+/* Tables */
+.table-wrapper,
+.table-container {
+  background: var(--table-bg);
+  border: 1px solid var(--table-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
 }
 
-/* Cards */
-body.light-theme .card,
-body.light-theme .stat-card,
-body.light-theme .metric-card,
-body.light-theme .dashboard-card,
-body.light-theme .lead-card {
-  border: 1px solid rgba(0, 76, 143, 0.25) !important;
-  background: #ffffff !important;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--table-bg);
 }
 
-/* Form sections */
-body.light-theme .form-section,
-body.light-theme .form-group {
-  border: 1px solid rgba(0, 76, 143, 0.2) !important;
-  background: #ffffff !important;
+thead {
+  background: var(--table-header-bg);
 }
 
-/* Groups page specific styling to match Users page */
-body.light-theme .groups-table {
-  background: #ffffff !important;
-  border: 1px solid rgba(0, 76, 143, 0.25) !important;
+th {
+  color: var(--table-header-text);
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 2px solid var(--table-border);
 }
 
-body.light-theme .groups-table thead {
-  background: rgba(0, 76, 143, 0.08) !important;
-  border-bottom: 2px solid rgba(0, 76, 143, 0.25) !important;
+td {
+  padding: 12px 16px;
+  color: var(--table-text);
+  border-bottom: 1px solid var(--table-border);
 }
 
-body.light-theme .groups-table th {
-  color: #004C8F !important;
-  font-weight: 700 !important;
+tbody tr:hover {
+  background: var(--table-row-hover);
 }
 
-body.light-theme .groups-table td {
-  color: #1a202c !important;
-  font-weight: 500 !important;
+/* Status Badges */
+.status-badge {
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
-body.light-theme .groups-table tbody tr:hover {
-  background: rgba(0, 76, 143, 0.05) !important;
-}
-
-body.light-theme .group-code,
-body.light-theme .group-name strong,
-body.light-theme .member-count,
-body.light-theme .manager-count {
-  color: #1a202c !important;
-}
-
-body.light-theme .group-name small {
-  color: #4a5568 !important;
-}
-
-body.light-theme .org-badge {
-  background: rgba(0, 76, 143, 0.12) !important;
-  color: #004C8F !important;
-  border: 1px solid rgba(0, 76, 143, 0.3) !important;
+.status-badge.active {
+  background: rgba(34, 197, 94, 0.15);
+  color: #059669;
 }
 
 body.light-theme .status-badge.active {
-  background: rgba(34, 197, 94, 0.15) !important;
-  color: #059669 !important;
+  background: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+.status-badge.inactive {
+  background: rgba(100, 116, 139, 0.15);
+  color: #475569;
 }
 
 body.light-theme .status-badge.inactive {
-  background: rgba(100, 116, 139, 0.15) !important;
+  background: #f1f5f9 !important;
   color: #475569 !important;
 }
 
+/* ============================================
+   GLOBAL FORM GRID SYSTEM
+   ============================================ */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.form-row-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.form-group-full {
+  grid-column: 1 / -1;
+}
+
+.form-group-span-2 {
+  grid-column: span 2;
+}
+
+.form-group-span-3 {
+  grid-column: span 3;
+}
+
+@media (max-width: 1200px) {
+  .form-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .form-row-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .form-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+
+  .form-row,
+  .form-row-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group-span-2,
+  .form-group-span-3 {
+    grid-column: span 1;
+  }
+}

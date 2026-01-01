@@ -4,16 +4,16 @@
     padding: 32px;
 }
 
-/* Purple Header */
+/* Page Header */
 .page-header {
-    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
+    background: var(--primary-gradient);
     padding: 14px 24px;
     margin-bottom: 0;
-    border-radius: 10px 10px 0 0;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
 }
 
 .header-left {
@@ -28,16 +28,10 @@
 }
 
 .header-left h1 {
-    color: white;
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin: 0 0 4px 0;
-}
-
-.header-left p {
-    color: rgba(255, 255, 255, 0.9);
+    color: white !important;
+    font-size: 1.25rem;
+    font-weight: 700;
     margin: 0;
-    font-size: 0.95rem;
 }
 
 .btn-back {
@@ -45,13 +39,12 @@
     align-items: center;
     gap: 6px;
     padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.95);
-    color: #059669;
-    border: none;
-    border-radius: 8px;
+    background: var(--button-secondary-bg);
+    color: var(--brand-blue);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
 
 .btn-back:hover {
@@ -92,21 +85,25 @@
     gap: 24px;
 }
 
+/* Form Sections */
 .form-section {
     background: var(--card-bg);
-    border-radius: 12px;
-    padding: 24px;
     border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    margin-bottom: 24px;
 }
 
 .section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--brand-blue);
+    margin: 0 0 20px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-color);
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 20px;
 }
 
 .section-title svg {
@@ -140,13 +137,13 @@
     gap: 8px;
 }
 
-.form-group label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--table-header-text);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+/* Form Controls */
+.form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.85rem;
 }
 
 .form-group label.required::after {
@@ -159,19 +156,19 @@
 }
 
 .form-control {
-    padding: 12px;
-    background: var(--table-header-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-sm);
+    color: var(--input-text);
+    font-size: 0.9rem;
 }
 
 .form-control:focus {
     outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    border-color: var(--brand-blue);
+    box-shadow: var(--input-focus-shadow);
 }
 
 .form-control::placeholder {
@@ -203,11 +200,13 @@ textarea.form-control {
     margin-bottom: 16px;
 }
 
+/* Contact Cards */
 .contact-card {
-    background: var(--table-header-bg);
-    border-radius: 12px;
-    padding: 20px;
+    background: var(--button-secondary-bg);
     border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-bottom: 16px;
 }
 
 .contact-header {
@@ -266,11 +265,11 @@ textarea.form-control {
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
+    gap: 16px;
     padding: 24px;
     background: var(--card-bg);
-    border-radius: 12px;
     border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
 }
 
 .btn {
@@ -283,9 +282,13 @@ textarea.form-control {
     border: none;
 }
 
+/* Action Buttons */
 .btn-primary {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: var(--primary-gradient);
     color: white;
+    padding: 12px 32px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -311,7 +314,7 @@ textarea.form-control {
 /* Responsive */
 @media (max-width: 768px) {
     .create-lead-container {
-        padding: 20px;
+        padding: 16px;
     }
 
     .form-grid,

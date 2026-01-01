@@ -4,16 +4,16 @@
     padding: 32px;
 }
 
-/* Header */
+/* Page Header */
 .page-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px 32px;
+    background: var(--primary-gradient);
+    padding: 14px 24px;
     margin-bottom: 0;
-    border-radius: 12px 12px 0 0;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
 }
 
 .header-left {
@@ -29,38 +29,36 @@
 }
 
 .header-left h1 {
-    color: white;
-    font-size: 1.25rem;
+    color: white !important;
+    font-size: 1.1rem;
     font-weight: 600;
     margin: 0;
-    letter-spacing: -0.025em;
 }
 
-.btn-primary {
+.btn-create-group {
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.95);
-    color: #667eea;
-    border: none;
-    border-radius: 8px;
+    background: var(--button-secondary-bg);
+    color: var(--brand-blue);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
 
-.btn-primary svg {
+.btn-create-group svg {
     width: 16px;
     height: 16px;
 }
 
-.btn-primary:hover {
-    background: white;
+.btn-create-group:hover {
+    background: var(--button-secondary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-sm);
 }
 
 /* Stats Grid */
@@ -130,46 +128,44 @@
     font-weight: 700;
 }
 
-/* Filters */
-.filters-section {
-    background: #1a1d2e;
-    padding: 24px 32px;
+/* Filters Container */
+.filters-container {
+    background: var(--card-bg);
+    padding: 16px 24px;
     display: flex;
     align-items: center;
     gap: 16px;
-    border-bottom: 1px solid #2d3142;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .search-box {
     position: relative;
     flex: 1;
-    min-width: 300px;
 }
 
-.search-box svg {
+.search-icon {
     position: absolute;
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: #94a3b8;
-    pointer-events: none;
+    color: var(--text-muted);
 }
 
 .search-input {
     width: 100%;
-    padding: 12px 14px 12px 42px;
-    background: #0f1117;
-    border: 1px solid #2d3142;
-    border-radius: 6px;
-    color: #e2e8f0;
-    font-size: 0.95rem;
+    padding: 10px 14px 10px 42px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-sm);
+    color: var(--input-text);
+    font-size: 0.9rem;
     transition: all 0.3s ease;
 }
 
 .search-input:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: var(--brand-blue);
+    box-shadow: var(--input-focus-shadow);
 }
 
 .filter-select {

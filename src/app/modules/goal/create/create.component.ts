@@ -527,8 +527,19 @@ export class GoalCreateComponent implements OnInit {
         this.router.navigate(['/goals/manage']);
     }
 
-    getFieldTypeIcon(fieldType: string): string {
-        return this.fieldTypes.find(ft => ft.value === fieldType)?.icon || '📝';
+    getFieldTypeIcon(type: string): string {
+        return this.fieldTypes.find(ft => ft.value === type)?.icon || '❓';
+    }
+
+    getFieldCategory(type: string): string {
+        const textTypes = ['text', 'email', 'phone', 'textarea', 'autoNumber'];
+        const numberTypes = ['number', 'currency', 'points'];
+        const selectTypes = ['dropdown', 'checkbox', 'radio', 'switch'];
+
+        if (textTypes.includes(type)) return 'cat-text';
+        if (numberTypes.includes(type)) return 'cat-number';
+        if (selectTypes.includes(type)) return 'cat-select';
+        return 'cat-complex';
     }
 
     getFieldTypeLabel(fieldType: string): string {

@@ -6,6 +6,24 @@
         <p>Loading...</p>
     </div>
 
+    <!-- Header -->
+    <div class="page-header" *ngIf="!loading">
+        <div class="header-left">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            <h1>Create New Goal</h1>
+        </div>
+        <button class="btn-back" (click)="cancel()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Goals
+        </button>
+    </div>
+
     <!-- Form -->
     <div *ngIf="!loading" class="form-wrapper">
         <form [formGroup]="goalForm" (ngSubmit)="onSubmit()" class="goal-form">
@@ -131,19 +149,37 @@
 
                         <div class="canvas-body" [class.empty]="formFields.length === 0">
                             <div *ngIf="formFields.length === 0" class="empty-canvas-state">
-                                <div class="empty-icon">✨</div>
+                                <div class="empty-icon">
+                                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+                                        style="opacity: 0.2;">
+                                        <path d="M12 3v18M3 12h18"></path>
+                                        <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                                    </svg>
+                                </div>
                                 <h4>Start Building Your Form</h4>
                                 <p>Select fields from the left sidebar to add them here.</p>
                             </div>
 
                             <div *ngFor="let field of formFields; let i = index" class="canvas-field-item"
-                                [class.selected]="selectedFieldIndex === i" (click)="selectField(i)">
+                                [class.selected]="selectedFieldIndex === i" [class]="getFieldCategory(field.fieldType)"
+                                (click)="selectField(i)">
                                 <div class="field-drag-handle">
                                     <div class="reorder-arrows">
                                         <button type="button" class="btn-arrow" [disabled]="i === 0"
-                                            (click)="moveFieldUp(i); $event.stopPropagation()">▲</button>
+                                            (click)="moveFieldUp(i); $event.stopPropagation()">
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="3">
+                                                <polyline points="18 15 12 9 6 15"></polyline>
+                                            </svg>
+                                        </button>
                                         <button type="button" class="btn-arrow" [disabled]="i === formFields.length - 1"
-                                            (click)="moveFieldDown(i); $event.stopPropagation()">▼</button>
+                                            (click)="moveFieldDown(i); $event.stopPropagation()">
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="3">
+                                                <polyline points="6 9 12 15 18 9"></polyline>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="field-preview-content">
@@ -174,12 +210,26 @@
                     <!-- Right Sidebar: Configuration Panel -->
                     <aside class="field-settings-sidebar">
                         <div class="sidebar-header">
-                            <h4>Field Settings</h4>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" style="color: var(--brand-blue);">
+                                    <path d="M12 20v-6M9 20V10M15 20V4M3 20h18"></path>
+                                </svg>
+                                <h4>Field Settings</h4>
+                            </div>
                             <p *ngIf="selectedFieldIndex !== null">Configure selected field attributes</p>
                         </div>
 
                         <div *ngIf="selectedFieldIndex === null" class="no-selection-state">
-                            <div class="no-selection-icon">⚙️</div>
+                            <div class="no-selection-icon">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1" style="opacity: 0.2;">
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                    <path
+                                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                                    </path>
+                                </svg>
+                            </div>
                             <p>Select a field from the preview to edit its properties</p>
                         </div>
 
@@ -200,21 +250,24 @@
                                         <input type="text" class="form-control"
                                             [(ngModel)]="formFields[selectedFieldIndex].fieldName"
                                             [ngModelOptions]="{standalone: true}" placeholder="field_name">
-                                        <span class="key-lock">🔒</span>
+                                        <span class="key-lock">
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                            </svg>
+                                        </span>
                                     </div>
                                     <small>Unique identifier for this field</small>
                                 </div>
 
-                                <div class="settings-row">
-                                    <div class="settings-group">
-                                        <label class="switch-label">
-                                            <input type="checkbox"
-                                                [(ngModel)]="formFields[selectedFieldIndex].mandatory"
-                                                [ngModelOptions]="{standalone: true}">
-                                            <span class="switch-custom"></span>
-                                            <span>Required Field</span>
-                                        </label>
-                                    </div>
+                                <div class="settings-group">
+                                    <label class="switch-label">
+                                        <input type="checkbox" [(ngModel)]="formFields[selectedFieldIndex].mandatory"
+                                            [ngModelOptions]="{standalone: true}">
+                                        <span class="switch-custom"></span>
+                                        <span>Required Field</span>
+                                    </label>
                                 </div>
 
                                 <hr class="settings-divider">
@@ -412,26 +465,22 @@
                             <div *ngFor="let status of statusOptions; let i = index" class="status-chip-item"
                                 [class.is-completion]="goalForm.get('completionStatus')?.value === status">
 
-                                <div class="status-chip-main">
-                                    <span class="status-name">{{ status }}</span>
-                                </div>
-
-                                <div class="status-chip-actions">
+                                <div class="status-chip-content">
                                     <label class="radio-wrapper" title="Mark as completion status">
                                         <input type="radio" name="completionStatus" [value]="status"
                                             [formControl]="$any(goalForm.get('completionStatus'))">
                                         <span class="radio-custom"></span>
                                     </label>
-
-                                    <button type="button" class="btn-remove-status" (click)="removeStatusOption(i)"
-                                        title="Remove status">
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2">
-                                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                                        </svg>
-                                    </button>
+                                    <span class="status-name">{{ status }}</span>
                                 </div>
+
+                                <button type="button" class="btn-remove-status" (click)="removeStatusOption(i)"
+                                    title="Remove status">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
                             </div>
 
                             <div *ngIf="statusOptions.length === 0" class="empty-status-state">

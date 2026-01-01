@@ -38,7 +38,7 @@
                     your organization.</span>
             </div>
 
-            <div class="form-grid">
+            <div class="form-row-3">
                 <div class="form-group">
                     <label for="name">
                         Name <span class="required">*</span>
@@ -65,14 +65,14 @@
                     </div>
                 </div>
 
-                <div class="form-group full-width">
+                <div class="form-group form-group-full">
                     <label for="description">Description</label>
                     <textarea id="description" formControlName="description" class="form-control" rows="3"
                         placeholder="Describe what this role can do..."></textarea>
                 </div>
 
                 <!-- Role Type Selection (Super Admin only) -->
-                <div class="form-group full-width" *ngIf="isSuperAdmin() && !isEditMode">
+                <div class="form-group form-group-full" *ngIf="isSuperAdmin() && !isEditMode">
                     <label>
                         Role Type <span class="required">*</span>
                     </label>
@@ -91,7 +91,7 @@
                 </div>
 
                 <!-- Organization Selection (for Custom roles - Super Admin only) -->
-                <div class="form-group full-width"
+                <div class="form-group form-group-full"
                     *ngIf="isSuperAdmin() && !roleForm.get('isSystem')?.value && !isEditMode">
                     <label for="organization">
                         Organization <span class="required">*</span>

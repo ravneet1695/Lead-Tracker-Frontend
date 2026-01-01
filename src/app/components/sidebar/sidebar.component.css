@@ -4,10 +4,10 @@
     top: 0;
     height: 100vh;
     width: 220px;
-    background: rgba(26, 26, 46, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-right: 1px solid var(--border-color);
+    background: var(--sidebar-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-right: 1px solid var(--sidebar-border);
     display: flex;
     flex-direction: column;
     transition: all var(--transition-base);
@@ -22,30 +22,11 @@
 /* Sidebar Header */
 .sidebar-header {
     padding: 8px 16px;
-    /* Reduced from 24px 20px to match main header */
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--sidebar-border);
     min-height: 52px;
-    /* Match main header height */
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    overflow: hidden;
-}
-
-.logo-icon {
-    font-size: 2.5rem;
-    /* Reduced from 3rem */
-    flex-shrink: 0;
-    filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .org-logo {
@@ -53,24 +34,13 @@
     height: 36px;
     object-fit: cover;
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.logo-text {
-    font-size: 1.25rem;
-    font-weight: 700;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    white-space: nowrap;
-    animation: fadeIn 0.3s ease;
+    background: var(--input-bg);
 }
 
 .toggle-btn {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--button-secondary-bg);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     padding: 8px;
     cursor: pointer;
     display: flex;
@@ -81,12 +51,8 @@
 }
 
 .toggle-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(102, 126, 234, 0.5);
-}
-
-.sidebar.collapsed .toggle-btn {
-    margin: 0 auto;
+    background: var(--button-secondary-hover);
+    border-color: var(--brand-blue);
 }
 
 /* Navigation */
@@ -102,7 +68,7 @@
 }
 
 .sidebar-nav::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--border-color);
     border-radius: 2px;
 }
 
@@ -112,8 +78,8 @@
     gap: 14px;
     padding: 14px 20px;
     margin: 6px 12px;
-    border-radius: 10px;
-    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    color: var(--nav-item-text);
     text-decoration: none;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
@@ -132,28 +98,25 @@
     content: '';
     position: absolute;
     left: 0;
-    top: 0;
-    bottom: 0;
+    top: 15%;
+    bottom: 15%;
     width: 4px;
-    background: linear-gradient(135deg, #004C8F 0%, #667eea 100%);
+    background: var(--brand-blue);
     opacity: 0;
     transition: opacity 0.25s ease;
     border-radius: 0 4px 4px 0;
 }
 
 .nav-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-primary);
-    border-color: rgba(102, 126, 234, 0.2);
-    transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background: var(--nav-item-hover-bg);
+    color: var(--nav-item-hover-text);
 }
 
 .nav-item.active {
-    background: linear-gradient(135deg, rgba(0, 76, 143, 0.15) 0%, rgba(102, 126, 234, 0.15) 100%);
-    color: #ffffff;
-    border-color: rgba(0, 76, 143, 0.4);
-    box-shadow: 0 4px 16px rgba(0, 76, 143, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    background: var(--nav-item-active-bg);
+    color: var(--nav-item-active-text);
+    border-color: var(--nav-item-active-bg);
+    font-weight: 600;
 }
 
 .nav-item.active::before {
@@ -167,30 +130,27 @@
     flex-shrink: 0;
     width: 22px;
     height: 22px;
-    color: rgba(255, 255, 255, 0.7);
+    color: inherit;
 }
 
 .nav-icon svg {
-    width: 22px;
-    height: 22px;
-    stroke: rgba(255, 255, 255, 0.7);
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
     fill: none;
     stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+    transition: all 0.25s ease;
 }
 
 .nav-label {
-    font-weight: 500;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     white-space: nowrap;
-    animation: fadeIn 0.3s ease;
 }
 
 /* Sidebar Footer */
 .sidebar-footer {
     padding: 20px 0;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--sidebar-border);
 }
 
 .logout-btn {
@@ -198,30 +158,13 @@
     border: 1px solid transparent;
     width: calc(100% - 24px);
     margin: 0 12px;
-}
-
-.sidebar.collapsed .logout-btn {
-    width: calc(100% - 16px);
-    margin: 0 8px;
+    color: var(--brand-red);
 }
 
 .logout-btn:hover {
-    background: rgba(255, 107, 107, 0.1);
-    border-color: rgba(255, 107, 107, 0.3);
-    color: #ff6b6b;
-}
-
-/* Mobile Overlay */
-.sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    z-index: 999;
-    animation: fadeIn 0.3s ease;
+    background: rgba(237, 35, 42, 0.1);
+    border-color: rgba(237, 35, 42, 0.2);
+    color: var(--brand-red);
 }
 
 /* Mobile Responsive */
@@ -233,47 +176,4 @@
     .sidebar:not(.collapsed) {
         transform: translateX(0);
     }
-
-    .toggle-btn {
-        display: none;
-    }
-}
-
-/* Explicit icon visibility for hover and active states */
-.nav-item:hover .nav-icon svg {
-    stroke: #ffffff;
-}
-
-.nav-item.active .nav-icon svg {
-    stroke: #004C8F;
-}
-/* Light theme icon colors */
-body.light-theme .nav-icon svg {
-    stroke: #4a5568;
-}
-
-body.light-theme .nav-item:hover .nav-icon svg {
-    stroke: #004C8F;
-}
-
-body.light-theme .nav-item.active .nav-icon svg {
-    stroke: #004C8F;
-}
-
-/* Light theme nav item styling */
-body.light-theme .nav-item {
-    color: #4a5568;
-}
-
-body.light-theme .nav-item:hover {
-    background: rgba(0, 76, 143, 0.08);
-    color: #004C8F;
-    border-color: rgba(0, 76, 143, 0.2);
-}
-
-body.light-theme .nav-item.active {
-    background: linear-gradient(135deg, rgba(0, 76, 143, 0.12) 0%, rgba(0, 76, 143, 0.08) 100%);
-    color: #004C8F;
-    border-color: rgba(0, 76, 143, 0.3);
-    box-shadow: 0 4px 16px rgba(0, 76, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
