@@ -23,7 +23,7 @@
 }
 
 .header-left svg {
-    color: rgba(255, 255, 255, 0.9);
+    color: white !important;
     flex-shrink: 0;
 }
 
