@@ -24,6 +24,7 @@ export interface MasterConfig {
     leadStatuses: LeadStatus[];
     productCategories: string[];
     customFields: CustomField[];
+    departments: string[];
     tags: string[];
     settings: {
         businessHours: {
