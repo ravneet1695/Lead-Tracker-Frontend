@@ -301,6 +301,82 @@ body.light-theme .permission-item:hover {
 
 /* Fix Status Options in Light Theme */
 body.light-theme .status-options-container {
+  border-color: #cbd5e1;
+  background: #ffffff;
+}
+
+body.light-theme .status-badge-count,
+body.light-theme .completion-badge {
+  background: rgba(0, 76, 143, 0.1);
+  color: var(--brand-blue);
+  border: 1px solid rgba(0, 76, 143, 0.2);
+}
+
+/* User & Group Form Overrides */
+body.light-theme .user-form,
+body.light-theme .group-form {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-theme .form-section {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-theme .form-section:hover {
+  border-color: rgba(0, 76, 143, 0.2) !important;
+}
+
+body.light-theme .form-control {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+body.light-theme .form-control:focus {
+  border-color: var(--brand-blue) !important;
+  box-shadow: 0 0 0 4px rgba(0, 76, 143, 0.05) !important;
+}
+
+body.light-theme .checkbox-list {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-theme .checkbox-item {
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-theme .checkbox-item:hover {
+  background: #e2e8f0 !important;
+  border-color: rgba(0, 76, 143, 0.3) !important;
+}
+
+/* Group List Overrides */
+body.light-theme .filters-container {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-theme .groups-table thead {
+  background: #f8fafc !important;
+}
+
+body.light-theme .groups-table td {
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+body.light-theme .org-badge {
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+/* Fix Status Options in Light Theme */
+body.light-theme .status-options-container {
   background: #ffffff !important;
   border-color: #d1d5db !important;
 }
