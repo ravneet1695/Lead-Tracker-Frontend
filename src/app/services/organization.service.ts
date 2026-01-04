@@ -20,6 +20,7 @@ export interface Organization {
     logo?: string;
     website?: string;
     description?: string;
+    departments?: string[];
     status?: 'active' | 'inactive';
     admin?: {
         _id: string;

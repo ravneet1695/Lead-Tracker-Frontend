@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OrganizationService } from '../../../services/organization.service';
 import { LocationService } from '../../../services/location.service';
@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 @Component({
     selector: 'app-organization-form',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule],
     templateUrl: './form.component.html',
     styleUrls: ['./form.component.css']
 })
@@ -29,6 +29,8 @@ export class OrganizationFormComponent implements OnInit {
     // File upload
     selectedLogoFile: File | null = null;
     selectedAdminProfileFile: File | null = null;
+    departments: string[] = [];
+    customDepartmentInput: string = '';
 
     constructor(
         private fb: FormBuilder,
@@ -150,19 +152,20 @@ export class OrganizationFormComponent implements OnInit {
     initializeForm(): void {
         this.organizationForm = this.fb.group({
             code: [{ value: '', disabled: true }], // Auto-generated, always disabled
-            name: ['', [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-Z0-9\s]+$/)]],
+            name: ['', [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-Z0-9\s&\-\.,]+$/)]],
             email: ['', [Validators.required, Validators.email]],
             website: ['', [Validators.pattern(/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/)]],
             alias: [''],
             phone: [''],
             address: this.fb.group({
                 street: [''],
-                city: [''],
-                state: [''],
-                pincode: ['']
+                city: ['', [Validators.required]],
+                state: ['', [Validators.required]],
+                pincode: ['', [Validators.required]]
             }),
             logo: ['', this.isEditMode ? [] : [Validators.required]],
             description: [''],
+            departments: [[]],
             // Admin user fields (only for create mode)
             adminUser: this.fb.group({
                 name: ['', this.isEditMode ? [] : [Validators.required]],
@@ -227,12 +230,13 @@ export class OrganizationFormComponent implements OnInit {
                             logo: org.logo || '',
                             description: org.description || '',
                             address: {
-                                state: org.address?.state || '',
                                 city: org.address?.city || '',
                                 pincode: org.address?.pincode || '',
                                 street: org.address?.street || ''
-                            }
+                            },
+                            departments: org.departments || []
                         });
+                        this.departments = org.departments || [];
                         console.log('Form values after patch:', this.organizationForm.value);
                     }, 100);
                 }
@@ -252,7 +256,7 @@ export class OrganizationFormComponent implements OnInit {
         });
     }
 
-    onLogoSelected(event: any): void {
+    onLogoChange(event: any): void {
         const file = event.target.files[0];
         if (file) {
             // Validate file type
@@ -277,6 +281,13 @@ export class OrganizationFormComponent implements OnInit {
             }
 
             this.selectedLogoFile = file;
+            // Update the form control value so the form becomes valid
+            const logoControl = this.organizationForm.get('logo');
+            if (logoControl) {
+                logoControl.setValue(file.name);
+                logoControl.markAsDirty();
+                logoControl.markAsTouched();
+            }
         }
     }
 
@@ -328,7 +339,6 @@ export class OrganizationFormComponent implements OnInit {
         }
 
         this.submitting = true;
-        // Use getRawValue() to include disabled fields (like code)
         const formData = this.organizationForm.getRawValue();
 
         // Prepare data based on mode
@@ -337,12 +347,11 @@ export class OrganizationFormComponent implements OnInit {
             // Exclude adminUser for updates - backend doesn't expect it
             const { adminUser, ...orgData } = formData;
             dataToSend = orgData;
-            console.log('Update payload:', dataToSend);
         } else {
             // Include everything for creation
             dataToSend = formData;
-            console.log('Create payload:', dataToSend);
         }
+        console.log(`${this.isEditMode ? 'Update' : 'Create'} payload:`, dataToSend);
 
         const request = this.isEditMode
             ? this.organizationService.updateOrganization(this.organizationId!, dataToSend)
@@ -375,17 +384,6 @@ export class OrganizationFormComponent implements OnInit {
 
     onCancel(): void {
         this.router.navigate(['/organizations']);
-    }
-
-    onLogoChange(event: Event): void {
-        const input = event.target as HTMLInputElement;
-        if (input.files && input.files.length > 0) {
-            this.selectedLogoFile = input.files[0];
-            // Update the form control with the file name or you can convert to base64
-            this.organizationForm.patchValue({
-                logo: this.selectedLogoFile.name
-            });
-        }
     }
 
     clearSelectedFile(): void {
@@ -429,5 +427,25 @@ export class OrganizationFormComponent implements OnInit {
             }
         }
         return '';
+    }
+
+    addDepartment(): void {
+        const value = this.customDepartmentInput.trim();
+        if (value && !this.departments.includes(value)) {
+            this.departments.push(value);
+            this.organizationForm.get('departments')?.patchValue(this.departments);
+            this.customDepartmentInput = '';
+        } else if (this.departments.includes(value)) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Duplicate Department',
+                text: 'This department already exists.'
+            });
+        }
+    }
+
+    removeDepartment(index: number): void {
+        this.departments.splice(index, 1);
+        this.organizationForm.get('departments')?.patchValue(this.departments);
     }
 }

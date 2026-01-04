@@ -48,8 +48,12 @@ export class MasterConfigService {
 
     constructor(private http: HttpClient) { }
 
-    getConfig(): Observable<any> {
-        return this.http.get(`${this.apiUrl}`);
+    getConfig(organizationId?: string): Observable<any> {
+        let url = this.apiUrl;
+        if (organizationId) {
+            url += `?organization=${organizationId}`;
+        }
+        return this.http.get(url);
     }
 
     updateConfig(config: Partial<MasterConfig>): Observable<any> {

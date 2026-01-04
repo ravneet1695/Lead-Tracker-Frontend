@@ -114,6 +114,9 @@ export class UserFormComponent implements OnInit {
         // Load roles for the selected organization
         this.loadRolesForOrganization(organizationId);
 
+        // Load departments for the organization
+        this.loadDepartments(organizationId);
+
         // Generate user code for the organization
         this.generateUserCode(organizationId);
     }
@@ -158,15 +161,18 @@ export class UserFormComponent implements OnInit {
         });
     }
 
-    loadDepartments(): void {
-        this.masterConfigService.getConfig().subscribe({
+    loadDepartments(organizationId?: string): void {
+        this.masterConfigService.getConfig(organizationId).subscribe({
             next: (response) => {
                 if (response.success && response.config) {
                     this.departments = response.config.departments || [];
+                } else {
+                    this.departments = [];
                 }
             },
             error: (error) => {
                 console.error('Error loading departments:', error);
+                this.departments = [];
             }
         });
     }
@@ -238,6 +244,9 @@ export class UserFormComponent implements OnInit {
                                 }
                             }
                         });
+
+                        // Load departments for the user's organization
+                        this.loadDepartments(orgId);
                     }
 
                     // Set dynamic breadcrumb label
