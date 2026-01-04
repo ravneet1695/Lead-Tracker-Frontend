@@ -7,7 +7,6 @@ import { OrganizationService } from '../../../services/organization.service';
 import { AuthService } from '../../../services/auth.service';
 import { RoleService } from '../../../services/role.service';
 import { BreadcrumbService } from '../../../services/breadcrumb.service';
-import { MasterConfigService } from '../../../services/master-config.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -50,7 +49,6 @@ export class UserFormComponent implements OnInit {
         private authService: AuthService,
         private roleService: RoleService,
         private breadcrumbService: BreadcrumbService,
-        private masterConfigService: MasterConfigService,
         private router: Router,
         private route: ActivatedRoute,
         private cdr: ChangeDetectorRef
@@ -162,10 +160,15 @@ export class UserFormComponent implements OnInit {
     }
 
     loadDepartments(organizationId?: string): void {
-        this.masterConfigService.getConfig(organizationId).subscribe({
+        if (!organizationId) {
+            this.departments = [];
+            return;
+        }
+
+        this.organizationService.getOrganization(organizationId).subscribe({
             next: (response) => {
-                if (response.success && response.config) {
-                    this.departments = response.config.departments || [];
+                if (response.success && response.organization) {
+                    this.departments = response.organization.departments || [];
                 } else {
                     this.departments = [];
                 }

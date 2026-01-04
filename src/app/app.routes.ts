@@ -42,12 +42,6 @@ export const routes: Routes = [
         data: { permissions: ['audit-logs.read'] }
     },
     {
-        path: 'master-config',
-        loadChildren: () => import('./modules/master-config/master-config.module').then(m => m.MasterConfigModule),
-        canActivate: [AuthGuard],
-        data: { permissions: ['master-config.read'] }
-    },
-    {
         path: 'roles',
         loadChildren: () => import('./modules/role/role.module').then(m => m.RoleModule),
         canActivate: [AuthGuard],
