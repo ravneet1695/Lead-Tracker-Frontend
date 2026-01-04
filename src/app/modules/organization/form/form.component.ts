@@ -156,7 +156,6 @@ export class OrganizationFormComponent implements OnInit {
             email: ['', [Validators.required, Validators.email]],
             website: ['', [Validators.pattern(/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/)]],
             alias: [''],
-            phone: [''],
             address: this.fb.group({
                 street: [''],
                 city: ['', [Validators.required]],
@@ -226,7 +225,6 @@ export class OrganizationFormComponent implements OnInit {
                             email: org.email || '',
                             website: org.website || '',
                             alias: org.alias || '',
-                            phone: org.phone || '',
                             logo: org.logo || '',
                             description: org.description || '',
                             address: {
