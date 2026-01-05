@@ -128,29 +128,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       </svg>`,
       route: '/roles',
       permissions: ['roles.read']
-    },
-    {
-      label: 'Reports',
-      icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 3v18h18"></path>
-        <path d="M18 17V9"></path>
-        <path d="M13 17V5"></path>
-        <path d="M8 17v-3"></path>
-      </svg>`,
-      route: '/reports',
-      permissions: ['reports.read']
-    },
-    {
-      label: 'Settings',
-      icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"></circle>
-        <path d="M12 1v6m0 6v6"></path>
-        <path d="m4.93 4.93 4.24 4.24m5.66 5.66 4.24 4.24"></path>
-        <path d="M1 12h6m6 0h6"></path>
-        <path d="m4.93 19.07 4.24-4.24m5.66-5.66 4.24-4.24"></path>
-      </svg>`,
-      route: '/settings',
-      permissions: ['settings.read']
     }
   ];
 
