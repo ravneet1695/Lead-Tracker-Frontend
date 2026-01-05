@@ -115,6 +115,187 @@
   --badge-border: rgba(0, 76, 143, 0.3);
 }
 
+/* ===== SHARED LIST COMPONENTS (Status & Actions) ===== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* Active / Success States */
+.status-badge.active,
+.status-badge.status-active,
+.status-badge.status-success,
+.status-badge.success {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: #10b981 !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+.status-badge.active .status-dot,
+.status-badge.status-active .status-dot,
+.status-badge.status-success .status-dot,
+.status-badge.success .status-dot {
+  background: #10b981;
+}
+
+/* Inactive / Danger / Failure States */
+.status-badge.inactive,
+.status-badge.status-inactive,
+.status-badge.status-failure,
+.status-badge.failure {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+}
+
+.status-badge.inactive .status-dot,
+.status-badge.status-inactive .status-dot,
+.status-badge.status-failure .status-dot,
+.status-badge.failure .status-dot {
+  background: #ef4444;
+}
+
+/* Completed State */
+.status-badge.completed,
+.status-badge.status-completed {
+  background: rgba(139, 92, 246, 0.1) !important;
+  color: #8b5cf6 !important;
+  border: 1px solid rgba(139, 92, 246, 0.2) !important;
+}
+
+.status-badge.completed .status-dot,
+.status-badge.status-completed .status-dot {
+  background: #8b5cf6;
+}
+
+/* In-Progress / Pending States */
+.status-badge.in-progress,
+.status-badge.status-in-progress,
+.status-badge.pending,
+.status-badge.status-pending {
+  background: rgba(251, 191, 36, 0.1) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(251, 191, 36, 0.2) !important;
+}
+
+.status-badge.in-progress .status-dot,
+.status-badge.status-in-progress .status-dot,
+.status-badge.pending .status-dot,
+.status-badge.status-pending .status-dot {
+  background: #fbbf24;
+}
+
+/* New / Default States */
+.status-badge.new,
+.status-badge.status-new {
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(59, 130, 246, 0.2) !important;
+}
+
+.status-badge.new .status-dot,
+.status-badge.status-new .status-dot {
+  background: #60a5fa;
+}
+
+/* Shared Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-action svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+}
+
+.btn-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Action Variants */
+.btn-action.btn-edit {
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: #60a5fa !important;
+  border-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+.btn-action.btn-edit:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.2) !important;
+  border-color: #60a5fa !important;
+  transform: translateY(-2px);
+}
+
+.btn-action.btn-view {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: #10b981 !important;
+  border-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+.btn-action.btn-view:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.2) !important;
+  border-color: #10b981 !important;
+  transform: translateY(-2px);
+}
+
+.btn-action.btn-toggle,
+.btn-action.btn-activate {
+  background: rgba(245, 158, 11, 0.1) !important;
+  color: #fbbc05 !important;
+  border-color: rgba(245, 158, 11, 0.1) !important;
+}
+
+.btn-action.btn-toggle:hover:not(:disabled),
+.btn-action.btn-activate:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.2) !important;
+  border-color: #fbbc05 !important;
+  transform: translateY(-2px);
+}
+
+.btn-action.btn-delete {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #f87171 !important;
+  border-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+.btn-action.btn-delete:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: #f87171 !important;
+  transform: translateY(-2px);
+}
+
 /* ===== LIGHT THEME ===== */
 body.light-theme {
   /* Backgrounds - Clean and Modern */

@@ -19,31 +19,37 @@
         </button>
     </header>
 
-    <!-- Filters Section -->
+
+    <!-- Filters Section - All in One Row -->
     <div class="filters-container">
         <div class="search-box">
-            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.35-4.35"></path>
             </svg>
-            <input type="text" class="search-input" placeholder="Search by name, code or description..."
-                [(ngModel)]="searchTerm" (input)="applyFilters()">
+            <input type="text" class="search-input" placeholder="Search by name or code..." [(ngModel)]="searchTerm"
+                (input)="applyFilters()">
         </div>
 
-        <div style="display: flex; gap: 12px;">
-            <select class="filter-select" [(ngModel)]="organizationFilter" (change)="onFilterChange()"
-                *ngIf="canViewAllOrganizations()">
-                <option value="all">All Organizations</option>
-                <option *ngFor="let org of organizations" [value]="org._id">{{ org.name }}</option>
-            </select>
+        <select class="filter-select" [(ngModel)]="organizationFilter" (change)="onFilterChange()"
+            *ngIf="canViewAllOrganizations()">
+            <option value="all">All Organizations</option>
+            <option *ngFor="let org of organizations" [value]="org._id">{{ org.name }}</option>
+        </select>
 
-            <select class="filter-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
-                <option value="">All Statuses</option>
-                <option value="active">Active Groups</option>
-                <option value="inactive">Inactive Groups</option>
-            </select>
-        </div>
+        <select class="filter-select" [(ngModel)]="statusFilter" (change)="onFilterChange()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select>
+
+        <button class="btn-refresh" (click)="loadGroups()" title="Sync Data">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 4v6h-6"></path>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+        </button>
     </div>
 
     <!-- Groups Data Table -->
@@ -51,13 +57,13 @@
         <table class="groups-table">
             <thead>
                 <tr>
-                    <th>Identifier</th>
-                    <th>Group Identity</th>
+                    <th>Group Code</th>
+                    <th>Group Details</th>
                     <th *ngIf="canViewAllOrganizations()">Organization</th>
                     <th>Team Size</th>
-                    <th>Governance</th>
-                    <th>Visibility</th>
-                    <th style="text-align: right;">Operations</th>
+                    <th>Manager</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -68,7 +74,15 @@
                     <td>
                         <div class="group-name">
                             <strong>{{ group.name }}</strong>
-                            <small *ngIf="group.description">{{ group.description }}</small>
+                            <div class="description-wrapper" *ngIf="group.description">
+                                <p class="description-text" [class.expanded]="isExpanded(group._id)">
+                                    {{ group.description }}
+                                </p>
+                                <button *ngIf="group.description.length > 60" class="btn-more"
+                                    (click)="toggleDescription(group._id)">
+                                    {{ isExpanded(group._id) ? 'Show Less' : 'Show More' }}
+                                </button>
+                            </div>
                         </div>
                     </td>
                     <td *ngIf="canViewAllOrganizations()">
@@ -88,17 +102,16 @@
                         <span class="manager-count">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2.5">
-                                <path d="M20 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                <path d="M21 14.31v8V14.32z"></path>
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                             </svg>
                             {{ group.managers?.length || 0 }}
                         </span>
                     </td>
                     <td>
                         <span class="status-badge" [class.active]="group.isActive" [class.inactive]="!group.isActive">
-                            <span [style.background]="group.isActive ? '#10b981' : '#ef4444'"
-                                style="width: 6px; height: 6px; border-radius: 50%;"></span>
+                            <span class="status-dot"></span>
                             {{ group.isActive ? 'Active' : 'Inactive' }}
                         </span>
                     </td>
@@ -116,9 +129,15 @@
                                 (click)="toggleGroupStatus(group)"
                                 [title]="group.isActive ? 'Deactivate Group' : 'Activate Group'">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.5">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    stroke-width="2.5" *ngIf="group.isActive">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" *ngIf="!group.isActive">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                 </svg>
                             </button>
                             <button *ngIf="canDeleteGroup()" class="btn-action btn-delete" (click)="deleteGroup(group)"

@@ -139,6 +139,45 @@ export class GoalListComponent implements OnInit {
         });
     }
 
+    toggleGoalStatus(id: string | undefined, currentStatus: string | undefined): void {
+        if (!id) return;
+        const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+        const action = currentStatus === 'active' ? 'deactivate' : 'activate';
+
+        Swal.fire({
+            title: `${action.charAt(0).toUpperCase() + action.slice(1)} Goal?`,
+            text: `Are you sure you want to ${action} this goal?`,
+            icon: action === 'deactivate' ? 'warning' : 'question',
+            showCancelButton: true,
+            confirmButtonColor: action === 'deactivate' ? '#f59e0b' : '#10b981',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: `Yes, ${action} it!`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.goalService.updateStatus(id, newStatus).subscribe({
+                    next: () => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: `Goal has been ${action}d.`,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        this.loadGoals();
+                    },
+                    error: (error) => {
+                        console.error(`Error ${action}ing goal:`, error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: `Failed to ${action} goal`
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     getStatusBadgeClass(status: string): string {
         switch (status) {
             case 'active': return 'status-active';

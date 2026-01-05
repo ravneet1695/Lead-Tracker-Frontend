@@ -93,13 +93,8 @@ import Swal from 'sweetalert2';
               <div class="goal-icon">🎯</div>
               <h3 class="goal-title">{{ goal.title }}</h3>
             </div>
-            <span class="status-badge" 
-                  [class.active]="goal.status === 'active'" 
-                  [class.completed]="goal.status === 'completed'"
-                  [class.inactive]="goal.status === 'inactive'">
-              <span class="status-icon">
-                {{ goal.status === 'active' ? '●' : goal.status === 'completed' ? '✓' : '○' }}
-              </span>
+            <span class="status-badge" [class]="goal.status">
+              <span class="status-dot"></span>
               {{ goal.status }}
             </span>
           </div>
@@ -702,50 +697,7 @@ import Swal from 'sweetalert2';
       line-height: 1.3;
     }
 
-    /* Enhanced Status Badge */
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      border-radius: 24px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-      transition: all 0.3s ease;
-    }
-
-    .status-icon {
-      font-size: 0.7rem;
-      animation: statusPulse 2s ease-in-out infinite;
-    }
-
-    @keyframes statusPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    .status-badge.active {
-      background: rgba(34, 197, 94, 0.15);
-      color: #22c55e;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
-    }
-
-    .status-badge.completed {
-      background: rgba(59, 130, 246, 0.15);
-      color: #3b82f6;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
-    }
-
-    .status-badge.inactive {
-      background: rgba(156, 163, 175, 0.15);
-      color: #9ca3af;
-      border: 1px solid rgba(156, 163, 175, 0.3);
-    }
+    /* Status Badges handled by styles.css */
 
     .goal-description {
       color: #94a3b8;

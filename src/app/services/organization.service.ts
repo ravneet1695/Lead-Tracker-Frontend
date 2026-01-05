@@ -111,6 +111,10 @@ export class OrganizationService {
         return this.http.patch<OrganizationResponse>(`${this.apiUrl}/${id}/restore`, {});
     }
 
+    toggleStatus(id: string, status: string): Observable<OrganizationResponse> {
+        return this.http.patch<OrganizationResponse>(`${this.apiUrl}/${id}/status`, { status });
+    }
+
     getNextCode(): Observable<{ code: string }> {
         return this.http.get<{ code: string }>(`${this.apiUrl}/next-code`);
     }

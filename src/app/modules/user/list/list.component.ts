@@ -201,6 +201,33 @@ export class UserListComponent implements OnInit {
         });
     }
 
+    deactivateUser(id: string | undefined): void {
+        if (!id) return;
+
+        Swal.fire({
+            title: 'Deactivate User?',
+            text: 'Do you want to deactivate this user?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f59e0b',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, deactivate!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.userService.deactivateUser(id).subscribe({
+                    next: () => {
+                        Swal.fire('Deactivated!', 'User has been deactivated successfully.', 'success');
+                        this.loadUsers();
+                    },
+                    error: (error) => {
+                        console.error('Error deactivating user:', error);
+                        Swal.fire('Error!', 'Failed to deactivate user.', 'error');
+                    }
+                });
+            }
+        });
+    }
+
     getStatusBadgeClass(status: string): string {
         return status === 'active' ? 'badge-success' : 'badge-secondary';
     }
