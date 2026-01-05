@@ -15,6 +15,7 @@ export interface User {
     role: string | { _id: string; name: string; label: string };
     organization?: string | { _id: string; name: string };
     groups?: string[];
+    department?: string;
     status: string;
     profileImage?: string;
 }

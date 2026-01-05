@@ -62,8 +62,8 @@
                 <tr>
                     <th>User Code</th>
                     <th>Name</th>
-                    <th>Email</th>
-                    <th>Mobile</th>
+                    <th>Contact Info</th>
+                    <th>Department</th>
                     <th>Role</th>
                     <th *ngIf="shouldShowOrganizationColumn()">Organization</th>
                     <th>Status</th>
@@ -81,8 +81,15 @@
                             <span class="user-name">{{ user.name }}</span>
                         </div>
                     </td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.mobile }}</td>
+                    <td>
+                        <div class="contact-info">
+                            <div class="email-text">{{ user.email }}</div>
+                            <div class="mobile-text">{{ user.mobile }}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="dept-text">{{ user.department || 'N/A' }}</span>
+                    </td>
                     <td>
                         <!-- System roles: Red badge -->
                         <span *ngIf="isSystemRole(user.role)" class="role-badge"

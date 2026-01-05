@@ -171,6 +171,27 @@
     font-size: 0.8rem;
 }
 
+/* Contact Info & Department */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.email-text {
+    font-weight: 500;
+    color: var(--table-text);
+}
+
+.mobile-text {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.dept-text {
+    color: var(--text-secondary);
+}
+
 /* Badge Styles */
 .role-badge,
 .status-badge,
