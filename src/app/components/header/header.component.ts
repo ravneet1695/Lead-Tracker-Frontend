@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
 import { ThemeService } from '../../services/theme.service';
+import { BreadcrumbService } from '../../services/breadcrumb.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -50,6 +51,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private themeService: ThemeService,
+    private breadcrumbService: BreadcrumbService,
     private router: Router,
     private sanitizer: DomSanitizer
   ) { }
@@ -67,6 +69,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(theme => {
         this.isDarkMode = theme === 'dark';
+      });
+
+    // Subscribe to breadcrumb label changes
+    this.breadcrumbService.labels$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.generateBreadcrumbs();
       });
 
     // Generate initial breadcrumbs
@@ -116,14 +125,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
     urlSegments.forEach((segment, index) => {
       currentUrl += `/${segment}`;
 
-      // Skip if it's just a number (likely an ID)
-      if (!isNaN(Number(segment))) {
-        return;
-      }
-
       // Format the label
-      let label = segment.charAt(0).toUpperCase() + segment.slice(1);
-      label = label.replace(/-/g, ' ');
+      let label = this.breadcrumbService.getLabel(segment) || segment;
+
+      // If no custom label, do default formatting
+      if (label === segment) {
+        // Skip if it's just a number (likely an ID)
+        if (!isNaN(Number(segment))) {
+          return;
+        }
+
+        label = segment.charAt(0).toUpperCase() + segment.slice(1);
+        label = label.replace(/-/g, ' ');
+      }
 
       // Get icon for this segment
       const icon = this.routeIcons[segment] || undefined;

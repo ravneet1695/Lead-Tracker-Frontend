@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, F
 import { GoalService } from '../../../services/goal.service';
 import { GoalEntryService } from '../../../services/goal-entry.service';
 import { AuthService } from '../../../services/auth.service';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -21,7 +22,7 @@ export class CreateLeadComponent implements OnInit {
     loading = true;
     submitting = false;
     userGroups: any[] = [];
-    selectedGroups: string[] = [];
+    selectedGroup: string = '';
     autoNumberCounters: { [key: string]: number } = {};
 
     constructor(
@@ -30,7 +31,8 @@ export class CreateLeadComponent implements OnInit {
         private router: Router,
         private goalService: GoalService,
         private goalEntryService: GoalEntryService,
-        private authService: AuthService
+        private authService: AuthService,
+        private breadcrumbService: BreadcrumbService
     ) { }
 
     ngOnInit(): void {
@@ -43,6 +45,9 @@ export class CreateLeadComponent implements OnInit {
         this.goalService.getGoal(this.goalId).subscribe({
             next: (response) => {
                 this.goal = response.goal;
+                if (this.goal) {
+                    this.breadcrumbService.setLabel(this.goalId, this.goal.title);
+                }
                 this.filterUserGroups();
                 this.initializeForm();
                 this.initializeAutoNumbers();
@@ -64,53 +69,44 @@ export class CreateLeadComponent implements OnInit {
 
     filterUserGroups(): void {
         const currentUser = this.authService.currentUserValue;
-        if (currentUser && currentUser.groups && this.goal.groups) {
-            const goalGroupIds = this.goal.groups.map((g: any) => g._id || g);
+        if (currentUser && currentUser.groups && this.goal.group) {
+            const goalGroupId = this.goal.group._id || this.goal.group;
             this.userGroups = currentUser.groups.filter((userGroup: any) =>
-                goalGroupIds.includes(userGroup._id || userGroup)
+                (userGroup._id || userGroup) === goalGroupId
             );
 
-            // DEVELOPMENT MODE: If user has no matching groups, use all goal groups
+            // DEVELOPMENT MODE: If user has no matching groups, use goal group
             if (this.userGroups.length === 0) {
-                console.warn('User not assigned to goal groups - using all goal groups for development');
-                this.userGroups = this.goal.groups;
+                console.warn('User not assigned to goal group - using goal group for development');
+                this.userGroups = [this.goal.group];
             }
 
-            // Auto-select if only one group
-            if (this.userGroups.length === 1) {
-                const groupId = this.userGroups[0]._id || this.userGroups[0];
-                this.selectedGroups = [groupId];
-            }
-        } else if (this.goal.groups) {
-            // If user has no groups at all, use all goal groups
-            console.warn('User has no groups - using all goal groups for development');
-            this.userGroups = this.goal.groups;
-            if (this.userGroups.length === 1) {
-                const groupId = this.userGroups[0]._id || this.userGroups[0];
-                this.selectedGroups = [groupId];
-            }
+            // Auto-select the only group
+            const groupId = this.userGroups[0]._id || this.userGroups[0];
+            this.selectedGroup = groupId;
+        } else if (this.goal.group) {
+            // If user has no groups at all, use goal group
+            console.warn('User has no groups - using goal group for development');
+            this.userGroups = [this.goal.group];
+            const groupId = this.userGroups[0]._id || this.userGroups[0];
+            this.selectedGroup = groupId;
         }
     }
 
-    toggleGroup(groupId: string): void {
-        const index = this.selectedGroups.indexOf(groupId);
-        if (index > -1) {
-            this.selectedGroups.splice(index, 1);
-        } else {
-            this.selectedGroups.push(groupId);
-        }
+    selectGroup(groupId: string): void {
+        this.selectedGroup = groupId;
         // Update form control
-        this.leadForm.patchValue({ groups: this.selectedGroups });
-        this.leadForm.get('groups')?.markAsTouched();
+        this.leadForm.patchValue({ group: this.selectedGroup });
+        this.leadForm.get('group')?.markAsTouched();
     }
 
     isGroupSelected(groupId: string): boolean {
-        return this.selectedGroups.includes(groupId);
+        return this.selectedGroup === groupId;
     }
 
     initializeForm(): void {
         const formControls: any = {
-            groups: [this.selectedGroups, Validators.required],
+            group: [this.selectedGroup, Validators.required],
             status: [this.goal.statusOptions?.[0] || 'New', Validators.required],
             remarks: ['']
         };
@@ -345,7 +341,7 @@ export class CreateLeadComponent implements OnInit {
 
         const entryData = {
             goal: this.goalId,
-            groups: formValue.groups,
+            group: formValue.group,
             data: data,
             status: formValue.status,
             contacts: formValue.contacts || [],

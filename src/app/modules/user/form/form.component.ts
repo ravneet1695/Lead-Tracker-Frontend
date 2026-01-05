@@ -6,6 +6,7 @@ import { UserService, User } from '../../../services/user.service';
 import { OrganizationService } from '../../../services/organization.service';
 import { AuthService } from '../../../services/auth.service';
 import { RoleService } from '../../../services/role.service';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -27,6 +28,7 @@ export class UserFormComponent implements OnInit {
     // Dropdown options
     organizations: any[] = [];
     roles: { value: string; label: string }[] = [];
+    departments: string[] = [];
     statuses = [
         { value: 'active', label: 'Active' },
         { value: 'inactive', label: 'Inactive' }
@@ -46,6 +48,7 @@ export class UserFormComponent implements OnInit {
         private organizationService: OrganizationService,
         private authService: AuthService,
         private roleService: RoleService,
+        private breadcrumbService: BreadcrumbService,
         private router: Router,
         private route: ActivatedRoute,
         private cdr: ChangeDetectorRef
@@ -55,6 +58,7 @@ export class UserFormComponent implements OnInit {
         this.determineUserType();
         this.initializeForm();
         this.checkEditMode();
+        this.loadDepartments();
     }
 
     determineUserType(): void {
@@ -70,20 +74,27 @@ export class UserFormComponent implements OnInit {
             lastName: ['', [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-Z\s]+$/)]],
             email: ['', [Validators.required, Validators.email]],
             mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-            password: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(8)]],
             role: ['', [Validators.required]],
             organization: [''],
+            department: [''],
             status: ['active', [Validators.required]]
         });
 
-        // Setup organization change listener for Super Admin
-        if (this.isSuperAdmin) {
-            this.userForm.get('organization')?.valueChanges.subscribe(orgId => {
-                if (orgId && !this.isEditMode) {
+        // Setup organization change listener
+        this.userForm.get('organization')?.valueChanges.subscribe(orgId => {
+            const deptControl = this.userForm.get('department');
+            if (orgId) {
+                deptControl?.setValidators([Validators.required]);
+                if (this.isSuperAdmin && !this.isEditMode) {
                     this.onOrganizationSelected(orgId);
                 }
-            });
-        }
+            } else {
+                deptControl?.clearValidators();
+                this.departments = [];
+                deptControl?.setValue('');
+            }
+            deptControl?.updateValueAndValidity();
+        });
 
         // Setup for Org Admin (auto-populate organization)
         if (this.isOrgAdmin && !this.isEditMode) {
@@ -107,6 +118,9 @@ export class UserFormComponent implements OnInit {
     onOrganizationSelected(organizationId: string): void {
         // Load roles for the selected organization
         this.loadRolesForOrganization(organizationId);
+
+        // Load departments for the organization
+        this.loadDepartments(organizationId);
 
         // Generate user code for the organization
         this.generateUserCode(organizationId);
@@ -152,6 +166,33 @@ export class UserFormComponent implements OnInit {
         });
     }
 
+    loadDepartments(organizationId?: string): void {
+        if (!organizationId) {
+            this.departments = [];
+            return;
+        }
+
+        this.organizationService.getOrganization(organizationId).subscribe({
+            next: (response) => {
+                if (response.success && response.organization) {
+                    this.departments = response.organization.departments || [];
+
+                    // Auto-select default department if it exists and field is currently empty
+                    const currentDept = this.userForm.get('department')?.value;
+                    if (response.organization.defaultDepartment && !currentDept && !this.isEditMode) {
+                        this.userForm.patchValue({ department: response.organization.defaultDepartment });
+                    }
+                } else {
+                    this.departments = [];
+                }
+            },
+            error: (error) => {
+                console.error('Error loading departments:', error);
+                this.departments = [];
+            }
+        });
+    }
+
     generateUserCode(organizationId?: string): void {
         this.userService.getNextUserCode(organizationId).subscribe({
             next: (response: any) => {
@@ -167,8 +208,6 @@ export class UserFormComponent implements OnInit {
         this.userId = this.route.snapshot.paramMap.get('id');
         if (this.userId) {
             this.isEditMode = true;
-            this.userForm.get('password')?.clearValidators();
-            this.userForm.get('password')?.updateValueAndValidity();
             this.loadUser();
         }
     }
@@ -181,6 +220,9 @@ export class UserFormComponent implements OnInit {
             next: (response) => {
                 if (response.user) {
                     const user = response.user;
+                    if (this.userId) {
+                        this.breadcrumbService.setLabel(this.userId, user.name || user.code || 'User Details');
+                    }
                     const nameParts = user.name.split(' ');
                     const firstName = nameParts[0] || '';
                     const lastName = nameParts.slice(1).join(' ') || '';
@@ -196,14 +238,19 @@ export class UserFormComponent implements OnInit {
                         email: user.email,
                         mobile: user.mobile,
                         organization: orgId,
+                        department: user.department || '',
                         status: user.status
                     });
 
                     // Load roles for the user's organization, then set role
                     if (orgId) {
                         this.loadRolesForOrganization(orgId, () => {
-                            // Set role after roles are loaded
-                            this.userForm.patchValue({ role: roleId });
+                            // Set role after roles are loaded and UI updated
+                            this.cdr.detectChanges();
+                            setTimeout(() => {
+                                this.userForm.patchValue({ role: roleId });
+                                this.cdr.markForCheck();
+                            });
 
                             // Check if role should be disabled (admin roles)
                             if (user.role && typeof user.role === 'object') {
@@ -216,6 +263,14 @@ export class UserFormComponent implements OnInit {
                                 }
                             }
                         });
+
+                        // Load departments for the user's organization
+                        this.loadDepartments(orgId);
+                    }
+
+                    // Set dynamic breadcrumb label
+                    if (user.code && this.userId) {
+                        this.breadcrumbService.setLabel(this.userId, user.code);
                     }
 
                     // Disable organization field in edit mode
@@ -252,10 +307,6 @@ export class UserFormComponent implements OnInit {
         };
         delete userData.firstName;
         delete userData.lastName;
-
-        if (this.isEditMode && !userData.password) {
-            delete userData.password;
-        }
 
         const formDataToSend = new FormData();
         Object.keys(userData).forEach(key => {
@@ -341,7 +392,7 @@ export class UserFormComponent implements OnInit {
             'lastName': 'Last Name',
             'email': 'Email',
             'mobile': 'Mobile',
-            'password': 'Password',
+            'department': 'Department',
             'role': 'Role',
             'organization': 'Organization',
             'status': 'Status'
@@ -407,6 +458,13 @@ export class UserFormComponent implements OnInit {
         const fileInput = document.getElementById('profileImage') as HTMLInputElement;
         if (fileInput) {
             fileInput.value = '';
+        }
+    }
+
+    ngOnDestroy(): void {
+        // Clear dynamic breadcrumb when leaving
+        if (this.userId) {
+            this.breadcrumbService.clear(this.userId);
         }
     }
 }

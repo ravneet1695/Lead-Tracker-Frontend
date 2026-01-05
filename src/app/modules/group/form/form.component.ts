@@ -5,6 +5,7 @@ import { GroupService } from '../../../services/group.service';
 import { UserService } from '../../../services/user.service';
 import { OrganizationService } from '../../../services/organization.service';
 import { AuthService } from '../../../services/auth.service';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -29,7 +30,8 @@ export class GroupFormComponent implements OnInit {
         private organizationService: OrganizationService,
         private authService: AuthService,
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private breadcrumbService: BreadcrumbService
     ) { }
 
     ngOnInit(): void {
@@ -55,8 +57,7 @@ export class GroupFormComponent implements OnInit {
             description: [''],
             organization: [''],
             users: [[]],
-            managers: [[]],
-            isActive: [true]
+            managers: [[]]
         });
 
         // For Super Admin in create mode, make organization required
@@ -148,14 +149,16 @@ export class GroupFormComponent implements OnInit {
         this.groupService.getGroup(id).subscribe({
             next: (response) => {
                 const group = response.group;
+                if (group && this.groupId) {
+                    this.breadcrumbService.setLabel(this.groupId, group.name);
+                }
                 this.groupForm.patchValue({
                     code: group.code,
                     name: group.name,
                     description: group.description,
                     organization: group.organization?._id,
                     users: group.users.map((u: any) => u._id),
-                    managers: group.managers.map((m: any) => m._id),
-                    isActive: group.isActive
+                    managers: group.managers.map((m: any) => m._id)
                 });
 
                 // Load users for this organization
@@ -375,6 +378,10 @@ export class GroupFormComponent implements OnInit {
     getSelectedUsers(): any[] {
         const selectedUserIds = this.groupForm.get('users')?.value || [];
         return this.users.filter(user => selectedUserIds.includes(user._id));
+    }
+
+    getSelectedManagersCount(): number {
+        return (this.groupForm.get('managers')?.value || []).length;
     }
 
     private markFormGroupTouched(formGroup: FormGroup): void {

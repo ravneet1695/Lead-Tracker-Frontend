@@ -11,7 +11,7 @@ export interface Goal {
         endDate: Date;
     };
     organization?: string;
-    groups: string[];
+    group: string;
     formSchema: any[];
     statusOptions: string[];
     completionStatus?: string;
@@ -47,5 +47,9 @@ export class GoalService {
 
     getGoalForm(id: string): Observable<any> {
         return this.http.get<any>(`${this.apiUrl}/${id}/form`);
+    }
+
+    updateStatus(id: string, status: string): Observable<any> {
+        return this.http.patch<any>(`${this.apiUrl}/${id}/status`, { status });
     }
 }

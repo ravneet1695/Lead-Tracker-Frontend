@@ -66,6 +66,7 @@ export class GoalCreateComponent implements OnInit {
     loading = false;
     submitting = false;
     isSuperAdmin = false;
+    isEditMode = false;
 
     fieldTypes = [
         { value: 'text', label: 'Text', icon: '📝' },
@@ -110,7 +111,7 @@ export class GoalCreateComponent implements OnInit {
                     this.loadGroups(orgId);
                 } else {
                     this.groups = [];
-                    this.goalForm.patchValue({ groups: [] });
+                    this.goalForm.patchValue({ group: '' });
                 }
             });
         }
@@ -127,7 +128,7 @@ export class GoalCreateComponent implements OnInit {
             completionStatus: ['Approved'], // Status that indicates lead counts toward goal
             startDate: ['', Validators.required],
             endDate: ['', Validators.required],
-            groups: [[], Validators.required]
+            group: ['', Validators.required]
         });
 
         // Make organization required for Super Admins
@@ -148,8 +149,8 @@ export class GoalCreateComponent implements OnInit {
         this.groupService.getGroups(params).subscribe({
             next: (response) => {
                 this.groups = response.groups || [];
-                // Clear selected groups when reloading
-                this.goalForm.patchValue({ groups: [] });
+                // Clear selected group when reloading
+                this.goalForm.patchValue({ group: '' });
                 this.loading = false;
             },
             error: (error) => {
@@ -165,26 +166,12 @@ export class GoalCreateComponent implements OnInit {
     }
 
     // Group Selection Methods
-    toggleGroupSelection(groupId: string): void {
-        const selectedGroups = this.goalForm.get('groups')?.value || [];
-        const index = selectedGroups.indexOf(groupId);
-
-        if (index > -1) {
-            selectedGroups.splice(index, 1);
-        } else {
-            selectedGroups.push(groupId);
-        }
-
-        this.goalForm.patchValue({ groups: selectedGroups });
+    selectGroup(groupId: string): void {
+        this.goalForm.patchValue({ group: groupId });
     }
 
     isGroupSelected(groupId: string): boolean {
-        const selectedGroups = this.goalForm.get('groups')?.value || [];
-        return selectedGroups.includes(groupId);
-    }
-
-    getSelectedGroupsCount(): number {
-        return (this.goalForm.get('groups')?.value || []).length;
+        return this.goalForm.get('group')?.value === groupId;
     }
 
     // Form Field Builder Methods
@@ -493,7 +480,7 @@ export class GoalCreateComponent implements OnInit {
                 startDate: formValue.startDate || null,
                 endDate: formValue.endDate || null
             },
-            groups: formValue.groups,
+            group: formValue.group,
             formSchema: this.formFields,
             statusOptions: this.statusOptions
         };
@@ -527,8 +514,19 @@ export class GoalCreateComponent implements OnInit {
         this.router.navigate(['/goals/manage']);
     }
 
-    getFieldTypeIcon(fieldType: string): string {
-        return this.fieldTypes.find(ft => ft.value === fieldType)?.icon || '📝';
+    getFieldTypeIcon(type: string): string {
+        return this.fieldTypes.find(ft => ft.value === type)?.icon || '❓';
+    }
+
+    getFieldCategory(type: string): string {
+        const textTypes = ['text', 'email', 'phone', 'textarea', 'autoNumber'];
+        const numberTypes = ['number', 'currency', 'points'];
+        const selectTypes = ['dropdown', 'checkbox', 'radio', 'switch'];
+
+        if (textTypes.includes(type)) return 'cat-text';
+        if (numberTypes.includes(type)) return 'cat-number';
+        if (selectTypes.includes(type)) return 'cat-select';
+        return 'cat-complex';
     }
 
     getFieldTypeLabel(fieldType: string): string {

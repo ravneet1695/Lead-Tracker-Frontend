@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, F
 import { GoalService } from '../../../services/goal.service';
 import { GoalEntryService } from '../../../services/goal-entry.service';
 import { AuthService } from '../../../services/auth.service';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -28,7 +29,8 @@ export class EditLeadComponent implements OnInit {
         private router: Router,
         private goalService: GoalService,
         private goalEntryService: GoalEntryService,
-        private authService: AuthService
+        private authService: AuthService,
+        private breadcrumbService: BreadcrumbService
     ) { }
 
     ngOnInit(): void {
@@ -41,6 +43,11 @@ export class EditLeadComponent implements OnInit {
         this.goalEntryService.getEntry(this.entryId).subscribe({
             next: (response) => {
                 this.entry = response.entry;
+                if (this.entry) {
+                    // Try to use a meaningful label for the breadcrumb
+                    const label = this.entry.data?.name || this.entry.code || 'Lead Details';
+                    this.breadcrumbService.setLabel(this.entryId, label);
+                }
                 this.loadGoal(this.entry.goal._id || this.entry.goal);
             },
             error: (error) => {

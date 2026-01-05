@@ -11,7 +11,6 @@
             </svg>
             <div>
                 <h1>Update Lead</h1>
-                <p *ngIf="goal">{{ goal.title }}</p>
             </div>
         </div>
         <button class="btn-back" (click)="cancel()">
@@ -43,8 +42,8 @@
                 Lead Information
             </h2>
 
-            <div class="form-grid">
-                <div *ngFor="let field of goal.formSchema" [class.col-span-2]="field.fieldType === 'textarea'"
+            <div class="form-row">
+                <div *ngFor="let field of goal.formSchema" [class.form-group-span-2]="field.fieldType === 'textarea'"
                     class="form-group">
 
                     <label [for]="field.fieldName" [class.required]="field.mandatory">
@@ -141,7 +140,7 @@
                             </svg>
                         </button>
                     </div>
-                    <div class="contact-grid">
+                    <div class="contact-grid form-row">
                         <div class="form-group">
                             <label>Name *</label>
                             <input type="text" formControlName="name" class="form-control" placeholder="Contact name">
@@ -182,7 +181,7 @@
                 Status & Remarks
             </h2>
 
-            <div class="form-grid">
+            <div class="form-row">
                 <div class="form-group">
                     <label for="status" class="required">Status</label>
                     <select id="status" formControlName="status" class="form-control">
@@ -192,7 +191,7 @@
                     </select>
                 </div>
 
-                <div class="form-group col-span-2">
+                <div class="form-group form-group-span-3">
                     <label for="remarks">Remarks</label>
                     <textarea id="remarks" formControlName="remarks" class="form-control" rows="3"
                         placeholder="Add any additional notes or remarks"></textarea>
