@@ -20,6 +20,8 @@ export interface Organization {
     website?: string;
     description?: string;
     departments?: string[];
+    defaultDepartment?: string;
+    defaultPassword?: string;
     status?: 'active' | 'inactive';
     admin?: {
         _id: string;

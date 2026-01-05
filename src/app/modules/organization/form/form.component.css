@@ -394,10 +394,66 @@
     background: rgba(0, 76, 143, 0.05);
 }
 
+.status-chip-item.is-default {
+    border-color: var(--brand-blue-light);
+    background: rgba(0, 76, 143, 0.15);
+    box-shadow: 0 0 10px rgba(0, 76, 143, 0.2);
+}
+
+.status-chip-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding-right: 8px;
+}
+
+.default-dept-indicator {
+    display: flex;
+    align-items: center;
+}
+
+.radio-outer {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.status-chip-item:hover .radio-outer {
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.status-chip-item.is-default .radio-outer {
+    border-color: var(--brand-blue-light);
+}
+
+.radio-inner {
+    width: 10px;
+    height: 10px;
+    background: var(--brand-blue-light);
+    border-radius: 50%;
+    box-shadow: 0 0 5px var(--brand-blue-light);
+}
+
 .status-name {
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-primary);
+}
+
+.default-badge {
+    font-size: 0.6rem;
+    font-weight: 800;
+    background: var(--brand-blue-light);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
 }
 
 .btn-remove-status {

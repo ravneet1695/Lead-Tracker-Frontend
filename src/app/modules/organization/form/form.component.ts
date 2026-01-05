@@ -166,23 +166,16 @@ export class OrganizationFormComponent implements OnInit {
             }),
             logo: ['', this.isEditMode ? [] : [Validators.required]],
             description: [''],
+            defaultPassword: ['', [Validators.required, Validators.minLength(6)]],
             departments: [[], [Validators.required]],
+            defaultDepartment: ['', [Validators.required]],
             // Admin user fields (only for create mode)
             adminUser: this.fb.group({
                 name: ['', this.isEditMode ? [] : [Validators.required]],
                 email: ['', this.isEditMode ? [] : [Validators.required, Validators.email]],
-                mobile: ['', this.isEditMode ? [] : [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-                password: ['', this.isEditMode ? [] : [Validators.required, Validators.minLength(8)]],
-                confirmPassword: ['', this.isEditMode ? [] : [Validators.required]]
-            }, { validators: this.isEditMode ? null : this.passwordMatchValidator })
+                mobile: ['', this.isEditMode ? [] : [Validators.required, Validators.pattern(/^[0-9]{10}$/)]]
+            })
         });
-    }
-
-    // Custom validator for password confirmation
-    passwordMatchValidator(group: FormGroup): { [key: string]: boolean } | null {
-        const password = group.get('password')?.value;
-        const confirmPassword = group.get('confirmPassword')?.value;
-        return password === confirmPassword ? null : { passwordMismatch: true };
     }
 
     checkEditMode(): void {
@@ -232,13 +225,15 @@ export class OrganizationFormComponent implements OnInit {
                             alias: org.alias || '',
                             logo: org.logo || '',
                             description: org.description || '',
+                            defaultPassword: org.defaultPassword || '',
                             address: {
                                 state: org.address?.state || '',
                                 city: org.address?.city || '',
                                 pincode: org.address?.pincode || '',
                                 street: org.address?.street || ''
                             },
-                            departments: org.departments || []
+                            departments: org.departments || [],
+                            defaultDepartment: org.defaultDepartment || ''
                         });
                         this.departments = org.departments || [];
                         console.log('Form values after patch:', this.organizationForm.value);
@@ -428,6 +423,7 @@ export class OrganizationFormComponent implements OnInit {
             if (field.errors['pattern']) {
                 if (fieldName === 'name') return 'Organization name can only contain letters, numbers, and spaces';
                 if (fieldName === 'adminUser.mobile') return 'Mobile number must be exactly 10 digits';
+                if (fieldName === 'defaultPassword') return 'Default password is required (min 6 chars)';
                 return 'Invalid format';
             }
         }
@@ -438,13 +434,19 @@ export class OrganizationFormComponent implements OnInit {
     }
 
     addDepartment(): void {
-        const value = this.customDepartmentInput.trim();
+        const value = this.customDepartmentInput.trim().toUpperCase();
         if (value && !this.departments.includes(value)) {
             this.departments.push(value);
             const control = this.organizationForm.get('departments');
             control?.patchValue(this.departments);
             control?.updateValueAndValidity();
             control?.markAsTouched();
+
+            // Set as default if it's the first department
+            if (this.departments.length === 1) {
+                this.organizationForm.get('defaultDepartment')?.setValue(value);
+            }
+
             this.customDepartmentInput = '';
         } else if (this.departments.includes(value)) {
             Swal.fire({
@@ -461,6 +463,18 @@ export class OrganizationFormComponent implements OnInit {
         control?.patchValue(this.departments);
         control?.updateValueAndValidity();
         control?.markAsTouched();
+
+        // Update default department if it was removed
+        const currentDefault = this.organizationForm.get('defaultDepartment')?.value;
+        if (currentDefault && !this.departments.includes(currentDefault)) {
+            const newDefault = this.departments.length > 0 ? this.departments[0] : '';
+            this.organizationForm.get('defaultDepartment')?.setValue(newDefault);
+        }
+    }
+
+    setDefaultDepartment(dept: string): void {
+        this.organizationForm.get('defaultDepartment')?.setValue(dept);
+        this.organizationForm.get('defaultDepartment')?.markAsDirty();
     }
 
     onlyNumbers(event: any): boolean {

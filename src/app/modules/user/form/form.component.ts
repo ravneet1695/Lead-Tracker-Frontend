@@ -76,7 +76,7 @@ export class UserFormComponent implements OnInit {
             mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
             role: ['', [Validators.required]],
             organization: [''],
-            department: [''],
+            department: ['', [Validators.required]],
             status: ['active', [Validators.required]]
         });
 
@@ -169,6 +169,12 @@ export class UserFormComponent implements OnInit {
             next: (response) => {
                 if (response.success && response.organization) {
                     this.departments = response.organization.departments || [];
+
+                    // Auto-select default department if it exists and field is currently empty
+                    const currentDept = this.userForm.get('department')?.value;
+                    if (response.organization.defaultDepartment && !currentDept && !this.isEditMode) {
+                        this.userForm.patchValue({ department: response.organization.defaultDepartment });
+                    }
                 } else {
                     this.departments = [];
                 }
