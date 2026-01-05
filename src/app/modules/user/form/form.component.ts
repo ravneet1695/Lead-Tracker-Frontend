@@ -76,18 +76,25 @@ export class UserFormComponent implements OnInit {
             mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
             role: ['', [Validators.required]],
             organization: [''],
-            department: ['', [Validators.required]],
+            department: [''],
             status: ['active', [Validators.required]]
         });
 
-        // Setup organization change listener for Super Admin
-        if (this.isSuperAdmin) {
-            this.userForm.get('organization')?.valueChanges.subscribe(orgId => {
-                if (orgId && !this.isEditMode) {
+        // Setup organization change listener
+        this.userForm.get('organization')?.valueChanges.subscribe(orgId => {
+            const deptControl = this.userForm.get('department');
+            if (orgId) {
+                deptControl?.setValidators([Validators.required]);
+                if (this.isSuperAdmin && !this.isEditMode) {
                     this.onOrganizationSelected(orgId);
                 }
-            });
-        }
+            } else {
+                deptControl?.clearValidators();
+                this.departments = [];
+                deptControl?.setValue('');
+            }
+            deptControl?.updateValueAndValidity();
+        });
 
         // Setup for Org Admin (auto-populate organization)
         if (this.isOrgAdmin && !this.isEditMode) {

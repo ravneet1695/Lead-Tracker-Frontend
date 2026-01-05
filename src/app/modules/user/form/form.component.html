@@ -109,7 +109,8 @@
                 <div class="form-row grid-cols-4">
                     <!-- Department Dropdown -->
                     <div class="form-group">
-                        <label class="form-label">Department <span class="required">*</span></label>
+                        <label class="form-label">Department <span class="required"
+                                *ngIf="userForm.get('organization')?.value">*</span></label>
                         <select class="form-control" formControlName="department"
                             [class.invalid]="isFieldInvalid('department')">
                             <option value="">Select Department</option>
