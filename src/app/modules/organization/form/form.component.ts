@@ -228,6 +228,7 @@ export class OrganizationFormComponent implements OnInit {
                             logo: org.logo || '',
                             description: org.description || '',
                             address: {
+                                state: org.address?.state || '',
                                 city: org.address?.city || '',
                                 pincode: org.address?.pincode || '',
                                 street: org.address?.street || ''
@@ -337,6 +338,7 @@ export class OrganizationFormComponent implements OnInit {
         }
 
         this.submitting = true;
+
         const formData = this.organizationForm.getRawValue();
 
         // Prepare data based on mode
@@ -445,5 +447,13 @@ export class OrganizationFormComponent implements OnInit {
     removeDepartment(index: number): void {
         this.departments.splice(index, 1);
         this.organizationForm.get('departments')?.patchValue(this.departments);
+    }
+
+    onlyNumbers(event: any): boolean {
+        const charCode = (event.which) ? event.which : event.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        return true;
     }
 }

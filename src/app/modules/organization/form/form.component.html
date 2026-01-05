@@ -49,8 +49,9 @@
 
                     <div class="form-group">
                         <label for="name" class="form-label">Name <span class="required">*</span></label>
-                        <input type="text" id="name" class="form-control" [class.invalid]="isFieldInvalid('name')"
-                            formControlName="name" placeholder="Enter organization name">
+                        <input type="text" id="name" class="form-control uppercase-input"
+                            [class.invalid]="isFieldInvalid('name')" formControlName="name"
+                            placeholder="Enter organization name">
                         <span *ngIf="isFieldInvalid('name')" class="error-message">
                             {{ getFieldError('name') }}
                         </span>
@@ -152,9 +153,9 @@
                     <div class="form-group">
                         <label for="adminMobile" class="form-label">Mobile Number <span
                                 class="required">*</span></label>
-                        <input type="number" id="adminMobile" class="form-control"
+                        <input type="tel" id="adminMobile" class="form-control"
                             [class.invalid]="isFieldInvalid('adminUser.mobile')" formControlName="mobile"
-                            placeholder="10-digit mobile number">
+                            placeholder="10-digit mobile number" (keypress)="onlyNumbers($event)" maxlength="10">
                         <span *ngIf="isFieldInvalid('adminUser.mobile')" class="error-message">
                             {{ getFieldError('adminUser.mobile') }}
                         </span>
