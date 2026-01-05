@@ -5,34 +5,6 @@
 }
 
 /* Page Header */
-.page-header {
-    background: var(--primary-gradient);
-    padding: 14px 24px;
-    margin-bottom: 0;
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: var(--shadow-sm);
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.header-left svg {
-    color: white !important;
-    flex-shrink: 0;
-}
-
-.header-left h1 {
-    color: white !important;
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin: 0;
-}
 
 .btn-back {
     display: flex;
@@ -324,12 +296,6 @@ textarea.form-control {
 
     .col-span-2 {
         grid-column: span 1;
-    }
-
-    .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
     }
 
     .header-left {

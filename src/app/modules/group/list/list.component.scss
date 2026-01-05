@@ -17,41 +17,6 @@
     }
 }
 
-/* Page Header - Aligned with User List */
-.page-header {
-    background: var(--primary-gradient);
-    padding: 14px 24px;
-    margin-bottom: 0;
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    z-index: 10;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.header-left svg {
-    color: rgba(255, 255, 255, 0.9);
-    width: 20px;
-    height: 20px;
-    filter: none;
-}
-
-.header-left h1 {
-    color: white !important;
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0;
-    letter-spacing: -0.025em;
-    text-shadow: none;
-}
 
 .btn-create-group {
     display: flex;
@@ -77,52 +42,15 @@
     box-shadow: var(--shadow-sm);
 }
 
-/* Filters Container - Aligned with User List */
+/* Group-specific filter styling */
 .filters-container {
-    background: var(--glass-bg);
-    padding: 16px 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    border-bottom: 1px solid var(--border-color);
     border-left: 1px solid var(--glass-border);
     border-right: 1px solid var(--glass-border);
 }
 
-.search-box {
-    position: relative;
-    flex: 1;
-    min-width: 300px;
-}
-
-.search-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-}
-
-.search-input {
-    width: 100%;
-    padding: 10px 14px 10px 42px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--input-border);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    transition: all var(--transition-base);
-}
-
+.search-input,
 .filter-select {
-    min-width: 180px;
-    padding: 10px 14px;
     background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--input-border);
-    border-radius: var(--radius-sm);
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    cursor: pointer;
 }
 
 .btn-refresh {
