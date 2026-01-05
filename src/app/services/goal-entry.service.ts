@@ -7,7 +7,7 @@ export interface GoalEntry {
     _id?: string;
     goal: string;
     user?: any;
-    groups: string[];
+    group: string;
     data: any;
     status: string;
     contacts?: Contact[];

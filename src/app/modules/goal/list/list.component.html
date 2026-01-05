@@ -58,7 +58,7 @@
                     <th>Description</th>
                     <th>Target</th>
                     <th>Timeline</th>
-                    <th>Groups</th>
+                    <th>Group</th>
                     <th *ngIf="canViewAllOrganizations()">Organization</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -97,11 +97,8 @@
                     </td>
                     <td>
                         <div class="groups-cell">
-                            <span class="group-badge" *ngFor="let group of goal.groups?.slice(0, 2)">
-                                {{ group.name || group }}
-                            </span>
-                            <span class="group-more" *ngIf="goal.groups?.length > 2">
-                                +{{ goal.groups.length - 2 }} more
+                            <span class="group-badge" *ngIf="goal.group">
+                                {{ goal.group.name || goal.group }}
                             </span>
                         </div>
                     </td>

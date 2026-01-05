@@ -323,11 +323,17 @@
     color: var(--brand-blue-light);
 }
 
-.group-checkbox input {
-    width: 18px;
-    height: 18px;
+.group-checkbox input,
+.group-radio input {
+    width: 20px;
+    height: 20px;
     border-radius: 4px;
-    accent-color: #004C8F;
+    accent-color: var(--brand-blue);
+    cursor: pointer;
+}
+
+.group-radio input {
+    border-radius: 50%;
 }
 
 .group-info h4 {

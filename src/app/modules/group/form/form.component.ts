@@ -5,6 +5,7 @@ import { GroupService } from '../../../services/group.service';
 import { UserService } from '../../../services/user.service';
 import { OrganizationService } from '../../../services/organization.service';
 import { AuthService } from '../../../services/auth.service';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -29,7 +30,8 @@ export class GroupFormComponent implements OnInit {
         private organizationService: OrganizationService,
         private authService: AuthService,
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private breadcrumbService: BreadcrumbService
     ) { }
 
     ngOnInit(): void {
@@ -147,6 +149,9 @@ export class GroupFormComponent implements OnInit {
         this.groupService.getGroup(id).subscribe({
             next: (response) => {
                 const group = response.group;
+                if (group && this.groupId) {
+                    this.breadcrumbService.setLabel(this.groupId, group.name);
+                }
                 this.groupForm.patchValue({
                     code: group.code,
                     name: group.name,

@@ -207,6 +207,9 @@ export class UserFormComponent implements OnInit {
             next: (response) => {
                 if (response.user) {
                     const user = response.user;
+                    if (this.userId) {
+                        this.breadcrumbService.setLabel(this.userId, user.name || user.code || 'User Details');
+                    }
                     const nameParts = user.name.split(' ');
                     const firstName = nameParts[0] || '';
                     const lastName = nameParts.slice(1).join(' ') || '';

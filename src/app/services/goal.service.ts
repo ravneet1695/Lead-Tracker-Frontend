@@ -11,7 +11,7 @@ export interface Goal {
         endDate: Date;
     };
     organization?: string;
-    groups: string[];
+    group: string;
     formSchema: any[];
     statusOptions: string[];
     completionStatus?: string;

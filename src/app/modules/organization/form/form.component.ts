@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } 
 import { Router, ActivatedRoute } from '@angular/router';
 import { OrganizationService } from '../../../services/organization.service';
 import { LocationService } from '../../../services/location.service';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -38,7 +39,8 @@ export class OrganizationFormComponent implements OnInit {
         private locationService: LocationService,
         private router: Router,
         private route: ActivatedRoute,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private breadcrumbService: BreadcrumbService
     ) { }
 
     ngOnInit(): void {
@@ -164,7 +166,7 @@ export class OrganizationFormComponent implements OnInit {
             }),
             logo: ['', this.isEditMode ? [] : [Validators.required]],
             description: [''],
-            departments: [[]],
+            departments: [[], [Validators.required]],
             // Admin user fields (only for create mode)
             adminUser: this.fb.group({
                 name: ['', this.isEditMode ? [] : [Validators.required]],
@@ -199,6 +201,9 @@ export class OrganizationFormComponent implements OnInit {
             next: (response) => {
                 if (response.organization) {
                     const org = response.organization;
+                    if (this.organizationId) {
+                        this.breadcrumbService.setLabel(this.organizationId, org.name);
+                    }
 
                     // Pre-populate dropdowns based on existing address data
                     if (org.address?.state) {
@@ -426,6 +431,9 @@ export class OrganizationFormComponent implements OnInit {
                 return 'Invalid format';
             }
         }
+        if (fieldName === 'departments' && this.organizationForm.get('departments')?.errors?.['required']) {
+            return 'At least one department is required';
+        }
         return '';
     }
 
@@ -433,7 +441,10 @@ export class OrganizationFormComponent implements OnInit {
         const value = this.customDepartmentInput.trim();
         if (value && !this.departments.includes(value)) {
             this.departments.push(value);
-            this.organizationForm.get('departments')?.patchValue(this.departments);
+            const control = this.organizationForm.get('departments');
+            control?.patchValue(this.departments);
+            control?.updateValueAndValidity();
+            control?.markAsTouched();
             this.customDepartmentInput = '';
         } else if (this.departments.includes(value)) {
             Swal.fire({
@@ -446,7 +457,10 @@ export class OrganizationFormComponent implements OnInit {
 
     removeDepartment(index: number): void {
         this.departments.splice(index, 1);
-        this.organizationForm.get('departments')?.patchValue(this.departments);
+        const control = this.organizationForm.get('departments');
+        control?.patchValue(this.departments);
+        control?.updateValueAndValidity();
+        control?.markAsTouched();
     }
 
     onlyNumbers(event: any): boolean {

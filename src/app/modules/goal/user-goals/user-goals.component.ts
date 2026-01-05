@@ -211,14 +211,14 @@ import Swal from 'sweetalert2';
               </div>
             </div>
 
-            <div class="detail-item full-width" *ngIf="goal.groups && goal.groups.length > 0">
+            <div class="detail-item full-width" *ngIf="goal.group">
               <div class="detail-icon">👥</div>
               <div class="detail-content">
-                <span class="detail-label">Assigned Groups</span>
+                <span class="detail-label">Assigned Group</span>
                 <div class="groups-list">
-                  <span *ngFor="let group of goal.groups" class="group-badge">
+                  <span class="group-badge">
                     <span class="group-icon">●</span>
-                    {{ group.name || group }}
+                    {{ goal.group.name || goal.group }}
                   </span>
                 </div>
               </div>

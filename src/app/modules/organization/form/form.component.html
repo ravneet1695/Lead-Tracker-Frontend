@@ -219,7 +219,7 @@
 
             <!-- Department Management Section -->
             <div class="form-section">
-                <h3 class="section-title">Department Management</h3>
+                <h3 class="section-title">Department Management <span class="required">*</span></h3>
 
                 <div class="status-options-container">
                     <div class="status-help-banner">
@@ -280,6 +280,10 @@
                             </div>
                         </div>
                     </div>
+                    <span *ngIf="isFieldInvalid('departments')" class="error-message"
+                        style="margin-top: 10px; display: block;">
+                        {{ getFieldError('departments') }}
+                    </span>
                 </div>
             </div>
 
