@@ -101,6 +101,22 @@
     box-shadow: var(--shadow-md);
 }
 
+.breadcrumb-icon {
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-icon ::ng-deep svg {
+    stroke: #ffffff !important;
+    /* Default Dark Theme - White */
+}
+
+/* Light Theme Override */
+:host-context(.light-theme) .breadcrumb-icon ::ng-deep svg {
+    stroke: #000000 !important;
+    /* Light Theme - Black */
+}
+
 .breadcrumb-separator {
     color: var(--text-muted);
     opacity: 0.5;
