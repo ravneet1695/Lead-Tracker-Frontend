@@ -133,6 +133,36 @@ export class EditLeadComponent implements OnInit {
         return this.leadForm.get('contacts') as FormArray;
     }
 
+    get statusActivities(): any[] {
+        return (this.activities || []).filter(a => a.action === 'STATUS_CHANGE');
+    }
+
+    get systemActivities(): any[] {
+        return (this.activities || []).filter(a =>
+            a.action !== 'REMARK_ADDED'
+        );
+    }
+
+    get timeline(): any[] {
+        const remarksWithTypes = (this.entry?.remarks || []).map((r: any) => ({
+            ...r,
+            type: 'REMARK',
+            timestamp: r.createdAt
+        }));
+
+        const activitiesWithTypes = (this.activities || [])
+            .filter(a => a.action !== 'REMARK_ADDED') // Avoid duplicates as we show full remarks
+            .map((a: any) => ({
+                ...a,
+                type: 'ACTIVITY',
+                timestamp: a.timestamp
+            }));
+
+        return [...remarksWithTypes, ...activitiesWithTypes].sort((a, b) => {
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        });
+    }
+
     addContact(contactData?: any): void {
         const contactGroup = this.fb.group({
             name: [contactData?.name || '', Validators.required],
@@ -209,6 +239,57 @@ export class EditLeadComponent implements OnInit {
                     text: 'Failed to add remark'
                 });
             }
+        });
+    }
+
+    saveQuickAction(): void {
+        const remark = this.newRemark.trim();
+
+        if (!remark) {
+            Swal.fire({
+                icon: 'info',
+                title: 'No remark',
+                text: 'Please enter a remark to post',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            return;
+        }
+
+        this.addingRemark = true;
+
+        this.goalEntryService.addRemark(this.entryId, remark).subscribe({
+            next: (remarkResponse) => {
+                this.entry.remarks = remarkResponse.remarks;
+                this.newRemark = '';
+                this.finishQuickAction();
+            },
+            error: (err) => this.handleQuickActionError(err)
+        });
+    }
+
+    private finishQuickAction(): void {
+        this.addingRemark = false;
+        this.loadActivities();
+        Swal.fire({
+            icon: 'success',
+            title: 'Action Saved',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    }
+
+    private handleQuickActionError(error: any): void {
+        this.addingRemark = false;
+        console.error('Quick action error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to save action'
         });
     }
 
