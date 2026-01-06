@@ -20,12 +20,15 @@ export interface User {
         logo?: string;
     };
     groups: string[];
+    mustChangePassword?: boolean;
 }
 
 export interface AuthResponse {
     success: boolean;
     token: string;
+    mustChangePassword?: boolean;
     user: User;
+    message?: string;
 }
 
 interface JWTPayload {
@@ -185,5 +188,22 @@ export class AuthService {
 
     hasAnyPermission(permissions: string[]): boolean {
         return permissions.some(p => this.hasPermission(p));
+    }
+
+    // First-time password change
+    changePasswordFirstTime(email: string, currentPassword: string, newPassword: string): Observable<AuthResponse> {
+        return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/change-password-first-time`, {
+            email,
+            currentPassword,
+            newPassword
+        }).pipe(
+            tap(response => {
+                if (response.success && response.token) {
+                    localStorage.setItem(this.tokenKey, response.token);
+                    localStorage.setItem('current_user', JSON.stringify(response.user));
+                    this.currentUserSubject.next(response.user);
+                }
+            })
+        );
     }
 }
