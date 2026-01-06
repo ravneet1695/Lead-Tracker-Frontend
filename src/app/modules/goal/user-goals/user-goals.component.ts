@@ -19,7 +19,7 @@ import Swal from 'sweetalert2';
             <div class="header-title-section">
               <div class="title-icon">🎯</div>
               <div>
-                <h1 class="gradient-text">My Goals</h1>
+                <h1 class="gradient-text">My Goal</h1>
                 <p class="header-subtitle">Track your progress and achieve your targets</p>
               </div>
             </div>
