@@ -5,6 +5,25 @@
 }
 
 /* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-left h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-primary);
+}
 
 .btn-back {
     display: flex;
@@ -93,13 +112,13 @@
 }
 
 /* Form Grid */
-.form-grid {
+.form-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
 }
 
-.col-span-2 {
+.form-group-span-2 {
     grid-column: span 2;
 }
 
@@ -110,7 +129,7 @@
 }
 
 /* Form Controls */
-.form-label {
+label {
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
@@ -118,7 +137,7 @@
     font-size: 0.85rem;
 }
 
-.form-group label.required::after {
+label.required::after {
     content: ' *';
     color: #ef4444;
 }
@@ -233,6 +252,225 @@ textarea.form-control {
     border-color: #10b981;
 }
 
+/* Status Section Refined */
+.status-config {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.status-select {
+    max-width: 300px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Remarks Container */
+.remarks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.add-remark-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.btn-add-remark {
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--brand-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add-remark:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-add-remark:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.remarks-history {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.remark-item {
+    background: var(--button-secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.remark-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+}
+
+.remark-user {
+    font-weight: 700;
+    color: var(--brand-blue);
+}
+
+.remark-date {
+    color: var(--text-muted);
+}
+
+.remark-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+}
+
+.no-remarks,
+.no-activities {
+    text-align: center;
+    padding: 32px;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px dashed var(--border-color);
+    border-radius: 12px;
+    color: var(--text-muted);
+}
+
+/* Activity Timeline */
+.activity-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-left: 20px;
+    position: relative;
+    margin-top: 20px;
+}
+
+.activity-timeline::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.activity-item {
+    position: relative;
+    padding-left: 32px;
+    padding-bottom: 24px;
+}
+
+.activity-item:last-child {
+    padding-bottom: 0;
+}
+
+.activity-marker {
+    position: absolute;
+    left: -32px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    border: 2px solid var(--card-bg);
+    z-index: 1;
+}
+
+.activity-marker[data-action="CREATED"] {
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+}
+
+.activity-marker[data-action="STATUS_CHANGE"] {
+    background: #3b82f6;
+    box-shadow: 0 0 8px #3b82f6;
+}
+
+.activity-marker[data-action="REMARK_ADDED"] {
+    background: #f59e0b;
+    box-shadow: 0 0 8px #f59e0b;
+}
+
+.activity-marker[data-action="DATA_UPDATE"] {
+    background: #7c3aed;
+    box-shadow: 0 0 8px #7c3aed;
+}
+
+.activity-content {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 16px;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.activity-action {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.activity-desc {
+    font-size: 0.9rem;
+    margin: 4px 0;
+    color: var(--text-primary);
+}
+
+.activity-user {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.mini-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
 /* Form Actions */
 .form-actions {
     display: flex;
@@ -254,7 +492,6 @@ textarea.form-control {
     border: none;
 }
 
-/* Action Buttons */
 .btn-primary {
     background: var(--primary-gradient);
     color: white;
@@ -289,12 +526,12 @@ textarea.form-control {
         padding: 16px;
     }
 
-    .form-grid,
+    .form-row,
     .contact-grid {
         grid-template-columns: 1fr;
     }
 
-    .col-span-2 {
+    .form-group-span-2 {
         grid-column: span 1;
     }
 

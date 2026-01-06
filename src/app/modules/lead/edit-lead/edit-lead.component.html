@@ -172,29 +172,97 @@
             </button>
         </div>
 
-        <!-- Status and Remarks -->
+        <!-- Status Section -->
         <div class="form-section">
             <h2 class="section-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
                 </svg>
-                Status & Remarks
+                Current Status
             </h2>
 
-            <div class="form-row">
+            <div class="status-config">
                 <div class="form-group">
-                    <label for="status" class="required">Status</label>
-                    <select id="status" formControlName="status" class="form-control">
+                    <label for="status" class="required">Lead Status</label>
+                    <select id="status" formControlName="status" class="form-control status-select"
+                        [ngClass]="getStatusClass(leadForm.get('status')?.value)">
                         <option *ngFor="let status of goal.statusOptions" [value]="status">
                             {{ status }}
                         </option>
                     </select>
                 </div>
+                <p class="status-hint">Updating the status will be logged in the activity timeline.</p>
+            </div>
+        </div>
 
-                <div class="form-group form-group-span-3">
-                    <label for="remarks">Remarks</label>
-                    <textarea id="remarks" formControlName="remarks" class="form-control" rows="3"
-                        placeholder="Add any additional notes or remarks"></textarea>
+        <!-- Remarks Section -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Remarks & Notes
+            </h2>
+
+            <div class="remarks-container">
+                <!-- Add New Remark -->
+                <div class="add-remark-box">
+                    <textarea [(ngModel)]="newRemark" [ngModelOptions]="{standalone: true}" class="form-control"
+                        placeholder="Type a new remark here..." rows="3"></textarea>
+                    <button type="button" class="btn-add-remark" (click)="submitRemark()"
+                        [disabled]="!newRemark.trim() || addingRemark">
+                        <svg *ngIf="!addingRemark" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span *ngIf="addingRemark" class="mini-spinner"></span>
+                        {{ addingRemark ? 'Adding...' : 'Add Remark' }}
+                    </button>
+                </div>
+
+                <!-- Remarks History -->
+                <div class="remarks-history" *ngIf="entry.remarks && entry.remarks.length > 0">
+                    <div *ngFor="let remark of entry.remarks.slice().reverse()" class="remark-item">
+                        <div class="remark-header">
+                            <span class="remark-user">{{ remark.user?.name || 'User' }}</span>
+                            <span class="remark-date">{{ remark.createdAt | date:'medium' }}</span>
+                        </div>
+                        <div class="remark-text">{{ remark.text }}</div>
+                    </div>
+                </div>
+
+                <div class="no-remarks" *ngIf="!entry.remarks || entry.remarks.length === 0">
+                    <p>No remarks added yet.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Activity Log
+            </h2>
+
+            <div class="activity-timeline">
+                <div *ngFor="let activity of activities" class="activity-item">
+                    <div class="activity-marker" [attr.data-action]="activity.action"></div>
+                    <div class="activity-content">
+                        <div class="activity-header">
+                            <span class="activity-action">{{ activity.action.replace('_', ' ') }}</span>
+                            <span class="activity-time">{{ activity.timestamp | date:'medium' }}</span>
+                        </div>
+                        <p class="activity-desc">{{ activity.description }}</p>
+                        <div class="activity-user">By {{ activity.user?.name }}</div>
+                    </div>
+                </div>
+
+                <div class="no-activities" *ngIf="activities.length === 0">
+                    <p>No activity recorded yet.</p>
                 </div>
             </div>
         </div>

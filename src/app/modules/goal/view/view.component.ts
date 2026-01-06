@@ -116,9 +116,15 @@ export class GoalViewComponent implements OnInit {
     getStatusClass(status: string): string {
         switch (status?.toLowerCase()) {
             case 'active': return 'status-active';
-            case 'completed': return 'status-completed';
+            case 'upcoming': return 'status-upcoming';
+            case 'closed': return 'status-closed';
             case 'inactive': return 'status-inactive';
             default: return 'status-inactive';
         }
+    }
+
+    getProgressPercentage(): number {
+        if (!this.goal?.progress) return 0;
+        return Math.min(100, Math.round(this.goal.progress.percentage || 0));
     }
 }
