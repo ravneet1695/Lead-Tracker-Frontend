@@ -360,9 +360,6 @@ export class CreateLeadComponent implements OnInit {
                         title: '🎉 Congratulations!',
                         html: `
                             <p style="font-size: 1.1rem; margin-bottom: 10px;">${response.message}</p>
-                            <p style="color: #10b981; font-weight: 600; font-size: 1.2rem;">
-                                +${response.bonusPoints} Bonus Points! 🏆
-                            </p>
                         `,
                         timer: 4000,
                         showConfirmButton: true,
