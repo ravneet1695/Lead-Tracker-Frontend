@@ -18,6 +18,7 @@ export interface DashboardData {
     topOrganizations?: any[];
     teamPerformance?: any[];
     recentEntries?: any[];
+    goalStagesSummary?: any[];
 }
 
 @Injectable({

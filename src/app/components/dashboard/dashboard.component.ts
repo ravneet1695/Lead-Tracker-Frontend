@@ -43,7 +43,6 @@ export class DashboardComponent implements OnInit {
 
     getCurrentUserRole(): string {
         const user = this.authService.currentUserValue;
-        // Return role label if available, otherwise role name
         if (typeof user?.role === 'object') {
             return user.role.label || user.role.name || 'User';
         }
@@ -52,5 +51,26 @@ export class DashboardComponent implements OnInit {
 
     getStatValue(stats: any, key: string): number {
         return stats?.[key] || 0;
+    }
+
+    getGoalTotal(goal: any): number {
+        if (!goal?.stages) return 0;
+        return goal.stages.reduce((acc: number, stage: any) => acc + (stage.count || 0), 0);
+    }
+
+    getMemberLeadsAtStage(member: any, status: string): any[] {
+        if (!member?.stages) return [];
+        const stage = member.stages.find((s: any) => s.status === status);
+        return stage?.leads || [];
+    }
+
+    getMemberTotal(member: any): number {
+        if (!member?.stages) return 0;
+        return member.stages.reduce((acc: number, stage: any) => acc + (stage.count || 0), 0);
+    }
+
+    getGoalStages(goal: any): string[] {
+        if (!goal?.stages) return [];
+        return goal.stages.map((s: any) => s.status);
     }
 }

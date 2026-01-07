@@ -14,270 +14,73 @@
 
     <!-- Dashboard Content -->
     <div *ngIf="dashboardData && !loading" class="dashboard-content">
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
-            <div class="welcome-section">
-                <h1>Welcome back, {{ dashboardData.user.name }}!</h1>
-                <p class="role-badge" [class]="'role-' + dashboardData.role">
-                    {{ getCurrentUserRole() }}
-                </p>
-            </div>
-        </div>
-
-        <!-- Super Admin Dashboard -->
-        <div *ngIf="dashboardData.role === 'super_admin'" class="role-dashboard super-admin-dashboard">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">🏢</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'totalOrganizations') }}</h3>
-                        <p>Total Organizations</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">✅</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'activeOrganizations') }}</h3>
-                        <p>Active Organizations</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'totalUsers') }}</h3>
-                        <p>Total Users</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🎯</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'totalGoals') }}</h3>
-                        <p>Total Goals</p>
-                    </div>
-                </div>
+        <!-- Goal Performance Tables -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2>Goal Performance Breakdown</h2>
+                <p class="section-subtitle">Track team performance across pipeline stages</p>
             </div>
 
-            <div class="dashboard-grid">
-                <div class="dashboard-card">
-                    <h2>Top Organizations</h2>
-                    <div class="org-list">
-                        <div *ngFor="let org of dashboardData.topOrganizations" class="org-item">
-                            <div class="org-info">
-                                <h4>{{ org.name }}</h4>
-                                <span class="org-status" [class.active]="org.status === 'active'">{{ org.status
-                                    }}</span>
-                            </div>
-                            <div class="org-stats">
-                                <span class="user-count">👥 {{ org.userCount }} users</span>
-                            </div>
+            <div class="goal-tables-container">
+                <div *ngFor="let goal of dashboardData.goalStagesSummary" class="goal-table-wrapper">
+                    <div class="goal-table-header">
+                        <div class="goal-header-content">
+                            <span class="goal-icon">🎯</span>
+                            <h3>{{ goal.goalTitle }}</h3>
                         </div>
+                        <span class="goal-total-badge">{{ getGoalTotal(goal) }} Total Leads</span>
                     </div>
-                </div>
 
-                <div class="dashboard-card">
-                    <h2>Recent Activity</h2>
-                    <div class="activity-list">
-                        <div *ngFor="let activity of dashboardData.recentActivity" class="activity-item">
-                            <div class="activity-icon">📝</div>
-                            <div class="activity-content">
-                                <p><strong>{{ activity.user }}</strong> - {{ activity.goal }}</p>
-                                <span class="activity-status" [class]="'status-' + activity.status">{{ activity.status
-                                    }}</span>
-                            </div>
-                            <span class="activity-time">{{ activity.createdAt | date: 'short' }}</span>
-                        </div>
+                    <div class="table-scroll-container">
+                        <table class="performance-table">
+                            <thead>
+                                <tr>
+                                    <th class="user-column">Team Member</th>
+                                    <th *ngFor="let stage of getGoalStages(goal)" class="status-column">
+                                        {{ stage }}
+                                    </th>
+                                    <th class="total-column">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let member of goal.memberBreakdown" class="member-row">
+                                    <td class="user-cell">
+                                        <div class="user-info">
+                                            <span class="user-avatar">{{ member.userName.charAt(0) }}</span>
+                                            <span class="user-name">{{ member.userName }}</span>
+                                        </div>
+                                    </td>
+                                    <td *ngFor="let stage of getGoalStages(goal)" class="leads-cell">
+                                        <div class="leads-list" *ngIf="getMemberLeadsAtStage(member, stage).length > 0">
+                                            <span *ngFor="let lead of getMemberLeadsAtStage(member, stage)"
+                                                class="lead-name-badge">
+                                                {{ lead.title }}
+                                            </span>
+                                        </div>
+                                        <span class="no-leads-text"
+                                            *ngIf="getMemberLeadsAtStage(member, stage).length === 0">-</span>
+                                    </td>
+                                    <td class="total-cell">
+                                        <span class="total-badge">{{ getMemberTotal(member) }}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="totals-row">
+                                    <td class="footer-label">Total</td>
+                                    <td *ngFor="let stage of goal.stages" class="footer-count">
+                                        <strong>{{ stage.count }}</strong>
+                                    </td>
+                                    <td class="footer-total">
+                                        <strong>{{ getGoalTotal(goal) }}</strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Org Admin Dashboard -->
-        <div *ngIf="dashboardData.role === 'org_admin'" class="role-dashboard org-admin-dashboard">
-            <div class="org-header">
-                <h2>{{ dashboardData.organization?.name }}</h2>
-                <span class="org-status-badge" [class.active]="dashboardData.organization?.status === 'active'">
-                    {{ dashboardData.organization?.status }}
-                </span>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'totalUsers') }}</h3>
-                        <p>Total Users</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">👔</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'managers') }}</h3>
-                        <p>Managers</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">💼</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'salesReps') }}</h3>
-                        <p>Sales Reps</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard-grid">
-                <div class="dashboard-card">
-                    <h2>Leaderboard</h2>
-                    <div class="leaderboard-list">
-                        <div *ngFor="let performer of dashboardData.leaderboard; let i = index"
-                            class="leaderboard-item">
-                            <span class="rank">{{ i + 1 }}</span>
-                            <div class="performer-info">
-                                <h4>{{ performer.user?.name }}</h4>
-                                <p>{{ performer.user?.email }}</p>
-                            </div>
-                            <span class="points">{{ performer.totalPoints }} pts</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dashboard-card">
-                    <h2>Recent Activity</h2>
-                    <div class="activity-list">
-                        <div *ngFor="let activity of dashboardData.recentActivity" class="activity-item">
-                            <div class="activity-icon">📝</div>
-                            <div class="activity-content">
-                                <p><strong>{{ activity.user }}</strong> - {{ activity.goal }}</p>
-                                <span class="activity-status" [class]="'status-' + activity.status">{{ activity.status
-                                    }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Manager Dashboard -->
-        <div *ngIf="dashboardData.role === 'manager'" class="role-dashboard manager-dashboard">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'teamSize') }}</h3>
-                        <p>Team Members</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'totalEntries') }}</h3>
-                        <p>Total Entries</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">✅</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'completedEntries') }}</h3>
-                        <p>Completed</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📈</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'completionRate') }}%</h3>
-                        <p>Completion Rate</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard-grid">
-                <div class="dashboard-card">
-                    <h2>Team Leaderboard</h2>
-                    <div class="leaderboard-list">
-                        <div *ngFor="let performer of dashboardData.leaderboard; let i = index"
-                            class="leaderboard-item">
-                            <span class="rank">{{ i + 1 }}</span>
-                            <div class="performer-info">
-                                <h4>{{ performer.user?.name }}</h4>
-                            </div>
-                            <span class="points">{{ performer.totalPoints }} pts</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dashboard-card">
-                    <h2>Recent Activity</h2>
-                    <div class="activity-list">
-                        <div *ngFor="let activity of dashboardData.recentActivity" class="activity-item">
-                            <div class="activity-icon">📝</div>
-                            <div class="activity-content">
-                                <p><strong>{{ activity.user }}</strong> - {{ activity.goal }}</p>
-                                <span class="activity-status" [class]="'status-' + activity.status">{{ activity.status
-                                    }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sales Dashboard -->
-        <div *ngIf="dashboardData.role === 'sales'" class="role-dashboard sales-dashboard">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'totalEntries') }}</h3>
-                        <p>Total Entries</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">✅</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'completedEntries') }}</h3>
-                        <p>Completed</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⏳</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'pendingEntries') }}</h3>
-                        <p>Pending</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⭐</div>
-                    <div class="stat-content">
-                        <h3>{{ getStatValue(dashboardData.stats, 'totalPoints') }}</h3>
-                        <p>Total Points</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard-grid">
-                <div class="dashboard-card">
-                    <h2>Recent Entries</h2>
-                    <div class="entries-list">
-                        <div *ngFor="let entry of dashboardData.recentEntries" class="entry-item">
-                            <div class="entry-info">
-                                <h4>{{ entry.goal?.name }}</h4>
-                                <span class="entry-status" [class]="'status-' + entry.status">{{ entry.status }}</span>
-                            </div>
-                            <span class="entry-points">{{ entry.goal?.points }} pts</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dashboard-card">
-                    <h2>Achievements</h2>
-                    <div class="badges-grid">
-                        <div *ngFor="let badge of dashboardData.stats?.badges" class="badge-item">
-                            <div class="badge-icon">🏆</div>
-                            <span>{{ badge }}</span>
-                        </div>
-                        <div *ngIf="!dashboardData.stats?.badges || dashboardData.stats.badges.length === 0"
-                            class="no-badges">
-                            <p>No badges earned yet. Keep working to earn your first badge!</p>
-                        </div>
+                    <div *ngIf="goal.memberBreakdown.length === 0" class="no-data-message">
+                        <p>No team members assigned to this goal yet.</p>
                     </div>
                 </div>
             </div>
