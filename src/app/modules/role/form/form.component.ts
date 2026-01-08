@@ -24,16 +24,8 @@ export class RoleFormComponent implements OnInit {
     organizations: any[] = [];
     currentUserRole: string = '';
 
-    // Available permissions
-    availablePermissions = [
-        { category: 'Users', permissions: ['users.create', 'users.read', 'users.update', 'users.delete'] },
-        { category: 'Groups', permissions: ['groups.create', 'groups.read', 'groups.update', 'groups.delete'] },
-        { category: 'Goals', permissions: ['goals.create', 'goals.read', 'goals.update', 'goals.delete'] },
-        { category: 'Goal Entries', permissions: ['goal-entries.create', 'goal-entries.read', 'goal-entries.update', 'goal-entries.delete'] },
-        { category: 'Dashboard', permissions: ['dashboard.read'] },
-        { category: 'Audit Logs', permissions: ['audit-logs.read', 'audit-logs.export'] },
-        { category: 'Roles', permissions: ['roles.create', 'roles.read', 'roles.update', 'roles.delete'] }
-    ];
+    // Available permissions (dynamic)
+    availablePermissions: any[] = [];
 
     constructor(
         private fb: FormBuilder,
@@ -47,9 +39,28 @@ export class RoleFormComponent implements OnInit {
     ngOnInit(): void {
         const user = this.authService.currentUserValue;
         this.currentUserRole = user?.role?.name || '';
+        this.loadAvailablePermissions();
         this.initializeForm();
         this.checkEditMode();
         this.loadOrganizations();
+    }
+
+    loadAvailablePermissions(): void {
+        this.roleService.getAvailablePermissions().subscribe({
+            next: (response) => {
+                const allPermissions = response.permissions || [];
+                // Filter permissions based on user role
+                if (this.isSuperAdmin()) {
+                    this.availablePermissions = allPermissions;
+                } else {
+                    // Non-Super Admins only see non-admin-only categories
+                    this.availablePermissions = allPermissions.filter((cat: any) => !cat.isAdminOnly);
+                }
+            },
+            error: (error) => {
+                console.error('Error loading permissions:', error);
+            }
+        });
     }
 
     initializeForm(): void {
@@ -191,8 +202,8 @@ export class RoleFormComponent implements OnInit {
             // Select all permissions
             permissionsArray.clear();
             this.availablePermissions.forEach(category => {
-                category.permissions.forEach(permission => {
-                    permissionsArray.push(this.fb.control(permission));
+                category.permissions.forEach((permission: any) => {
+                    permissionsArray.push(this.fb.control(permission.id));
                 });
             });
         } else {
