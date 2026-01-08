@@ -154,11 +154,22 @@ export class DashboardComponent implements OnInit {
     }
 
     updateAvailableStatuses(): void {
-        // Extract statuses from ALL available goals to ensure consistent columns/filters
+        // Extract statuses from the CURRENT organizational/goal context
         const statusSet = new Set<string>();
 
-        // Use original data to discover all possible statuses
-        this.originalGoalData.forEach((goal: any) => {
+        // If specific goals are selected, only show statuses from those goals
+        // Otherwise, show statuses from all goals available in the current org filter
+        const relevantGoals = this.selectedGoals.length > 0
+            ? this.originalGoalData.filter(g => this.selectedGoals.includes(g.goalId || g._id))
+            : this.filteredAvailableGoals.map(ag => this.originalGoalData.find(g => (g.goalId || g._id) === ag.id)).filter(g => !!g);
+
+        relevantGoals.forEach((goal: any) => {
+            // First check statusOptions (the intended schema)
+            if (goal.statusOptions && goal.statusOptions.length > 0) {
+                goal.statusOptions.forEach((s: string) => statusSet.add(s));
+            }
+
+            // Also check actual stages in data for any "discovered" statuses
             if (goal.stages) {
                 goal.stages.forEach((stage: any) => {
                     if (stage.status) {
@@ -169,7 +180,7 @@ export class DashboardComponent implements OnInit {
         });
 
         this.availableLeadStatuses = Array.from(statusSet).sort();
-        console.log('📋 Discovered Lead Statuses:', this.availableLeadStatuses);
+        console.log(`📋 Discovered ${this.availableLeadStatuses.length} Lead Statuses for current context`);
     }
 
     applyClientSideFilters(): void {
@@ -219,15 +230,21 @@ export class DashboardComponent implements OnInit {
             // Find the original goal to get its full set of defined stages
             const originalGoal = this.originalGoalData.find(g => (g.goalId || g._id) === goalId);
 
-            // Extract all statuses for this goal (prioritize originalGoal properties)
-            const statusOptions = (originalGoal && originalGoal.statusOptions) ? originalGoal.statusOptions :
-                ((goal.statusOptions) ? goal.statusOptions : []);
+            // Extract all statuses specifically for this goal
+            const statusOptions = (originalGoal && originalGoal.statusOptions && originalGoal.statusOptions.length > 0)
+                ? originalGoal.statusOptions
+                : (goal.statusOptions && goal.statusOptions.length > 0 ? goal.statusOptions : []);
 
             const stageSource = (originalGoal && originalGoal.stages) ? originalGoal.stages : (goal.stages || []);
-            const allGoalStatuses = statusOptions.length > 0 ? statusOptions : stageSource.map((s: any) => s.status);
+
+            // If statusOptions exist, they are the source of truth for "as per the goal"
+            // If not, use whatever statuses are actually present in the data
+            const allGoalStatuses = statusOptions.length > 0
+                ? statusOptions
+                : Array.from(new Set(stageSource.map((s: any) => s.status))).filter(s => !!s);
 
             if (allGoalStatuses.length === 0) {
-                console.warn(`⚠️ Goal ${goalId} (${goal.goalTitle}) has NO STAGES defined!`, goal);
+                console.warn(`⚠️ Goal ${goalId} (${goal.goalTitle}) has NO STAGES or status options!`, goal);
             }
 
             const processedGoal = { ...goal };
