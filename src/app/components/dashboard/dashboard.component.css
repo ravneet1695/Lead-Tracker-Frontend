@@ -2,12 +2,17 @@
     padding: 16px;
     background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
     min-height: 100vh;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .dashboard-content {
     max-width: 1600px;
+    width: 100%;
     margin: 0 auto;
     animation: fadeIn 0.6s ease-out;
+    box-sizing: border-box;
 }
 
 @keyframes fadeIn {
@@ -25,6 +30,8 @@
 /* Section Styles */
 .dashboard-section {
     margin-bottom: 20px;
+    width: 100%;
+    min-width: 0;
 }
 
 .section-header {
@@ -143,6 +150,8 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    width: 100%;
+    min-width: 0;
 }
 
 .goal-table-wrapper {
@@ -152,6 +161,8 @@
     box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     animation: slideUp 0.5s ease-out;
+    width: 100%;
+    min-width: 0;
 }
 
 @keyframes slideUp {
@@ -252,6 +263,10 @@
 .table-scroll-container {
     overflow-x: auto;
     overflow-y: visible;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on mobile */
+    border-radius: 0 0 12px 12px;
 }
 
 .table-scroll-container::-webkit-scrollbar {
@@ -298,18 +313,24 @@
 }
 
 .performance-table th.user-column {
-    min-width: 180px;
+    min-width: 200px;
     position: sticky;
     left: 0;
     background: linear-gradient(to bottom, #f8fafc, #f1f5f9);
-    z-index: 11;
+    z-index: 20;
+    /* Increased z-index */
     border-right: 2px solid #e2e8f0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    /* Shadow to separate from scrolling content */
 }
 
 .performance-table th.status-column {
     text-align: center;
-    min-width: 100px;
+    min-width: 140px;
+    /* Increased min-width to force scroll when many */
     background: linear-gradient(to bottom, #f8fafc, #eff6ff);
+    white-space: nowrap;
+    /* Prevent status text from wrapping */
 }
 
 .performance-table th.total-column {
@@ -348,9 +369,11 @@
     position: sticky;
     left: 0;
     background: white;
-    z-index: 5;
+    z-index: 10;
+    /* Above regular cells, below header */
     border-right: 2px solid #e2e8f0;
     font-weight: 600;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
 }
 
 .performance-table tbody tr:nth-child(even) td.user-cell {
@@ -495,10 +518,11 @@
     position: sticky;
     left: 0;
     background: linear-gradient(to bottom, #f1f5f9, #e2e8f0);
-    z-index: 5;
+    z-index: 10;
     border-right: 2px solid #cbd5e1;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
 }
 
 .performance-table tfoot td.footer-count {

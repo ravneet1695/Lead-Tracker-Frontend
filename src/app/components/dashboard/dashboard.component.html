@@ -27,8 +27,8 @@
             <div class="filters-container">
                 <!-- Organization Filter -->
                 <select class="filter-select" [(ngModel)]="selectedOrganization" (change)="onOrganizationChange()"
-                    [disabled]="isOrgAdmin()">
-                    <option value="" *ngIf="!isOrgAdmin()">All Organizations</option>
+                    [disabled]="isRestricted()">
+                    <option value="" *ngIf="!isRestricted()">All Organizations</option>
                     <option *ngFor="let org of availableOrganizations" [value]="org.id">{{ org.name }}</option>
                 </select>
 

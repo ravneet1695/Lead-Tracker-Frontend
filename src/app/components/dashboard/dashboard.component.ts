@@ -26,7 +26,7 @@ export class DashboardComponent implements OnInit {
     goalStatusFilter: string = ''; // Goal status (active, closed, etc.)
     leadStatusFilter: string = ''; // Lead entry status
     goalDropdownOpen: boolean = false;
-    isUserOrgAdmin: boolean = false; // Flag for UI restrictions
+    isUserRestricted: boolean = false; // Flag for UI restrictions (non-Super Admins)
 
     // Available options for dropdowns
     availableOrganizations: any[] = [];
@@ -49,10 +49,12 @@ export class DashboardComponent implements OnInit {
 
     private checkUserPermissions(): void {
         const user = this.authService.currentUserValue;
-        if (user && user.role?.name === 'org_admin' && user.organization?._id) {
-            this.isUserOrgAdmin = true;
-            this.selectedOrganization = user.organization._id;
-            console.log('🛡️ Org Admin detected, auto-mapping to organization:', this.selectedOrganization);
+        if (user && user.role?.name !== 'super_admin') {
+            this.isUserRestricted = true;
+            if (user.organization?._id) {
+                this.selectedOrganization = user.organization._id;
+                console.log('🛡️ Restricted user detected, auto-mapping to organization:', this.selectedOrganization);
+            }
         }
     }
 
@@ -217,9 +219,12 @@ export class DashboardComponent implements OnInit {
             // Find the original goal to get its full set of defined stages
             const originalGoal = this.originalGoalData.find(g => (g.goalId || g._id) === goalId);
 
-            // Extract all statuses for this goal (prioritize originalGoal.stages)
+            // Extract all statuses for this goal (prioritize originalGoal properties)
+            const statusOptions = (originalGoal && originalGoal.statusOptions) ? originalGoal.statusOptions :
+                ((goal.statusOptions) ? goal.statusOptions : []);
+
             const stageSource = (originalGoal && originalGoal.stages) ? originalGoal.stages : (goal.stages || []);
-            const allGoalStatuses = stageSource.map((s: any) => s.status);
+            const allGoalStatuses = statusOptions.length > 0 ? statusOptions : stageSource.map((s: any) => s.status);
 
             if (allGoalStatuses.length === 0) {
                 console.warn(`⚠️ Goal ${goalId} (${goal.goalTitle}) has NO STAGES defined!`, goal);
@@ -409,7 +414,7 @@ export class DashboardComponent implements OnInit {
         return member.stages.reduce((acc: number, stage: any) => acc + (stage.count || 0), 0);
     }
 
-    isOrgAdmin(): boolean {
-        return this.isUserOrgAdmin;
+    isRestricted(): boolean {
+        return this.isUserRestricted;
     }
 }
