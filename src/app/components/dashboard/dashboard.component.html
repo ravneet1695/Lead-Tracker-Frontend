@@ -26,8 +26,9 @@
             <!-- Filters Section -->
             <div class="filters-container">
                 <!-- Organization Filter -->
-                <select class="filter-select" [(ngModel)]="selectedOrganization" (change)="onOrganizationChange()">
-                    <option value="">All Organizations</option>
+                <select class="filter-select" [(ngModel)]="selectedOrganization" (change)="onOrganizationChange()"
+                    [disabled]="isOrgAdmin()">
+                    <option value="" *ngIf="!isOrgAdmin()">All Organizations</option>
                     <option *ngFor="let org of availableOrganizations" [value]="org.id">{{ org.name }}</option>
                 </select>
 
@@ -103,8 +104,8 @@
                             <thead>
                                 <tr>
                                     <th class="user-column">Team Member</th>
-                                    <th *ngFor="let stage of getGoalStages(goal)" class="status-column">
-                                        {{ stage }}
+                                    <th *ngFor="let stage of goal.stages" class="status-column">
+                                        {{ stage.status }}
                                     </th>
                                     <th class="total-column">Total</th>
                                 </tr>
@@ -117,15 +118,16 @@
                                             <span class="user-name">{{ member.userName }}</span>
                                         </div>
                                     </td>
-                                    <td *ngFor="let stage of getGoalStages(goal)" class="leads-cell">
-                                        <div class="leads-list" *ngIf="getMemberLeadsAtStage(member, stage).length > 0">
-                                            <span *ngFor="let lead of getMemberLeadsAtStage(member, stage)"
-                                                class="lead-name-badge">
+                                    <td *ngFor="let stage of goal.stages" class="leads-cell">
+                                        <div class="leads-list"
+                                            *ngIf="getMemberLeadsAtStage(member, stage.status).length > 0">
+                                            <span *ngFor="let lead of getMemberLeadsAtStage(member, stage.status)"
+                                                class="lead-name-badge" [title]="lead.title">
                                                 {{ lead.title }}
                                             </span>
                                         </div>
                                         <span class="no-leads-text"
-                                            *ngIf="getMemberLeadsAtStage(member, stage).length === 0">-</span>
+                                            *ngIf="getMemberLeadsAtStage(member, stage.status).length === 0">0</span>
                                     </td>
                                     <td class="total-cell">
                                         <span class="total-badge">{{ getMemberTotal(member) }}</span>
@@ -136,7 +138,7 @@
                                 <tr class="totals-row">
                                     <td class="footer-label">Total</td>
                                     <td *ngFor="let stage of goal.stages" class="footer-count">
-                                        <strong>{{ stage.count }}</strong>
+                                        <strong [class.text-muted]="stage.count === 0">{{ stage.count }}</strong>
                                     </td>
                                     <td class="footer-total">
                                         <strong>{{ getGoalTotal(goal) }}</strong>

@@ -26,6 +26,7 @@ export class DashboardComponent implements OnInit {
     goalStatusFilter: string = ''; // Goal status (active, closed, etc.)
     leadStatusFilter: string = ''; // Lead entry status
     goalDropdownOpen: boolean = false;
+    isUserOrgAdmin: boolean = false; // Flag for UI restrictions
 
     // Available options for dropdowns
     availableOrganizations: any[] = [];
@@ -42,7 +43,17 @@ export class DashboardComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
+        this.checkUserPermissions();
         this.loadDashboardData();
+    }
+
+    private checkUserPermissions(): void {
+        const user = this.authService.currentUserValue;
+        if (user && user.role?.name === 'org_admin' && user.organization?._id) {
+            this.isUserOrgAdmin = true;
+            this.selectedOrganization = user.organization._id;
+            console.log('🛡️ Org Admin detected, auto-mapping to organization:', this.selectedOrganization);
+        }
     }
 
     loadDashboardData(): void {
@@ -141,52 +152,48 @@ export class DashboardComponent implements OnInit {
     }
 
     updateAvailableStatuses(): void {
-        // Extract statuses from selected goals or filtered goals
+        // Extract statuses from ALL available goals to ensure consistent columns/filters
         const statusSet = new Set<string>();
 
-        let goalsToCheck = this.originalGoalData;
-
-        // If goals are selected, only get statuses from those goals
-        if (this.selectedGoals.length > 0) {
-            goalsToCheck = this.originalGoalData.filter(goal =>
-                this.selectedGoals.includes(goal.goalId)
-            );
-        } else if (this.selectedOrganization) {
-            // If organization is selected, get statuses from that org's goals
-            goalsToCheck = this.originalGoalData.filter(goal => {
-                const goalOrgId = typeof goal.organization === 'object' ? goal.organization._id : goal.organization;
-                return goalOrgId === this.selectedOrganization;
-            });
-        }
-
-        goalsToCheck.forEach((goal: any) => {
+        // Use original data to discover all possible statuses
+        this.originalGoalData.forEach((goal: any) => {
             if (goal.stages) {
                 goal.stages.forEach((stage: any) => {
-                    statusSet.add(stage.status);
+                    if (stage.status) {
+                        statusSet.add(stage.status);
+                    }
                 });
             }
         });
 
-        this.availableLeadStatuses = Array.from(statusSet);
+        this.availableLeadStatuses = Array.from(statusSet).sort();
+        console.log('📋 Discovered Lead Statuses:', this.availableLeadStatuses);
     }
 
     applyClientSideFilters(): void {
-        if (!this.originalGoalData) {
+        console.log('🔄 [applyClientSideFilters] Starting...', {
+            selectedOrg: this.selectedOrganization,
+            selectedGoals: this.selectedGoals,
+            leadStatusFilter: this.leadStatusFilter
+        });
+
+        if (!this.originalGoalData || !Array.isArray(this.originalGoalData)) {
+            console.warn('⚠️ No original goal data to filter');
             this.filteredGoalData = [];
             return;
         }
 
         // Start with all goals
-        let filtered = [...this.originalGoalData];
+        let filtered = this.originalGoalData.map(g => ({ ...g }));
 
         // Filter by organization
         if (this.selectedOrganization) {
             filtered = filtered.filter(goal => {
-                const goalOrgId = typeof goal.organization === 'object' ? goal.organization._id : goal.organization;
+                const org = goal.organization;
+                const goalOrgId = typeof org === 'object' ? org._id : org;
                 return goalOrgId === this.selectedOrganization;
             });
         }
-        // No default filter - show all goals unless organization is selected
 
         // Filter by goal status (active, closed, etc.)
         if (this.goalStatusFilter) {
@@ -195,61 +202,79 @@ export class DashboardComponent implements OnInit {
 
         // Filter by selected goals
         if (this.selectedGoals.length > 0) {
-            filtered = filtered.filter(goal =>
-                this.selectedGoals.includes(goal.goalId)
-            );
+            filtered = filtered.filter(goal => {
+                const goalId = goal.goalId || goal._id;
+                return this.selectedGoals.includes(goalId);
+            });
         }
 
-        // Filter each goal's member breakdown
+        console.log(`📡 Goals after initial filtering: ${filtered.length}`);
+
+        // Process each goal to filter leads while preserving status columns
         filtered = filtered.map(goal => {
-            const filteredGoal = { ...goal };
+            const goalId = goal.goalId || goal._id;
 
-            // Filter member breakdown
-            filteredGoal.memberBreakdown = goal.memberBreakdown.map((member: any) => {
-                const filteredMember = { ...member };
+            // Find the original goal to get its full set of defined stages
+            const originalGoal = this.originalGoalData.find(g => (g.goalId || g._id) === goalId);
 
-                // Filter stages
-                filteredMember.stages = member.stages.map((stage: any) => {
-                    let filteredLeads = [...stage.leads];
+            // Extract all statuses for this goal (prioritize originalGoal.stages)
+            const stageSource = (originalGoal && originalGoal.stages) ? originalGoal.stages : (goal.stages || []);
+            const allGoalStatuses = stageSource.map((s: any) => s.status);
 
-                    // Apply status filter
-                    if (this.leadStatusFilter && stage.status !== this.leadStatusFilter) {
-                        filteredLeads = [];
+            if (allGoalStatuses.length === 0) {
+                console.warn(`⚠️ Goal ${goalId} (${goal.goalTitle}) has NO STAGES defined!`, goal);
+            }
+
+            const processedGoal = { ...goal };
+
+            // Filter member breakdown while keeping ALL stage keys (even if empty)
+            processedGoal.memberBreakdown = (goal.memberBreakdown || []).map((member: any) => {
+                const processedMember = { ...member };
+
+                // Map across ALL possible statuses for this goal
+                processedMember.stages = allGoalStatuses.map((status: string) => {
+                    // Find if member has data for this status
+                    const existingStage = (member.stages || []).find((s: any) => s.status === status);
+                    let leads = existingStage ? [...(existingStage.leads || [])] : [];
+
+                    // Apply lead entry status filter
+                    if (this.leadStatusFilter && status !== this.leadStatusFilter) {
+                        leads = [];
                     }
 
                     return {
-                        ...stage,
-                        leads: filteredLeads,
-                        count: filteredLeads.length
+                        status,
+                        leads,
+                        count: leads.length
                     };
-                }).filter((stage: any) => {
-                    // Keep stage if no status filter, or if it matches the filter
-                    return !this.leadStatusFilter || stage.status === this.leadStatusFilter;
                 });
 
-                return filteredMember;
+                return processedMember;
             });
 
-            // Recalculate stage totals
-            const stageTotals: any = {};
-            filteredGoal.memberBreakdown.forEach((member: any) => {
-                member.stages.forEach((stage: any) => {
-                    if (!stageTotals[stage.status]) {
-                        stageTotals[stage.status] = 0;
-                    }
-                    stageTotals[stage.status] += stage.count;
+            // Recalculate stage totals across ALL statuses
+            processedGoal.stages = allGoalStatuses.map((status: string) => {
+                let totalCount = 0;
+                processedGoal.memberBreakdown.forEach((member: any) => {
+                    const memberStage = member.stages.find((s: any) => s.status === status);
+                    totalCount += memberStage?.count || 0;
                 });
+
+                return {
+                    status,
+                    count: totalCount
+                };
+            }).filter((stage: any) => {
+                // If a status filter is active, only show that column
+                // Otherwise show all columns for this goal
+                return !this.leadStatusFilter || stage.status === this.leadStatusFilter;
             });
 
-            filteredGoal.stages = Object.entries(stageTotals).map(([status, count]) => ({
-                status,
-                count
-            }));
-
-            return filteredGoal;
+            return processedGoal;
         });
 
         this.filteredGoalData = filtered;
+        console.log('✅ [applyClientSideFilters] Completed. Filtered goals:', this.filteredGoalData.length);
 
         // Update dashboard data with filtered results
         if (this.dashboardData) {
@@ -384,8 +409,7 @@ export class DashboardComponent implements OnInit {
         return member.stages.reduce((acc: number, stage: any) => acc + (stage.count || 0), 0);
     }
 
-    getGoalStages(goal: any): string[] {
-        if (!goal?.stages) return [];
-        return goal.stages.map((s: any) => s.status);
+    isOrgAdmin(): boolean {
+        return this.isUserOrgAdmin;
     }
 }
