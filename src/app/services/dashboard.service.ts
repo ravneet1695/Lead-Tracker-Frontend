@@ -10,14 +10,6 @@ export interface DashboardData {
         email: string;
         role: string;
     };
-    stats: any;
-    charts?: any;
-    recentActivity: any[];
-    leaderboard?: any[];
-    organization?: any;
-    topOrganizations?: any[];
-    teamPerformance?: any[];
-    recentEntries?: any[];
     goalStagesSummary?: any[];
 }
 

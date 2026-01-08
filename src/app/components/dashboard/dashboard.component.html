@@ -16,9 +16,76 @@
     <div *ngIf="dashboardData && !loading" class="dashboard-content">
         <!-- Goal Performance Tables -->
         <div class="dashboard-section">
+
+
             <div class="section-header">
                 <h2>Goal Performance Breakdown</h2>
                 <p class="section-subtitle">Track team performance across pipeline stages</p>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-container">
+                <!-- Organization Filter -->
+                <select class="filter-select" [(ngModel)]="selectedOrganization" (change)="onOrganizationChange()">
+                    <option value="">All Organizations</option>
+                    <option *ngFor="let org of availableOrganizations" [value]="org.id">{{ org.name }}</option>
+                </select>
+
+                <!-- Goal Filter (dependent on organization) -->
+                <div class="dropdown-wrapper">
+                    <button class="dropdown-trigger" type="button" (click)="toggleGoalDropdown($event)">
+                        <span *ngIf="selectedGoals.length === 0" class="dropdown-placeholder">Select Goals</span>
+                        <span *ngIf="selectedGoals.length > 0" class="dropdown-selected">{{ selectedGoals.length }}
+                            selected</span>
+                        <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div class="dropdown-menu" *ngIf="goalDropdownOpen" (click)="$event.stopPropagation()">
+
+
+                        <label class="dropdown-item" *ngFor="let goal of filteredAvailableGoals">
+                            <input type="checkbox" [checked]="isGoalSelected(goal.id)"
+                                (change)="toggleGoalSelection(goal.id)">
+                            <span>{{ goal.title }}</span>
+                        </label>
+                        <div class="dropdown-empty" *ngIf="filteredAvailableGoals.length === 0 && !loading">
+                            <span *ngIf="selectedOrganization">No goals available for selected organization</span>
+                            <span *ngIf="!selectedOrganization">No goals available</span>
+                        </div>
+                        <div class="dropdown-empty" *ngIf="loading">
+                            Loading goals...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Goal Status Filter (Active, Closed, etc.) -->
+                <select class="filter-select" [(ngModel)]="goalStatusFilter" (change)="applyFilters()">
+                    <option value="">All Goal Statuses</option>
+                    <option *ngFor="let status of availableGoalStatuses" [value]="status">{{ status | titlecase }}
+                    </option>
+                </select>
+
+                <!-- Lead Entry Status Filter (dependent on selected goals) -->
+                <select class="filter-select" [(ngModel)]="leadStatusFilter" (change)="applyFilters()">
+                    <option value="">All Lead Statuses</option>
+                    <option *ngFor="let status of availableLeadStatuses" [value]="status">{{ status }}</option>
+                </select>
+
+                <input type="date" class="date-input" [(ngModel)]="startDate" (change)="applyFilters()"
+                    placeholder="Start Date">
+                <input type="date" class="date-input" [(ngModel)]="endDate" (change)="applyFilters()"
+                    placeholder="End Date">
+
+                <button class="btn-clear-filters" (click)="clearFilters()"
+                    *ngIf="selectedOrganization || goalStatusFilter || leadStatusFilter || startDate || endDate || selectedGoals.length > 0">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Clear Filters
+                </button>
             </div>
 
             <div class="goal-tables-container">
