@@ -30,7 +30,6 @@ export class RoleFormComponent implements OnInit {
         { category: 'Groups', permissions: ['groups.create', 'groups.read', 'groups.update', 'groups.delete'] },
         { category: 'Goals', permissions: ['goals.create', 'goals.read', 'goals.update', 'goals.delete'] },
         { category: 'Goal Entries', permissions: ['goal-entries.create', 'goal-entries.read', 'goal-entries.update', 'goal-entries.delete'] },
-        { category: 'Reports', permissions: ['reports.read', 'reports.export'] },
         { category: 'Dashboard', permissions: ['dashboard.read'] },
         { category: 'Audit Logs', permissions: ['audit-logs.read', 'audit-logs.export'] },
         { category: 'Roles', permissions: ['roles.create', 'roles.read', 'roles.update', 'roles.delete'] }
@@ -63,6 +62,11 @@ export class RoleFormComponent implements OnInit {
             permissions: this.fb.array([]),
             isActive: [true]
         });
+
+        // Default permission for new roles
+        if (!this.isEditMode) {
+            this.permissionsArray.push(this.fb.control('dashboard.read'));
+        }
 
         // For non-Super Admin users, auto-populate organization with their organization
         if (!this.isSuperAdmin()) {
