@@ -251,4 +251,53 @@ export class RoleListComponent implements OnInit {
     canDeleteRole(): boolean {
         return this.hasPermission('roles.delete');
     }
+
+    exportCsv(): void {
+        if (!this.filteredRoles || this.filteredRoles.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Data',
+                text: 'There are no roles to export.'
+            });
+            return;
+        }
+
+        // Define CSV headers
+        const headers = ['Role Name', 'Label', 'Type', 'Organization', 'Status', 'Permissions Count', 'Created At'];
+
+        // Map data to CSV rows
+        const rows = this.filteredRoles.map(role => {
+            const type = role.isSystem ? 'System' : 'Custom';
+            const organization = this.getOrganizationName(role);
+            const status = role.isActive ? 'Active' : 'Inactive';
+            const permissionsCount = this.hasWildcardPermission(role) ? 'All (Admin)' : this.getPermissionCount(role).toString();
+            const createdAt = role.createdAt ? new Date(role.createdAt).toLocaleDateString() : 'N/A';
+
+            return [
+                role.name,
+                role.label,
+                type,
+                organization,
+                status,
+                permissionsCount,
+                createdAt
+            ].map(field => `"${field}"`).join(','); // Escape fields and join with comma
+        });
+
+        // Combine headers and rows
+        const csvContent = [headers.join(','), ...rows].join('\n');
+
+        // Create blob and download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `roles_export_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
 }

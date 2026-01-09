@@ -4,39 +4,9 @@
   margin: 0 auto;
   padding: 32px;
   min-height: 100vh;
-  background: #0a0a14;
 }
 
 /* Page Header */
-.page-header {
-  background: var(--primary-gradient);
-  padding: 14px 24px;
-  margin-bottom: 0;
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: var(--shadow-sm);
-}
-
-.page-header .header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.page-header .header-left svg {
-  color: rgba(255, 255, 255, 0.9);
-  width: 20px;
-  height: 20px;
-}
-
-.page-header .header-left h1 {
-  color: white !important;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0;
-}
 
 .page-header .header-right {
   display: flex;
@@ -44,39 +14,40 @@
 }
 
 /* Back Button */
-.btn-back-to-goals {
+.btn-back-link {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: var(--button-secondary-bg);
+  gap: 10px;
+  padding: 10px 20px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 76, 143, 0.2);
+  border-radius: var(--radius-md);
   color: var(--brand-blue);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 0.85rem;
+  font-weight: 700;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.btn-back-to-goals svg {
-  width: 18px;
-  height: 18px;
+.btn-back-link:hover {
+  background: #f8fafc;
+  border-color: var(--brand-blue);
+  color: var(--brand-blue-light);
+  transform: translateX(-4px);
+  box-shadow: 0 6px 20px rgba(0, 76, 143, 0.25);
 }
 
-.btn-back-to-goals:hover {
-  background: var(--button-secondary-hover);
-  transform: translateY(-1px);
+.btn-back-link svg {
+  transition: transform 0.3s ease;
 }
 
-/* Filters Container */
+.btn-back-link:hover svg {
+  transform: translateX(-2px);
+}
+
+/* Filters Container - now in global styles.css */
 .filters-container {
-  background: var(--card-bg);
-  padding: 16px 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border-bottom: 1px solid var(--border-color);
   border-radius: 0 0 var(--radius-md) var(--radius-md);
   margin-bottom: 24px;
   flex-wrap: wrap;

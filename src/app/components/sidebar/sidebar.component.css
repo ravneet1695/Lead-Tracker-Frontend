@@ -130,14 +130,14 @@
     flex-shrink: 0;
     width: 22px;
     height: 22px;
-    color: inherit;
+    color: var(--brand-blue) !important;
 }
 
 .nav-icon svg {
     width: 20px;
     height: 20px;
-    stroke: currentColor;
-    fill: none;
+    stroke: var(--brand-blue) !important;
+    fill: none !important;
     stroke-width: 2.5;
     transition: all 0.25s ease;
 }
@@ -165,6 +165,14 @@
     background: rgba(237, 35, 42, 0.1);
     border-color: rgba(237, 35, 42, 0.2);
     color: var(--brand-red);
+}
+
+.logout-btn .nav-icon {
+    color: var(--brand-red) !important;
+}
+
+.logout-btn .nav-icon svg {
+    stroke: var(--brand-red) !important;
 }
 
 /* Mobile Responsive */

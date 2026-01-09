@@ -177,10 +177,15 @@ export class UserFormComponent implements OnInit {
                 if (response.success && response.organization) {
                     this.departments = response.organization.departments || [];
 
-                    // Auto-select default department if it exists and field is currently empty
+                    // Auto-select default department if it exists, otherwise select the first available department
+                    // Only if field is currently empty and not in edit mode (or forcing a refresh)
                     const currentDept = this.userForm.get('department')?.value;
-                    if (response.organization.defaultDepartment && !currentDept && !this.isEditMode) {
-                        this.userForm.patchValue({ department: response.organization.defaultDepartment });
+                    if (!currentDept && !this.isEditMode) {
+                        if (response.organization.defaultDepartment) {
+                            this.userForm.patchValue({ department: response.organization.defaultDepartment });
+                        } else if (this.departments.length > 0) {
+                            this.userForm.patchValue({ department: this.departments[0] });
+                        }
                     }
                 } else {
                     this.departments = [];

@@ -5,33 +5,6 @@
 }
 
 /* Page Header */
-.page-header {
-    background: var(--primary-gradient);
-    padding: 14px 24px;
-    margin-bottom: 0;
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: var(--shadow-sm);
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.header-left svg {
-    color: white !important;
-}
-
-.header-left h1 {
-    color: white !important;
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin: 0;
-}
 
 .header-group-badge {
     color: rgba(255, 255, 255, 0.9);

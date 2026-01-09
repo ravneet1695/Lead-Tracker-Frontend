@@ -1,0 +1,210 @@
+<div class="view-container">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading goal details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-container">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <h2>Oops! Something went wrong</h2>
+        <p>{{ error }}</p>
+        <button class="btn-minimal" (click)="goBack()">Back to List</button>
+    </div>
+
+    <!-- Goal Content -->
+    <div *ngIf="!loading && !error && goal" class="goal-view-container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="header-left">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                <h1>Goal Details: {{ goal.title }}</h1>
+            </div>
+            <div class="header-actions">
+                <button type="button" class="btn-back" (click)="goBack()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to List
+                </button>
+                <button *ngIf="canEditGoal()" class="btn-edit-elegant" (click)="editGoal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    Edit Goal
+                </button>
+            </div>
+        </header>
+
+        <div class="details-wrapper">
+            <div class="goal-details-card">
+
+                <!-- Core Configuration Section -->
+                <div class="form-section">
+                    <h3 class="section-title">Core Configuration</h3>
+
+                    <div class="form-row">
+                        <div class="info-group">
+                            <label class="info-label">Goal ID</label>
+                            <div class="info-value code">{{ goalId.toUpperCase() }}</div>
+                        </div>
+                        <div class="info-group">
+                            <label class="info-label">Current Status</label>
+                            <div class="info-value">
+                                <span class="status-badge-minimal" [ngClass]="getStatusClass(goal.status)">
+                                    <span class="status-dot"></span>
+                                    {{ goal.status || 'Active' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <label class="info-label">Completion Status</label>
+                            <div class="info-value text-highlight">
+                                Targeting "{{ goal.completionStatus }}"
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-group full-width" style="margin-top: 20px;">
+                        <label class="info-label">Goal Description</label>
+                        <div class="info-value description-box">
+                            {{ goal.description || 'No description provided for this goal.' }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline & Assignment Section -->
+                <div class="form-section">
+                    <h3 class="section-title">Timeline & Team Assignment</h3>
+
+                    <div class="form-row three-cols">
+                        <div class="info-group">
+                            <label class="info-label">Start Date</label>
+                            <div class="info-value date-box">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                {{ goal.timeline?.startDate | date:'mediumDate' }}
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <label class="info-label">End Date</label>
+                            <div class="info-value date-box">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                {{ goal.timeline?.endDate | date:'mediumDate' }}
+                            </div>
+                        </div>
+                        <div class="info-group">
+                            <label class="info-label">Assigned Group</label>
+                            <div class="info-value group-box">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                {{ goal.group?.name }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-group" style="margin-top: 20px;">
+                        <label class="info-label">Associated Organization</label>
+                        <div class="info-value org-box">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                            {{ goal.organization?.name }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Schema Section -->
+                <div class="form-section">
+                    <h3 class="section-title">Lead Capture Form Configuration</h3>
+                    <p class="section-desc">The following fields are defined for capturing lead data through this goal.
+                    </p>
+
+                    <div class="schema-table-wrapper">
+                        <table class="schema-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px;">#</th>
+                                    <th>Field Label</th>
+                                    <th>Input Type</th>
+                                    <th>Status</th>
+                                    <th>Context / Options</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let field of goal.formSchema; let i = index">
+                                    <td class="td-number">
+                                        <span class="field-number">{{ i + 1 }}</span>
+                                    </td>
+                                    <td class="td-label">
+                                        <strong>{{ field.alias || field.fieldName || 'Unnamed Field' }}</strong>
+                                    </td>
+                                    <td class="td-type">
+                                        <div class="type-info">
+                                            <span class="type-icon">{{ getFieldTypeIcon(field.fieldType) }}</span>
+                                            <span class="type-tag">{{ getFieldTypeLabel(field.fieldType) }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="td-status">
+                                        <span class="status-tag" [class.required]="field.mandatory">
+                                            {{ field.mandatory ? 'Required' : 'Optional' }}
+                                        </span>
+                                    </td>
+                                    <td class="td-context">
+                                        <!-- Repeatable Group Subfields -->
+                                        <div *ngIf="field.fieldType === 'formArray' && field.arrayFields?.length"
+                                            class="subfields-inline">
+                                            <span *ngFor="let sub of field.arrayFields" class="sub-tag">
+                                                {{ sub.alias || sub.fieldName }}
+                                            </span>
+                                        </div>
+                                        <!-- Dropdown Options -->
+                                        <div *ngIf="field.fieldType === 'dropdown' && field.options?.length"
+                                            class="subfields-inline">
+                                            <span *ngFor="let opt of field.options" class="sub-tag opt">
+                                                {{ opt }}
+                                            </span>
+                                        </div>
+                                        <span *ngIf="field.fieldType !== 'formArray' && field.fieldType !== 'dropdown'"
+                                            class="no-subfields">—</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

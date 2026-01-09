@@ -43,7 +43,18 @@
             </h2>
 
             <div class="form-row">
-                <div *ngFor="let field of goal.formSchema" [class.form-group-span-2]="field.fieldType === 'textarea'"
+                <div class="form-group">
+                    <label for="status" class="required">
+                        <span class="field-icon">⚡</span> Status
+                    </label>
+                    <select id="status" formControlName="status" class="form-control"
+                        [ngClass]="getStatusClass(leadForm.get('status')?.value)">
+                        <option *ngFor="let status of goal.statusOptions" [value]="status">
+                            {{ status }}
+                        </option>
+                    </select>
+                </div>
+                <div *ngFor="let field of goal.formSchema" [class.form-group-span-3]="field.fieldType === 'textarea'"
                     class="form-group">
 
                     <label [for]="field.fieldName" [class.required]="field.mandatory">
@@ -172,29 +183,100 @@
             </button>
         </div>
 
-        <!-- Status and Remarks -->
+
+        <!-- Action Hub Section -->
         <div class="form-section">
             <h2 class="section-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                Status & Remarks
+                Action Hub
             </h2>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="status" class="required">Status</label>
-                    <select id="status" formControlName="status" class="form-control">
-                        <option *ngFor="let status of goal.statusOptions" [value]="status">
-                            {{ status }}
-                        </option>
-                    </select>
+            <div class="timeline-container">
+                <!-- Pane 1: Action Pane (Left) -->
+                <div class="action-pane action-hub-pane">
+                    <h3 class="pane-header">POST REMARK</h3>
+                    <div class="action-card-glass">
+                        <div class="action-group">
+                            <label>Content</label>
+                            <textarea [(ngModel)]="newRemark" [ngModelOptions]="{standalone: true}"
+                                class="form-control remark-textarea-premium" placeholder="What's happening?..."
+                                rows="2"></textarea>
+                        </div>
+
+                        <button type="button" class="btn-premium-action" (click)="saveQuickAction()"
+                            [disabled]="addingRemark">
+                            <span *ngIf="!addingRemark">Post Remark</span>
+                            <span *ngIf="addingRemark" class="mini-spinner"></span>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="form-group form-group-span-3">
-                    <label for="remarks">Remarks</label>
-                    <textarea id="remarks" formControlName="remarks" class="form-control" rows="3"
-                        placeholder="Add any additional notes or remarks"></textarea>
+                <!-- Pane 2: Remarks Journey (Middle) -->
+                <div class="action-hub-pane remarks-pane">
+                    <h3 class="pane-header">
+                        Remarks History
+                        <span class="pane-count" *ngIf="entry.remarks?.length">{{ entry.remarks.length }}</span>
+                    </h3>
+
+                    <div class="sleek-history-container">
+                        <div class="timeline-line"></div>
+                        <div *ngFor="let remark of (entry.remarks || []).slice().reverse()"
+                            class="history-item remark-item-premium">
+                            <div class="history-marker remark-marker">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="history-content">
+                                <div class="history-meta">
+                                    <span class="user-badge">{{ remark.user?.name || 'User' }}</span>
+                                    <span class="time-stamp">{{ remark.createdAt | date:'shortTime' }} • {{
+                                        remark.createdAt | date:'MMM d' }}</span>
+                                </div>
+                                <div class="remark-bubble">
+                                    {{ remark.text }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="empty-state-minimal" *ngIf="!entry.remarks || entry.remarks.length === 0">
+                            No remarks yet.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pane 3: System Audit (Right) -->
+                <div class="action-hub-pane events-pane">
+                    <h3 class="pane-header">Activity Log</h3>
+
+                    <div class="sleek-history-container">
+                        <div class="timeline-line"></div>
+                        <div *ngFor="let activity of systemActivities" class="history-item activity-item-premium">
+                            <div class="history-marker" [attr.data-action]="activity.action">
+                                <span *ngIf="activity.action === 'CREATED'">🆕</span>
+                                <span *ngIf="activity.action === 'STATUS_CHANGE'">⚡</span>
+                                <span *ngIf="activity.action === 'DATA_UPDATE'">⚙️</span>
+                            </div>
+                            <div class="history-content">
+                                <div class="history-meta">
+                                    <span class="action-type">{{ activity.action.replace('_', ' ') }}</span>
+                                    <span class="time-stamp">{{ activity.timestamp | date:'shortTime' }}</span>
+                                </div>
+                                <p class="activity-detail">{{ activity.description }}</p>
+                                <div class="activity-author">
+                                    By {{ activity.user?.name || 'System' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="empty-state-minimal" *ngIf="systemActivities.length === 0">
+                            No activity recorded.
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

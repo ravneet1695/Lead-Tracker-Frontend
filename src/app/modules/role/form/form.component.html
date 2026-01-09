@@ -109,16 +109,6 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="checkbox-container">
-                        <input type="checkbox" formControlName="isActive">
-                        <span class="checkbox-checkmark"></span>
-                        <div class="checkbox-content">
-                            <span class="checkbox-title">Active</span>
-                            <small class="checkbox-desc">Inactive roles cannot be assigned to users</small>
-                        </div>
-                    </label>
-                </div>
             </div>
 
             <!-- Permissions Management Section -->
@@ -141,10 +131,10 @@
                             </div>
                             <div class="permission-list">
                                 <label class="permission-item" *ngFor="let permission of category.permissions">
-                                    <input type="checkbox" [checked]="isPermissionSelected(permission)"
-                                        (change)="togglePermission(permission)">
+                                    <input type="checkbox" [checked]="isPermissionSelected(permission.id)"
+                                        (change)="togglePermission(permission.id)">
                                     <span class="permission-box"></span>
-                                    <span class="permission-name">{{ permission }}</span>
+                                    <span class="permission-name">{{ permission.label }}</span>
                                 </label>
                             </div>
                         </div>

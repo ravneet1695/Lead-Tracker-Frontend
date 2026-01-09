@@ -23,6 +23,10 @@ export class EditLeadComponent implements OnInit {
     loading = true;
     submitting = false;
 
+    activities: any[] = [];
+    newRemark: string = '';
+    addingRemark: boolean = false;
+
     constructor(
         private fb: FormBuilder,
         private route: ActivatedRoute,
@@ -36,6 +40,7 @@ export class EditLeadComponent implements OnInit {
     ngOnInit(): void {
         this.entryId = this.route.snapshot.params['entryId'];
         this.loadEntry();
+        this.loadActivities();
     }
 
     loadEntry(): void {
@@ -44,7 +49,6 @@ export class EditLeadComponent implements OnInit {
             next: (response) => {
                 this.entry = response.entry;
                 if (this.entry) {
-                    // Try to use a meaningful label for the breadcrumb
                     const label = this.entry.data?.name || this.entry.code || 'Lead Details';
                     this.breadcrumbService.setLabel(this.entryId, label);
                 }
@@ -60,6 +64,17 @@ export class EditLeadComponent implements OnInit {
                 }).then(() => {
                     this.router.navigate(['/leads']);
                 });
+            }
+        });
+    }
+
+    loadActivities(): void {
+        this.goalEntryService.getActivities(this.entryId).subscribe({
+            next: (response) => {
+                this.activities = response.activities;
+            },
+            error: (error) => {
+                console.error('Error loading activities:', error);
             }
         });
     }
@@ -85,8 +100,7 @@ export class EditLeadComponent implements OnInit {
 
     initializeForm(): void {
         const formControls: any = {
-            status: [this.entry.status || 'New', Validators.required],
-            remarks: [this.entry.remarks || '']
+            status: [this.entry.status || 'New', Validators.required]
         };
 
         // Add dynamic form fields with existing data
@@ -100,17 +114,14 @@ export class EditLeadComponent implements OnInit {
                     validators.push(Validators.pattern(/^[0-9]{10}$/));
                 }
 
-                // Get existing value from entry data
                 const existingValue = this.entry.data?.[field.fieldName] || '';
                 formControls[field.fieldName] = [existingValue, validators];
             });
         }
 
-        // Add contacts array with existing contacts
         formControls.contacts = this.fb.array([]);
         this.leadForm = this.fb.group(formControls);
 
-        // Populate existing contacts
         if (this.entry.contacts && this.entry.contacts.length > 0) {
             this.entry.contacts.forEach((contact: any) => {
                 this.addContact(contact);
@@ -120,6 +131,36 @@ export class EditLeadComponent implements OnInit {
 
     get contactsArray(): FormArray {
         return this.leadForm.get('contacts') as FormArray;
+    }
+
+    get statusActivities(): any[] {
+        return (this.activities || []).filter(a => a.action === 'STATUS_CHANGE');
+    }
+
+    get systemActivities(): any[] {
+        return (this.activities || []).filter(a =>
+            a.action !== 'REMARK_ADDED'
+        );
+    }
+
+    get timeline(): any[] {
+        const remarksWithTypes = (this.entry?.remarks || []).map((r: any) => ({
+            ...r,
+            type: 'REMARK',
+            timestamp: r.createdAt
+        }));
+
+        const activitiesWithTypes = (this.activities || [])
+            .filter(a => a.action !== 'REMARK_ADDED') // Avoid duplicates as we show full remarks
+            .map((a: any) => ({
+                ...a,
+                type: 'ACTIVITY',
+                timestamp: a.timestamp
+            }));
+
+        return [...remarksWithTypes, ...activitiesWithTypes].sort((a, b) => {
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        });
     }
 
     addContact(contactData?: any): void {
@@ -144,18 +185,13 @@ export class EditLeadComponent implements OnInit {
         if (field.calculation) {
             try {
                 let formula = field.calculation;
-
                 this.goal.formSchema.forEach((f: any) => {
                     const value = this.getFieldValue(f.fieldName) || 0;
                     formula = formula.replace(new RegExp(f.fieldName, 'g'), value.toString());
                 });
-
-                // Use Function constructor instead of eval for safer evaluation
-                // Only allow basic math operations
                 const safeFormula = formula.replace(/[^0-9+\-*/().\s]/g, '');
                 const calculate = new Function('return ' + safeFormula);
                 const result = calculate();
-
                 this.leadForm.patchValue({
                     [field.fieldName]: result
                 });
@@ -173,6 +209,88 @@ export class EditLeadComponent implements OnInit {
                 }
             });
         }
+    }
+
+    submitRemark(): void {
+        if (!this.newRemark.trim()) return;
+
+        this.addingRemark = true;
+        this.goalEntryService.addRemark(this.entryId, this.newRemark).subscribe({
+            next: (response) => {
+                this.addingRemark = false;
+                this.entry.remarks = response.remarks;
+                this.newRemark = '';
+                this.loadActivities(); // Refresh activities
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Remark Added',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            },
+            error: (error) => {
+                this.addingRemark = false;
+                console.error('Error adding remark:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to add remark'
+                });
+            }
+        });
+    }
+
+    saveQuickAction(): void {
+        const remark = this.newRemark.trim();
+
+        if (!remark) {
+            Swal.fire({
+                icon: 'info',
+                title: 'No remark',
+                text: 'Please enter a remark to post',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            return;
+        }
+
+        this.addingRemark = true;
+
+        this.goalEntryService.addRemark(this.entryId, remark).subscribe({
+            next: (remarkResponse) => {
+                this.entry.remarks = remarkResponse.remarks;
+                this.newRemark = '';
+                this.finishQuickAction();
+            },
+            error: (err) => this.handleQuickActionError(err)
+        });
+    }
+
+    private finishQuickAction(): void {
+        this.addingRemark = false;
+        this.loadActivities();
+        Swal.fire({
+            icon: 'success',
+            title: 'Action Saved',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+    }
+
+    private handleQuickActionError(error: any): void {
+        this.addingRemark = false;
+        console.error('Quick action error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to save action'
+        });
     }
 
     onSubmit(): void {
@@ -193,8 +311,6 @@ export class EditLeadComponent implements OnInit {
         }
 
         const formValue = this.leadForm.value;
-
-        // Build data object from form schema fields
         const data: any = {};
         if (this.goal.formSchema) {
             this.goal.formSchema.forEach((field: any) => {
@@ -205,8 +321,7 @@ export class EditLeadComponent implements OnInit {
         const updateData = {
             data: data,
             status: formValue.status,
-            contacts: formValue.contacts || [],
-            remarks: formValue.remarks
+            contacts: formValue.contacts || []
         };
 
         this.submitting = true;
@@ -252,5 +367,15 @@ export class EditLeadComponent implements OnInit {
             'autoCalculate': '🧮'
         };
         return icons[fieldType] || '📝';
+    }
+
+    getStatusClass(status: string): string {
+        if (!status) return 'status-new';
+        const s = status.toLowerCase();
+        if (s.includes('new') || s.includes('initiated')) return 'status-new';
+        if (s.includes('won') || s.includes('happy') || s.includes('completed')) return 'status-won';
+        if (s.includes('lost') || s.includes('rejected')) return 'status-lost';
+        if (s.includes('process') || s.includes('progress') || s.includes('pending')) return 'status-process';
+        return 'status-default';
     }
 }

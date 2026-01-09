@@ -1,0 +1,160 @@
+<div class="goals-container">
+    <!-- Purple Header -->
+    <div class="page-header">
+        <div class="header-left">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
+                <line x1="12" y1="2" x2="12" y2="6"></line>
+            </svg>
+            <h1>My Goal</h1>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-container">
+        <div class="search-box">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" class="search-input" placeholder="Search by title or description..."
+                [(ngModel)]="searchTerm" (input)="applyFilters()">
+        </div>
+
+        <select class="filter-select" [(ngModel)]="statusFilter" (change)="applyFilters()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select>
+
+        <select class="filter-select" [(ngModel)]="organizationFilter" (change)="onOrganizationFilterChange()"
+            *ngIf="canViewAllOrganizations()">
+            <option value="all">All Organizations</option>
+            <option *ngFor="let org of organizations" [value]="org._id">{{ org.name }}</option>
+        </select>
+
+        <select class="filter-select" [(ngModel)]="groupFilter" (change)="applyFilters()">
+            <option value="">All Groups</option>
+            <option *ngFor="let group of groups" [value]="group._id">{{ group.name }}</option>
+        </select>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading goals...</p>
+    </div>
+
+    <!-- Goals Table -->
+    <div *ngIf="!loading && filteredGoals.length > 0" class="table-wrapper">
+        <table class="goals-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Timeline</th>
+                    <th>Group</th>
+                    <th *ngIf="canViewAllOrganizations()">Organization</th>
+                    <th>Target</th>
+                    <th>Progress</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let goal of filteredGoals">
+                    <td>
+                        <div class="goal-title-cell">
+                            <span class="goal-icon">🎯</span>
+                            <span class="goal-title-text">{{ goal.title }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="goal-description-text">{{ goal.description || 'No description' }}</span>
+                    </td>
+                    <td>
+                        <div class="timeline-cell">
+                            <div class="timeline-date" *ngIf="goal.timeline?.startDate">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                {{ formatDate(goal.timeline.startDate) }}
+                            </div>
+                            <div class="timeline-date" *ngIf="goal.timeline?.endDate">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                {{ formatDate(goal.timeline.endDate) }}
+                            </div>
+                            <span *ngIf="!goal.timeline?.startDate && !goal.timeline?.endDate" class="no-timeline">No
+                                timeline</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="group-badge">{{ getGroupName(goal.group) }}</span>
+                    </td>
+                    <td *ngIf="canViewAllOrganizations()">
+                        <span class="org-badge">{{ getOrganizationName(goal.organization) }}</span>
+                    </td>
+                    <td>
+                        <span class="target-text">{{ goal.target || 'N/A' }}</span>
+                    </td>
+                    <td>
+                        <div class="progress-cell" *ngIf="goal.progress">
+                            <div class="progress-bar-mini">
+                                <div class="progress-fill" [style.width.%]="goal.progress.percentage" [ngClass]="{
+                       'low': goal.progress.percentage < 30,
+                       'medium': goal.progress.percentage >= 30 && goal.progress.percentage < 70,
+                       'high': goal.progress.percentage >= 70 && goal.progress.percentage < 100,
+                       'complete': goal.progress.percentage >= 100
+                     }">
+                                </div>
+                            </div>
+                            <span class="progress-text">{{ goal.progress.percentage | number:'1.0-0' }}%</span>
+                        </div>
+                        <span *ngIf="!goal.progress" class="no-progress">N/A</span>
+                    </td>
+                    <td>
+                        <span class="status-badge" [class]="goal.status || 'active'">
+                            <span class="status-dot"></span>
+                            {{ goal.status || 'Active' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-action btn-edit" (click)="createLead(goal._id)"
+                                [disabled]="!canCreateLead(goal)"
+                                [title]="canCreateLead(goal) ? 'Create Lead' : 'Goal is inactive or expired'">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && filteredGoals.length === 0" class="empty-state">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="6"></circle>
+            <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
+            <line x1="12" y1="2" x2="12" y2="6"></line>
+        </svg>
+        <p>No goals found</p>
+    </div>
+</div>
