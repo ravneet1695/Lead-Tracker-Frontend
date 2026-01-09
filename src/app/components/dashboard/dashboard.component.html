@@ -63,21 +63,32 @@
 
                 <!-- Goal Status Filter (Active, Closed, etc.) -->
                 <select class="filter-select" [(ngModel)]="goalStatusFilter" (change)="applyFilters()">
-                    <option value="">All Goal Statuses</option>
+                    <option value="">Status</option>
                     <option *ngFor="let status of availableGoalStatuses" [value]="status">{{ status | titlecase }}
                     </option>
                 </select>
 
                 <!-- Lead Entry Status Filter (dependent on selected goals) -->
                 <select class="filter-select" [(ngModel)]="leadStatusFilter" (change)="applyFilters()">
-                    <option value="">All Lead Statuses</option>
+                    <option value="">Lead Status</option>
                     <option *ngFor="let status of availableLeadStatuses" [value]="status">{{ status }}</option>
                 </select>
 
-                <input type="date" class="date-input" [(ngModel)]="startDate" (change)="applyFilters()"
-                    placeholder="Start Date">
-                <input type="date" class="date-input" [(ngModel)]="endDate" (change)="applyFilters()"
-                    placeholder="End Date">
+                <!-- Unified Date Range Filter -->
+                <div class="date-range-filter">
+                    <svg class="calendar-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <input type="date" class="date-input-merged" [(ngModel)]="startDate" (change)="applyFilters()"
+                        placeholder="Start">
+                    <span class="date-separator">to</span>
+                    <input type="date" class="date-input-merged" [(ngModel)]="endDate" (change)="applyFilters()"
+                        placeholder="End">
+                </div>
 
                 <button class="btn-clear-filters" (click)="clearFilters()"
                     *ngIf="selectedOrganization || goalStatusFilter || leadStatusFilter || startDate || endDate || selectedGoals.length > 0">

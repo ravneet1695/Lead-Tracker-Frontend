@@ -208,6 +208,38 @@ export class DashboardComponent implements OnInit {
             });
         }
 
+        // Filter by Date Range (Functional Implementation)
+        if (this.startDate || this.endDate) {
+            const filterStart = this.startDate ? new Date(this.startDate) : null;
+            const filterEnd = this.endDate ? new Date(this.endDate) : null;
+
+            if (filterStart) filterStart.setHours(0, 0, 0, 0);
+            if (filterEnd) filterEnd.setHours(23, 59, 59, 999);
+
+            filtered = filtered.filter(goal => {
+                // Find the original goal to get its full timeline data
+                const originalGoal = this.originalGoalData.find(g => (g.goalId || g._id) === (goal.goalId || goal._id));
+
+                // If the goal object doesn't have timeline, we might need to look at its source
+                // dashboardData maps Backend Goal schema to UI structure
+                // Let's check Goal timeline
+                const gStart = goal.timeline?.startDate ? new Date(goal.timeline.startDate) : null;
+                const gEnd = goal.timeline?.endDate ? new Date(goal.timeline.endDate) : null;
+
+                if (!gStart && !gEnd) return true; // Keep goals without dates if filters are active? (Depends on preference, usually yes)
+
+                if (gStart) gStart.setHours(0, 0, 0, 0);
+                if (gEnd) gEnd.setHours(23, 59, 59, 999);
+
+                // Check overlap
+                // Goal starts after filter end OR Goal ends before filter start -> NO OVERLAP
+                if (filterEnd && gStart && gStart > filterEnd) return false;
+                if (filterStart && gEnd && gEnd < filterStart) return false;
+
+                return true;
+            });
+        }
+
         // Filter by goal status (active, closed, etc.)
         if (this.goalStatusFilter) {
             filtered = filtered.filter(goal => goal.status === this.goalStatusFilter);
