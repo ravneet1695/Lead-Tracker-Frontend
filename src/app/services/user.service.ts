@@ -15,6 +15,7 @@ export interface User {
     role: string | { _id: string; name: string; label: string };
     organization?: string | { _id: string; name: string };
     groups?: string[];
+    department?: string;
     status: string;
     profileImage?: string;
 }
@@ -61,7 +62,15 @@ export class UserService {
         return this.http.patch<any>(`${this.apiUrl}/${id}/status`, { status: 'active' });
     }
 
-    getNextUserCode(): Observable<any> {
-        return this.http.get<any>(`${this.apiUrl}/next-code`);
+    deactivateUser(id: string): Observable<any> {
+        return this.http.patch<any>(`${this.apiUrl}/${id}/status`, { status: 'inactive' });
+    }
+
+    getNextUserCode(organizationId?: string): Observable<any> {
+        let url = `${this.apiUrl}/next-code`;
+        if (organizationId) {
+            url += `?organization=${organizationId}`;
+        }
+        return this.http.get<any>(url);
     }
 }

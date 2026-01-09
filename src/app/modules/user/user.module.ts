@@ -8,7 +8,7 @@ import { UserFormComponent } from './form/form.component';
 const routes: Routes = [
     { path: '', component: UserListComponent },
     { path: 'new', component: UserFormComponent },
-    { path: ':id/edit', component: UserFormComponent }
+    { path: 'edit/:id', component: UserFormComponent }
 ];
 
 @NgModule({

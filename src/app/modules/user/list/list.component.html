@@ -10,7 +10,7 @@
             </svg>
             <h1>Users</h1>
         </div>
-        <button *ngIf="canCreateUser()" class="btn-create-user" (click)="createUser()">
+        <button *ngIf="canCreateUser()" class="btn-header-action" (click)="createUser()">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -37,15 +37,15 @@
             <option value="inactive">Inactive</option>
         </select>
 
-        <select class="filter-select" [(ngModel)]="roleFilter" (change)="applyFilters()">
-            <option value="">All Roles</option>
-            <option *ngFor="let role of roles" [value]="role._id">{{ role.label }}</option>
-        </select>
-
         <select class="filter-select" [(ngModel)]="organizationFilter" (change)="onFilterChange()"
             *ngIf="canViewAllOrganizations()">
             <option value="all">All Organizations</option>
             <option *ngFor="let org of organizations" [value]="org._id">{{ org.name }}</option>
+        </select>
+
+        <select class="filter-select" [(ngModel)]="roleFilter" (change)="applyFilters()">
+            <option value="">All Roles</option>
+            <option *ngFor="let role of roles" [value]="role._id">{{ role.label }}</option>
         </select>
     </div>
 
@@ -62,8 +62,8 @@
                 <tr>
                     <th>User Code</th>
                     <th>Name</th>
-                    <th>Email</th>
-                    <th>Mobile</th>
+                    <th>Contact Info</th>
+                    <th>Department</th>
                     <th>Role</th>
                     <th *ngIf="shouldShowOrganizationColumn()">Organization</th>
                     <th>Status</th>
@@ -81,38 +81,71 @@
                             <span class="user-name">{{ user.name }}</span>
                         </div>
                     </td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.mobile }}</td>
                     <td>
-                        <span class="role-badge" [class]="'role-' + getRoleName(user.role)">{{
-                            getRoleDisplayLabel(user.role) }}</span>
-                    </td>
-                    <td *ngIf="shouldShowOrganizationColumn()">{{ getOrganizationName(user.organization) }}</td>
-                    <td>
-                        <span class="status-badge" [class]="'status-' + user.status">{{ user.status }}</span>
+                        <div class="contact-info">
+                            <div class="email-text">{{ user.email }}</div>
+                            <div class="mobile-text">{{ user.mobile }}</div>
+                        </div>
                     </td>
                     <td>
-                        <div class="action-buttons">
+                        <span class="dept-text">{{ user.department || 'N/A' }}</span>
+                    </td>
+                    <td>
+                        <!-- System roles: Red badge -->
+                        <span *ngIf="isSystemRole(user.role)" class="role-badge"
+                            [class]="'role-' + getRoleName(user.role)">
+                            {{ getRoleDisplayLabel(user.role) }}
+                        </span>
+                        <!-- Custom roles: Colored pill -->
+                        <span *ngIf="!isSystemRole(user.role)" class="role-pill"
+                            [style.background-color]="getRoleColor(user.role)" [style.color]="'#1a1d2e'">
+                            {{ getRoleDisplayLabel(user.role) }}
+                        </span>
+                    </td>
+                    <td *ngIf="shouldShowOrganizationColumn()">
+                        <span class="org-pill" [style.background-color]="getOrganizationColor(user.organization)"
+                            [style.color]="'white'">
+                            {{ getOrganizationName(user.organization) }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge" [class.active]="user.status === 'active'"
+                            [class.inactive]="user.status === 'inactive'">
+                            <span class="status-dot"></span>
+                            {{ user.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons" style="justify-content: flex-end;">
                             <button *ngIf="canUpdateUser()" class="btn-action btn-edit" (click)="editUser(user._id)"
                                 title="Edit">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path d="M12 20h9"></path>
+                                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                </svg>
+                            </button>
+                            <button *ngIf="canUpdateUser() && user.status === 'active'" class="btn-action btn-toggle"
+                                (click)="$event.stopPropagation(); deactivateUser(user._id)" title="Deactivate">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
                                 </svg>
                             </button>
                             <button *ngIf="canUpdateUser() && user.status === 'inactive'"
                                 class="btn-action btn-activate" (click)="activateUser(user._id)" title="Activate">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
                                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                 </svg>
                             </button>
                             <button *ngIf="canDeleteUser() && user.status === 'active'" class="btn-action btn-delete"
                                 (click)="deleteUser(user._id)" title="Delete">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
                                     <polyline points="3 6 5 6 21 6"></polyline>
                                     <path
                                         d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">

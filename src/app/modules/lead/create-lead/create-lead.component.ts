@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, F
 import { GoalService } from '../../../services/goal.service';
 import { GoalEntryService } from '../../../services/goal-entry.service';
 import { AuthService } from '../../../services/auth.service';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -30,7 +31,8 @@ export class CreateLeadComponent implements OnInit {
         private router: Router,
         private goalService: GoalService,
         private goalEntryService: GoalEntryService,
-        private authService: AuthService
+        private authService: AuthService,
+        private breadcrumbService: BreadcrumbService
     ) { }
 
     ngOnInit(): void {
@@ -43,6 +45,9 @@ export class CreateLeadComponent implements OnInit {
         this.goalService.getGoal(this.goalId).subscribe({
             next: (response) => {
                 this.goal = response.goal;
+                if (this.goal) {
+                    this.breadcrumbService.setLabel(this.goalId, this.goal.title);
+                }
                 this.filterUserGroups();
                 this.initializeForm();
                 this.initializeAutoNumbers();
@@ -64,30 +69,39 @@ export class CreateLeadComponent implements OnInit {
 
     filterUserGroups(): void {
         const currentUser = this.authService.currentUserValue;
-        if (currentUser && currentUser.groups && this.goal.groups) {
-            const goalGroupIds = this.goal.groups.map((g: any) => g._id || g);
+        if (currentUser && currentUser.groups && this.goal.group) {
+            const goalGroupId = this.goal.group._id || this.goal.group;
             this.userGroups = currentUser.groups.filter((userGroup: any) =>
-                goalGroupIds.includes(userGroup._id || userGroup)
+                (userGroup._id || userGroup) === goalGroupId
             );
 
-            // DEVELOPMENT MODE: If user has no matching groups, use all goal groups
-            // This allows testing without proper group assignments
+            // DEVELOPMENT MODE: If user has no matching groups, use goal group
             if (this.userGroups.length === 0) {
-                console.warn('User not assigned to goal groups - using all goal groups for development');
-                this.userGroups = this.goal.groups;
+                console.warn('User not assigned to goal group - using goal group for development');
+                this.userGroups = [this.goal.group];
             }
 
-            if (this.userGroups.length === 1) {
-                this.selectedGroup = this.userGroups[0]._id || this.userGroups[0];
-            }
-        } else if (this.goal.groups) {
-            // If user has no groups at all, use all goal groups
-            console.warn('User has no groups - using all goal groups for development');
-            this.userGroups = this.goal.groups;
-            if (this.userGroups.length === 1) {
-                this.selectedGroup = this.userGroups[0]._id || this.userGroups[0];
-            }
+            // Auto-select the only group
+            const groupId = this.userGroups[0]._id || this.userGroups[0];
+            this.selectedGroup = groupId;
+        } else if (this.goal.group) {
+            // If user has no groups at all, use goal group
+            console.warn('User has no groups - using goal group for development');
+            this.userGroups = [this.goal.group];
+            const groupId = this.userGroups[0]._id || this.userGroups[0];
+            this.selectedGroup = groupId;
         }
+    }
+
+    selectGroup(groupId: string): void {
+        this.selectedGroup = groupId;
+        // Update form control
+        this.leadForm.patchValue({ group: this.selectedGroup });
+        this.leadForm.get('group')?.markAsTouched();
+    }
+
+    isGroupSelected(groupId: string): boolean {
+        return this.selectedGroup === groupId;
     }
 
     initializeForm(): void {
@@ -100,6 +114,13 @@ export class CreateLeadComponent implements OnInit {
         // Add dynamic form fields
         if (this.goal.formSchema) {
             this.goal.formSchema.forEach((field: any) => {
+                // Handle FormArray fields separately
+                if (field.fieldType === 'formArray' && field.arrayFields) {
+                    // Initialize as FormArray
+                    formControls[field.fieldName] = this.fb.array([]);
+                    return; // Skip regular field processing
+                }
+
                 const validators = field.mandatory ? [Validators.required] : [];
 
                 // Add specific validators based on field type
@@ -117,6 +138,18 @@ export class CreateLeadComponent implements OnInit {
         formControls.contacts = this.fb.array([]);
 
         this.leadForm = this.fb.group(formControls);
+
+        // Add minimum required instances for FormArray fields
+        if (this.goal.formSchema) {
+            this.goal.formSchema.forEach((field: any) => {
+                if (field.fieldType === 'formArray' && field.arrayFields) {
+                    const minInstances = field.minInstances || 0;
+                    for (let i = 0; i < minInstances; i++) {
+                        this.addArrayInstance(field.fieldName, field.arrayFields);
+                    }
+                }
+            });
+        }
     }
 
     initializeAutoNumbers(): void {
@@ -148,6 +181,94 @@ export class CreateLeadComponent implements OnInit {
 
     removeContact(index: number): void {
         this.contactsArray.removeAt(index);
+    }
+
+    // FormArray Management Methods
+    getFormArray(fieldName: string): FormArray {
+        return this.leadForm.get(fieldName) as FormArray;
+    }
+
+    addArrayInstance(fieldName: string, arrayFields: any[]): void {
+        const formArray = this.getFormArray(fieldName);
+        const group: any = {};
+
+        arrayFields.forEach((subfield: any) => {
+            const validators = subfield.mandatory ? [Validators.required] : [];
+
+            if (subfield.fieldType === 'email') {
+                validators.push(Validators.email);
+            } else if (subfield.fieldType === 'phone') {
+                validators.push(Validators.pattern(/^[0-9]{10}$/));
+            }
+
+            group[subfield.fieldName] = ['', validators];
+        });
+
+        formArray.push(this.fb.group(group));
+    }
+
+    removeArrayInstance(fieldName: string, index: number): void {
+        const formArray = this.getFormArray(fieldName);
+        formArray.removeAt(index);
+    }
+
+    canAddInstance(field: any): boolean {
+        const formArray = this.getFormArray(field.fieldName);
+        const maxInstances = field.maxInstances || 10;
+        return formArray.length < maxInstances;
+    }
+
+    canRemoveInstance(field: any): boolean {
+        const formArray = this.getFormArray(field.fieldName);
+        const minInstances = field.minInstances || 0;
+        return formArray.length > minInstances;
+    }
+
+    // Dependency Handling Methods
+    getDependentConfig(field: any, subfield: any, instanceIndex: number): any {
+        if (!subfield.dependsOn) return null;
+
+        const formArray = this.getFormArray(field.fieldName);
+        const instance = formArray.at(instanceIndex);
+        const parentValue = instance.get(subfield.dependsOn.fieldName)?.value;
+
+        if (!parentValue) return null;
+
+        const mapping = subfield.dependsOn.mappings?.find((m: any) => m.when === parentValue);
+        return mapping?.then || null;
+    }
+
+    getEffectiveLabel(field: any, subfield: any, instanceIndex: number): string {
+        const config = this.getDependentConfig(field, subfield, instanceIndex);
+        return config?.label || subfield.alias;
+    }
+
+    getEffectiveOptions(field: any, subfield: any, instanceIndex: number): string[] {
+        const config = this.getDependentConfig(field, subfield, instanceIndex);
+        return config?.options || subfield.options || [];
+    }
+
+    shouldShowField(field: any, subfield: any, instanceIndex: number): boolean {
+        const config = this.getDependentConfig(field, subfield, instanceIndex);
+        return config?.show !== false;
+    }
+
+    onParentFieldChange(field: any, subfield: any, instanceIndex: number, parentFieldName: string): void {
+        // Find the dependent subfield
+        const dependentSubfield = field.arrayFields.find((f: any) =>
+            f.dependsOn?.fieldName === parentFieldName
+        );
+
+        if (!dependentSubfield) return;
+
+        const config = this.getDependentConfig(field, dependentSubfield, instanceIndex);
+        if (config?.defaultValue !== undefined) {
+            const formArray = this.getFormArray(field.fieldName);
+            const instance = formArray.at(instanceIndex);
+            instance.patchValue({
+                [dependentSubfield.fieldName]: config.defaultValue
+            });
+        }
     }
 
     getFieldValue(fieldName: string): any {
@@ -239,9 +360,6 @@ export class CreateLeadComponent implements OnInit {
                         title: '🎉 Congratulations!',
                         html: `
                             <p style="font-size: 1.1rem; margin-bottom: 10px;">${response.message}</p>
-                            <p style="color: #10b981; font-weight: 600; font-size: 1.2rem;">
-                                +${response.bonusPoints} Bonus Points! 🏆
-                            </p>
                         `,
                         timer: 4000,
                         showConfirmButton: true,
@@ -286,7 +404,8 @@ export class CreateLeadComponent implements OnInit {
             'textarea': '📄',
             'multiContact': '👥',
             'autoNumber': '#️⃣',
-            'autoCalculate': '🧮'
+            'autoCalculate': '🧮',
+            'formArray': '🔁'
         };
         return icons[fieldType] || '📝';
     }

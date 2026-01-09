@@ -36,6 +36,10 @@ export class RoleService {
 
     constructor(private http: HttpClient) { }
 
+    getAvailablePermissions(): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/permissions`);
+    }
+
     getRoles(includeInactive: boolean = false): Observable<RoleListResponse> {
         if (includeInactive) {
             return this.http.get<RoleListResponse>(this.apiUrl, {

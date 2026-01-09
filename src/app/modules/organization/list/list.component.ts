@@ -127,6 +127,45 @@ export class OrganizationListComponent implements OnInit {
         });
     }
 
+    toggleStatus(id: string | undefined, currentStatus: string | undefined): void {
+        if (!id) return;
+        const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+        const action = currentStatus === 'active' ? 'deactivate' : 'activate';
+
+        Swal.fire({
+            title: `${action.charAt(0).toUpperCase() + action.slice(1)} Organization?`,
+            text: `Are you sure you want to ${action} this organization?`,
+            icon: currentStatus === 'active' ? 'warning' : 'question',
+            showCancelButton: true,
+            confirmButtonColor: currentStatus === 'active' ? '#f59e0b' : '#10b981',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: `Yes, ${action} it!`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.organizationService.toggleStatus(id, newStatus).subscribe({
+                    next: () => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: `Organization has been ${action}d.`,
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        this.loadOrganizations();
+                    },
+                    error: (error) => {
+                        console.error(`Error ${action}ing organization:`, error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: `Failed to ${action} organization`
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     getStatusBadgeClass(status: string): string {
         return status === 'active' ? 'badge-active' : 'badge-inactive';
     }

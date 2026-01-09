@@ -19,8 +19,11 @@ export class ThemeService {
     }
 
     private getSavedTheme(): Theme {
-        const saved = localStorage.getItem(this.THEME_KEY);
-        return (saved === 'light' || saved === 'dark') ? saved : 'dark';
+        const savedTheme = localStorage.getItem(this.THEME_KEY);
+        if (savedTheme === 'light' || savedTheme === 'dark') {
+            return savedTheme as Theme;
+        }
+        return 'light'; // Default to light theme
     }
 
     getCurrentTheme(): Theme {

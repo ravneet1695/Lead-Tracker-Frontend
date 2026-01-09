@@ -21,6 +21,16 @@ export class GroupListComponent implements OnInit {
     statusFilter = '';
     organizationFilter = 'all';
 
+    // Stats
+    stats = {
+        total: 0,
+        active: 0,
+        totalMembers: 0,
+        avgTeamSize: 0
+    };
+
+    expandedGroups: Set<string> = new Set();
+
     constructor(
         private groupService: GroupService,
         private organizationService: OrganizationService,
@@ -48,6 +58,7 @@ export class GroupListComponent implements OnInit {
         this.groupService.getGroups(params).subscribe({
             next: (response) => {
                 this.groups = response.groups || [];
+                this.calculateStats();
                 this.applyFilters();
                 this.loading = false;
             },
@@ -87,6 +98,15 @@ export class GroupListComponent implements OnInit {
 
             return matchesSearch;
         });
+    }
+
+    calculateStats(): void {
+        this.stats.total = this.groups.length;
+        this.stats.active = this.groups.filter(g => g.isActive).length;
+        this.stats.totalMembers = this.groups.reduce((acc, g) => acc + (g.users?.length || 0), 0);
+        this.stats.avgTeamSize = this.stats.total > 0
+            ? Math.round(this.stats.totalMembers / this.stats.total)
+            : 0;
     }
 
     onFilterChange(): void {
@@ -163,6 +183,18 @@ export class GroupListComponent implements OnInit {
                 });
             }
         });
+    }
+
+    toggleDescription(id: string): void {
+        if (this.expandedGroups.has(id)) {
+            this.expandedGroups.delete(id);
+        } else {
+            this.expandedGroups.add(id);
+        }
+    }
+
+    isExpanded(id: string): boolean {
+        return this.expandedGroups.has(id);
     }
 
     // Permission checks
