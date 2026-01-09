@@ -71,7 +71,6 @@ export class OrganizationFormComponent implements OnInit {
                 if (response.success && response.data) {
                     this.locationData = response.data;
                     this.states = Object.keys(this.locationData);
-                    console.log('Location data loaded from API:', this.locationData);
                 }
             },
             error: (error) => {
@@ -192,37 +191,18 @@ export class OrganizationFormComponent implements OnInit {
                 if (response.organization) {
                     const org = response.organization;
 
-                    console.log('=== LOADING ORGANIZATION ===');
-                    console.log('Full organization data:', org);
-                    console.log('Address:', org.address);
-                    console.log('State:', org.address?.state);
-                    console.log('City:', org.address?.city);
-                    console.log('Pincode:', org.address?.pincode);
-
                     // Pre-populate dropdowns based on existing address data
                     if (org.address?.state) {
-                        console.log('Processing state:', org.address.state);
-
                         // Populate cities for the selected state
                         if (this.locationData[org.address.state]) {
                             this.cities = Object.keys(this.locationData[org.address.state]);
-                            console.log('Cities populated:', this.cities);
-                        } else {
-                            console.warn('State not found in locationData:', org.address.state);
                         }
 
                         // Populate pincodes for the selected city
                         if (org.address.city && this.locationData[org.address.state]?.[org.address.city]) {
                             this.pincodes = this.locationData[org.address.state][org.address.city];
-                            console.log('Pincodes populated:', this.pincodes);
-                            console.log('Pincode to select:', org.address.pincode);
-                            if (org.address.pincode) {
-                                console.log('Is pincode in list?', this.pincodes.includes(org.address.pincode));
-                            }
                             // Manually trigger change detection to update template
                             this.cdr.detectChanges();
-                        } else {
-                            console.warn('City not found in locationData:', org.address.city);
                         }
                     }
 
@@ -230,9 +210,13 @@ export class OrganizationFormComponent implements OnInit {
                     // Use setTimeout to ensure dropdowns are rendered
                     setTimeout(() => {
                         this.organizationForm.patchValue(org);
-                        console.log('Form patched with values');
-                        console.log('Current form address:', this.organizationForm.get('address')?.value);
-                        console.log('Pincodes array:', this.pincodes);
+                        this.organizationForm.patchValue({
+                            address: {
+                                state: org.address?.state || '',
+                                city: org.address?.city || '',
+                                pincode: org.address?.pincode || ''
+                            }
+                        });
                     }, 100);
                 }
                 this.loading = false;
@@ -325,9 +309,7 @@ export class OrganizationFormComponent implements OnInit {
         // Use getRawValue() to include disabled fields (like code)
         const formData = this.organizationForm.getRawValue();
 
-        // Log form data to verify mobile number is included
-        console.log('Form data being sent:', formData);
-        console.log('Admin user mobile:', formData.adminUser?.mobile);
+
 
         const request = this.isEditMode
             ? this.organizationService.updateOrganization(this.organizationId!, formData)

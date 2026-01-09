@@ -81,10 +81,7 @@ export class AuthService {
         // Call backend logout endpoint for audit trail
         const token = this.token;
         if (token) {
-            this.http.post(`${environment.apiUrl}/auth/logout`, {}).subscribe({
-                next: () => console.log('Logout recorded'),
-                error: (err) => console.error('Logout error:', err)
-            });
+            this.http.post(`${environment.apiUrl}/auth/logout`, {}).subscribe();
         }
 
         // Clear local storage and state
@@ -166,13 +163,7 @@ export class AuthService {
         return roleName === 'super_admin' || roleName === 'org_admin';
     }
 
-    isManager(): boolean {
-        return this.currentUserValue?.role?.name === 'manager';
-    }
 
-    isSales(): boolean {
-        return this.currentUserValue?.role?.name === 'sales';
-    }
 
     // Permission-based checking methods (NEW)
     hasPermission(permission: string): boolean {

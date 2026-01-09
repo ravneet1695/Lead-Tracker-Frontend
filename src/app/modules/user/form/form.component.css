@@ -6,10 +6,12 @@
 
 /* Purple Header */
 .page-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 24px 32px;
+    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
+    padding: 14px 24px;
     margin-bottom: 0;
-    border-radius: 12px 12px 0 0;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    align-items: center;
 }
 
 .page-header h1 {
@@ -36,7 +38,7 @@
     height: 50px;
     margin: 0 auto 20px;
     border: 4px solid rgba(102, 126, 234, 0.2);
-    border-top-color: #667eea;
+    border-top-color: #004C8F;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -68,7 +70,7 @@
 }
 
 .section-title {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--text-primary);
     margin: 0 0 24px 0;
@@ -100,7 +102,7 @@
 }
 
 .org-header svg {
-    color: #667eea;
+    color: #004C8F;
 }
 
 .org-title {
@@ -119,7 +121,7 @@
 }
 
 .field-label svg {
-    color: #667eea;
+    color: #004C8F;
 }
 
 .help-text {
@@ -226,16 +228,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 8px;
+    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 35px;
+    min-height: 35px;
     flex-shrink: 0;
 }
 
@@ -313,17 +315,17 @@
 }
 
 .file-upload-label:hover {
-    border-color: #667eea;
+    border-color: #004C8F;
     background: #f9fafb;
 }
 
 .file-upload-label svg {
-    color: #667eea;
+    color: #004C8F;
 }
 
 .file-upload-text {
     padding: 8px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
     color: white;
     border-radius: 6px;
     font-weight: 600;

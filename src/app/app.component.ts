@@ -34,8 +34,8 @@ import { Subscription } from 'rxjs';
     }
 
     .main-content.with-sidebar {
-      margin-left: 260px;
-      padding-top: 70px;
+      margin-left: 220px;
+      padding-top: 52px; /* Further reduced from 60px */
     }
 
     /* Adjust main-content when sidebar is collapsed */

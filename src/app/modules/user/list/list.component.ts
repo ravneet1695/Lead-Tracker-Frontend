@@ -225,25 +225,23 @@ export class UserListComponent implements OnInit {
     getRoleLabel(role: string): string {
         const roleMap: { [key: string]: string } = {
             'super_admin': 'ADMIN',
-            'org_admin': 'ADMIN',
-            'manager': 'ALLIANCE MANAGER',
-            'sales': 'SALES'
+            'org_admin': 'ADMIN'
         };
         return roleMap[role] || role.toUpperCase();
     }
 
     getRoleName(role: string | { _id: string; name: string; label: string }): string {
         if (typeof role === 'object' && role !== null) {
-            return role.name || 'sales';
+            return role.name || 'org_admin';
         }
-        return role || 'sales';
+        return role || 'org_admin';
     }
 
     getRoleDisplayLabel(role: string | { _id: string; name: string; label: string }): string {
         if (typeof role === 'object' && role !== null) {
-            return role.label || role.name || 'Sales';
+            return role.label || role.name || 'Org Admin';
         }
-        return role || 'Sales';
+        return role || 'Org Admin';
     }
 
     getOrganizationName(organization: string | { _id: string; name: string } | undefined): string {

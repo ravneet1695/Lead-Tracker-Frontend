@@ -14,7 +14,7 @@
     gap: 12px;
     font-size: 2rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -37,7 +37,7 @@
     height: 50px;
     margin: 0 auto 20px;
     border: 4px solid rgba(102, 126, 234, 0.2);
-    border-top-color: #667eea;
+    border-top-color: #004C8F;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -64,7 +64,7 @@
 }
 
 .section-title {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--text-primary);
     margin: 0 0 24px 0;
@@ -162,18 +162,19 @@ textarea.form-control {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 8px;
+    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 35px;
+    min-height: 35px;
     flex-shrink: 0;
 }
+
 
 .btn-file-upload:hover {
     transform: translateY(-2px);
@@ -266,7 +267,7 @@ textarea.form-control {
 }
 
 .btn-submit {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #004C8F 0%, #003366 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }

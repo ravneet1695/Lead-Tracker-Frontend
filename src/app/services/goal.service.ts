@@ -12,9 +12,11 @@ export interface Goal {
         startDate: Date;
         endDate: Date;
     };
+    organization?: string;
     groups: string[];
     formSchema: any[];
     statusOptions: string[];
+    status?: 'active' | 'inactive' | 'completed';
     pointsConfig?: {
         entryCreation: number;
         statusUpdate: number;
