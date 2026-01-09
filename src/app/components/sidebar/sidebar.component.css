@@ -167,6 +167,14 @@
     color: var(--brand-red);
 }
 
+.logout-btn .nav-icon {
+    color: var(--brand-red) !important;
+}
+
+.logout-btn .nav-icon svg {
+    stroke: var(--brand-red) !important;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .sidebar {

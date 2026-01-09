@@ -19,17 +19,36 @@
 }
 
 
-.btn-back {
-    border-radius: var(--radius-sm);
-    font-weight: 600;
-    font-size: 0.85rem;
+.btn-back-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 76, 143, 0.2);
+    border-radius: var(--radius-md);
+    color: var(--brand-blue);
+    font-weight: 700;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: all var(--transition-base);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.btn-back:hover {
-    background: rgba(255, 255, 255, 0.2);
+.btn-back-link:hover {
+    background: #f8fafc;
+    border-color: var(--brand-blue);
+    color: var(--brand-blue-light);
     transform: translateX(-4px);
+    box-shadow: 0 6px 20px rgba(0, 76, 143, 0.25);
+}
+
+.btn-back-link svg {
+    transition: transform 0.3s ease;
+}
+
+.btn-back-link:hover svg {
+    transform: translateX(-2px);
 }
 
 /* The original .page-header h1 and .page-header svg rules are removed as they are replaced by the new header structure */
