@@ -11,10 +11,16 @@ export interface GoalEntry {
     data: any;
     status: string;
     contacts?: Contact[];
-    remarks?: string;
+    remarks?: Remark[];
     statusHistory?: StatusHistory[];
     createdAt?: Date;
     updatedAt?: Date;
+}
+
+export interface Remark {
+    text: string;
+    user: any;
+    createdAt: Date;
 }
 
 export interface Contact {
@@ -60,5 +66,13 @@ export class GoalEntryService {
 
     getEntryHistory(id: string): Observable<any> {
         return this.http.get(`${this.apiUrl}/${id}/history`);
+    }
+
+    addRemark(id: string, text: string): Observable<any> {
+        return this.http.post(`${this.apiUrl}/${id}/remarks`, { text });
+    }
+
+    getActivities(id: string): Observable<any> {
+        return this.http.get(`${this.apiUrl}/${id}/activities`);
     }
 }

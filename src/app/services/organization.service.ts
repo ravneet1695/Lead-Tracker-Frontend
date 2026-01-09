@@ -9,7 +9,6 @@ export interface Organization {
     code?: string;
     alias?: string;
     email: string;
-    phone?: string;
     address?: {
         street?: string;
         city?: string;
@@ -18,22 +17,29 @@ export interface Organization {
         pincode?: string;
     };
     logo?: string;
+    website?: string;
     description?: string;
+    departments?: string[];
+    defaultDepartment?: string;
+    defaultPassword?: string;
     status?: 'active' | 'inactive';
     admin?: {
         _id: string;
         name: string;
         mobile: string;
     };
-    adminUser?: {
+    deletedAt?: Date | null;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+export interface CreateOrganizationRequest extends Organization {
+    adminUser: {
         name: string;
         email: string;
         mobile: string;
         password: string;
     };
-    deletedAt?: Date | null;
-    createdAt?: Date;
-    updatedAt?: Date;
 }
 
 export interface OrganizationListResponse {
@@ -89,7 +95,7 @@ export class OrganizationService {
         return this.http.get<OrganizationResponse>(`${this.apiUrl}/${id}`);
     }
 
-    createOrganization(data: Organization): Observable<OrganizationResponse> {
+    createOrganization(data: CreateOrganizationRequest): Observable<OrganizationResponse> {
         return this.http.post<OrganizationResponse>(this.apiUrl, data);
     }
 
@@ -103,6 +109,10 @@ export class OrganizationService {
 
     restoreOrganization(id: string): Observable<OrganizationResponse> {
         return this.http.patch<OrganizationResponse>(`${this.apiUrl}/${id}/restore`, {});
+    }
+
+    toggleStatus(id: string, status: string): Observable<OrganizationResponse> {
+        return this.http.patch<OrganizationResponse>(`${this.apiUrl}/${id}/status`, { status });
     }
 
     getNextCode(): Observable<{ code: string }> {

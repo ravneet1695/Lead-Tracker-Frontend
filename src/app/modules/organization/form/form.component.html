@@ -1,258 +1,369 @@
 <div class="form-container">
-
+    <!-- Loading State -->
     <div *ngIf="loading" class="loading-state">
         <div class="spinner"></div>
         <p>Loading organization...</p>
     </div>
 
-    <form *ngIf="!loading" [formGroup]="organizationForm" (ngSubmit)="onSubmit()" class="organization-form">
-        <!-- Basic Information -->
-        <div class="form-section">
-            <h3 class="section-title">Basic Information</h3>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="code" class="form-label">Code</label>
-                    <input type="text" id="code" class="form-control" formControlName="code"
-                        placeholder="Auto-generated" readonly>
-                    <small class="form-text">Auto-generated upon creation</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="name" class="form-label">Name <span style="color: #ff6b6b;">*</span></label>
-                    <input type="text" id="name" class="form-control" [class.invalid]="isFieldInvalid('name')"
-                        formControlName="name" placeholder="Enter organization name">
-                    <span *ngIf="isFieldInvalid('name')" class="error-message">
-                        {{ getFieldError('name') }}
-                    </span>
-                </div>
-
-                <div class="form-group">
-                    <label for="alias" class="form-label">Alias / Short Name</label>
-                    <input type="text" id="alias" class="form-control" formControlName="alias"
-                        placeholder="Short name or alias">
-                    <small class="form-text">Optional short name for the organization</small>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="email" class="form-label">Email <span style="color: #ff6b6b;">*</span></label>
-                    <input type="email" id="email" class="form-control" [class.invalid]="isFieldInvalid('email')"
-                        formControlName="email" placeholder="organization@example.com">
-                    <span *ngIf="isFieldInvalid('email')" class="error-message">
-                        {{ getFieldError('email') }}
-                    </span>
-                </div>
-
-
-                <div class="form-group">
-                    <label for="website" class="form-label">Website</label>
-                    <input type="url" id="website" class="form-control" [class.invalid]="isFieldInvalid('website')"
-                        formControlName="website" placeholder="https://www.example.com">
-                    <span *ngIf="isFieldInvalid('website')" class="error-message">
-                        Please enter a valid website URL
-                    </span>
-                </div>
-
-                <div class="form-group">
-                    <label for="logo" class="form-label">Logo <span style="color: #ff6b6b;">*</span></label>
-                    <div class="file-upload-box" style="background-color: transparent;padding: 3px 12px;">
-                        <input type="file" id="logo" class="file-input-hidden" (change)="onLogoChange($event)"
-                        accept=".jpg,.jpeg,.png" #fileInput>
-                        <button type="button" class="btn-file-upload" (click)="fileInput.click()" title="Attach file">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path
-                                    d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
-                                </path>
-                            </svg>
-                        </button>
-                        <span class="file-name-display"
-                            *ngIf="selectedLogoFile || (isEditMode && organizationForm.get('logo')?.value); else noFileSelected">
-                            {{ selectedLogoFile?.name || (isEditMode ? 'Current logo: ' +
-                            organizationForm.get('logo')?.value : '') }}
-                        </span>
-                        <ng-template #noFileSelected>
-                            <span class="file-name-display" style="opacity: 0.8;">No file
-                                selected</span>
-                        </ng-template>
-                        <button type="button" class="btn-file-cancel" *ngIf="selectedLogoFile"
-                            (click)="clearSelectedFile()" title="Remove file">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-                    <span *ngIf="isFieldInvalid('logo')" class="error-message">
-                        Logo is required
-                    </span>
-                </div>
-            </div>
+    <!-- Header -->
+    <div class="page-header" *ngIf="!loading">
+        <div class="header-left">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            <h1>{{ isEditMode ? 'Edit Organization' : 'Create New Organization' }}</h1>
         </div>
+        <button class="btn-back" (click)="onCancel()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Organizations
+        </button>
+    </div>
 
-        <!-- Administrator Details (Create Mode Only) -->
-        <div class="form-section" *ngIf="!isEditMode" formGroupName="adminUser">
-            <h3 class="section-title">Administrator Details</h3>
+    <div *ngIf="!loading" class="form-wrapper">
+        <form [formGroup]="organizationForm" (ngSubmit)="onSubmit()" class="organization-form">
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="adminName" class="form-label">Name <span style="color: #ff6b6b;">*</span></label>
-                    <input type="text" id="adminName" class="form-control"
-                        [class.invalid]="isFieldInvalid('adminUser.name')" formControlName="name"
-                        placeholder="Enter admin name">
-                    <span *ngIf="isFieldInvalid('adminUser.name')" class="error-message">
-                        {{ getFieldError('adminUser.name') }}
-                    </span>
-                </div>
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <h3 class="section-title">Basic Information</h3>
 
-                <div class="form-group">
-                    <label for="adminEmail" class="form-label">Email <span style="color: #ff6b6b;">*</span></label>
-                    <input type="email" id="adminEmail" class="form-control"
-                        [class.invalid]="isFieldInvalid('adminUser.email')" formControlName="email"
-                        placeholder="admin@example.com">
-                    <span *ngIf="isFieldInvalid('adminUser.email')" class="error-message">
-                        {{ getFieldError('adminUser.email') }}
-                    </span>
-                </div>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="code" class="form-label">Organization Code</label>
+                        <div class="key-input-wrapper">
+                            <input type="text" id="code" class="form-control" formControlName="code"
+                                placeholder="Auto-generated" readonly>
+                            <span class="key-lock">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </span>
+                        </div>
+                        <small class="form-text">Auto-generated upon creation</small>
+                    </div>
 
-                <div class="form-group">
-                    <label for="adminMobile" class="form-label">Mobile <span style="color: #ff6b6b;">*</span></label>
-                    <input type="number" id="adminMobile" class="form-control"
-                        [class.invalid]="isFieldInvalid('adminUser.mobile')" formControlName="mobile"
-                        placeholder="10-digit mobile number"
-                        oninput="if(this.value.length > 10) this.value = this.value.slice(0, 10);">
-                    <span *ngIf="isFieldInvalid('adminUser.mobile')" class="error-message">
-                        {{ getFieldError('adminUser.mobile') }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="adminPassword" class="form-label">Password <span
-                            style="color: #ff6b6b;">*</span></label>
-                    <input type="password" id="adminPassword" class="form-control"
-                        [class.invalid]="isFieldInvalid('adminUser.password')" formControlName="password"
-                        placeholder="Min 8 characters">
-                    <span *ngIf="isFieldInvalid('adminUser.password')" class="error-message">
-                        {{ getFieldError('adminUser.password') }}
-                    </span>
-                </div>
-                <div class="form-group">
-                    <label for="confirmPassword" class="form-label">Confirm Password <span
-                            style="color: #ff6b6b;">*</span></label>
-                    <input type="password" id="confirmPassword" class="form-control"
-                        [class.invalid]="organizationForm.get('adminUser')?.hasError('passwordMismatch') && organizationForm.get('adminUser.confirmPassword')?.touched"
-                        formControlName="confirmPassword" placeholder="Re-enter password">
-                    <span
-                        *ngIf="organizationForm.get('adminUser')?.hasError('passwordMismatch') && organizationForm.get('adminUser.confirmPassword')?.touched"
-                        class="error-message">
-                        Passwords do not match
-                    </span>
-                </div>
-
-                <!-- Admin Profile Image -->
-                <div class="form-group">
-                    <label for="adminProfileImage" class="form-label">Profile Image</label>
-                    <div class="file-upload-box" style="background-color: transparent;padding: 3px 12px;">
-                        <input type="file" id="adminProfileImage" class="file-input-hidden"
-                            (change)="onAdminProfileSelected($event)" accept=".jpg,.jpeg,.png" #adminFileInput>
-                        <button type="button" class="btn-file-upload" (click)="adminFileInput.click()"
-                            title="Attach file">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path
-                                    d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
-                                </path>
-                            </svg>
-                        </button>
-                        <span class="file-name-display" *ngIf="selectedAdminProfileFile; else noAdminFileSelected">
-                            {{ selectedAdminProfileFile.name }}
+                    <div class="form-group">
+                        <label for="name" class="form-label">Name <span class="required">*</span></label>
+                        <input type="text" id="name" class="form-control uppercase-input"
+                            [class.invalid]="isFieldInvalid('name')" formControlName="name"
+                            placeholder="Enter organization name">
+                        <span *ngIf="isFieldInvalid('name')" class="error-message">
+                            {{ getFieldError('name') }}
                         </span>
-                        <ng-template #noAdminFileSelected>
-                            <span class="file-name-display" style="opacity: 0.8;">No file
-                                selected</span>
-                        </ng-template>
-                        <button type="button" class="btn-file-cancel" *ngIf="selectedAdminProfileFile"
-                            (click)="removeAdminProfile()" title="Remove file">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="alias" class="form-label">Alias / Short Name</label>
+                        <input type="text" id="alias" class="form-control" formControlName="alias"
+                            placeholder="Short name or alias">
+                        <small class="form-text">Optional short name</small>
+                    </div>
+                </div>
+
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="defaultPassword" class="form-label">Default Password <span
+                                class="required">*</span></label>
+                        <input type="text" id="defaultPassword" class="form-control"
+                            [class.invalid]="isFieldInvalid('defaultPassword')" formControlName="defaultPassword"
+                            placeholder="Enter default user password">
+                        <span *ngIf="isFieldInvalid('defaultPassword')" class="error-message">
+                            {{ getFieldError('defaultPassword') }}
+                        </span>
+                        <small class="form-text">Password for newly created users</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Organization Email <span class="required">*</span></label>
+                        <input type="email" id="email" class="form-control" [class.invalid]="isFieldInvalid('email')"
+                            formControlName="email" placeholder="organization@example.com">
+                        <span *ngIf="isFieldInvalid('email')" class="error-message">
+                            {{ getFieldError('email') }}
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="website" class="form-label">Website</label>
+                        <input type="url" id="website" class="form-control" [class.invalid]="isFieldInvalid('website')"
+                            formControlName="website" placeholder="https://www.example.com">
+                        <span *ngIf="isFieldInvalid('website')" class="error-message">
+                            Please enter a valid website URL
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="logo" class="form-label">Organization Logo <span class="required"
+                                *ngIf="!isEditMode">*</span></label>
+                        <div class="file-upload-box">
+                            <input type="file" id="logo" class="file-input-hidden" (change)="onLogoChange($event)"
+                                accept=".jpg,.jpeg,.png" #fileInput>
+                            <button type="button" class="btn-file-upload" (click)="fileInput.click()"
+                                title="Attach file">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
+                                    </path>
+                                </svg>
+                            </button>
+                            <span class="file-name-display"
+                                *ngIf="selectedLogoFile || (isEditMode && organizationForm.get('logo')?.value); else noFileSelected">
+                                {{ selectedLogoFile?.name || (isEditMode ? 'Current logo attached' : '') }}
+                            </span>
+                            <ng-template #noFileSelected>
+                                <span class="file-name-display" style="opacity: 0.6;">No file selected</span>
+                            </ng-template>
+                            <button type="button" class="btn-file-cancel" *ngIf="selectedLogoFile"
+                                (click)="clearSelectedFile()" title="Remove file">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <span *ngIf="isFieldInvalid('logo')" class="error-message">
+                            Logo is required
+                        </span>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Address Information -->
-        <div class="form-section" formGroupName="address">
-            <h3 class="section-title">Address Information</h3>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="state" class="form-label">State</label>
-                    <select id="state" class="form-control" formControlName="state">
-                        <option value="">Select State</option>
-                        <option *ngFor="let state of states" [value]="state">{{ state }}</option>
-                    </select>
+            <!-- Administrator Details Section -->
+            <div class="form-section" *ngIf="!isEditMode" formGroupName="adminUser">
+                <div class="section-header">
+                    <h3 class="section-title">Administrator Details</h3>
+                    <span class="badge-count">Primary Admin Account</span>
                 </div>
 
-                <div class="form-group">
-                    <label for="city" class="form-label">City</label>
-                    <select id="city" class="form-control" formControlName="city" [disabled]="!cities.length">
-                        <option value="">Select City</option>
-                        <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
-                    </select>
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="adminName" class="form-label">Full Name <span class="required">*</span></label>
+                        <input type="text" id="adminName" class="form-control"
+                            [class.invalid]="isFieldInvalid('adminUser.name')" formControlName="name"
+                            placeholder="Enter admin name">
+                        <span *ngIf="isFieldInvalid('adminUser.name')" class="error-message">
+                            {{ getFieldError('adminUser.name') }}
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adminEmail" class="form-label">Email Address <span class="required">*</span></label>
+                        <input type="email" id="adminEmail" class="form-control"
+                            [class.invalid]="isFieldInvalid('adminUser.email')" formControlName="email"
+                            placeholder="admin@example.com">
+                        <span *ngIf="isFieldInvalid('adminUser.email')" class="error-message">
+                            {{ getFieldError('adminUser.email') }}
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="adminMobile" class="form-label">Mobile Number <span
+                                class="required">*</span></label>
+                        <input type="tel" id="adminMobile" class="form-control"
+                            [class.invalid]="isFieldInvalid('adminUser.mobile')" formControlName="mobile"
+                            placeholder="10-digit mobile number" (keypress)="onlyNumbers($event)" maxlength="10">
+                        <span *ngIf="isFieldInvalid('adminUser.mobile')" class="error-message">
+                            {{ getFieldError('adminUser.mobile') }}
+                        </span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="pincode" class="form-label">Pincode</label>
-                    <select id="pincode" class="form-control" formControlName="pincode" [disabled]="!pincodes.length">
-                        <option value="">Select Pincode</option>
-                        <option *ngFor="let pincode of pincodes" [value]="pincode">{{ pincode }}</option>
-                    </select>
+
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="adminProfileImage" class="form-label">Admin Profile Photo</label>
+                        <div class="file-upload-box">
+                            <input type="file" id="adminProfileImage" class="file-input-hidden"
+                                (change)="onAdminProfileSelected($event)" accept=".jpg,.jpeg,.png" #adminFileInput>
+                            <button type="button" class="btn-file-upload" (click)="adminFileInput.click()"
+                                title="Attach file">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path
+                                        d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48">
+                                    </path>
+                                </svg>
+                            </button>
+                            <span class="file-name-display" *ngIf="selectedAdminProfileFile; else noAdminFileSelected">
+                                {{ selectedAdminProfileFile.name }}
+                            </span>
+                            <ng-template #noAdminFileSelected>
+                                <span class="file-name-display" style="opacity: 0.6;">No file selected</span>
+                            </ng-template>
+                            <button type="button" class="btn-file-cancel" *ngIf="selectedAdminProfileFile"
+                                (click)="removeAdminProfile()" title="Remove file">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group" style="grid-column: 1 / -1;">
+            <!-- Department Management Section -->
+            <div class="form-section">
+                <h3 class="section-title">Department Management <span class="required">*</span></h3>
+
+                <div class="status-options-container">
+                    <div class="status-help-banner">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        <span>Define the organizational departments for users of this organization</span>
+                    </div>
+
+                    <div class="add-status-form">
+                        <div class="add-status-input-group">
+                            <input type="text" [(ngModel)]="customDepartmentInput" [ngModelOptions]="{standalone: true}"
+                                class="form-control" placeholder="Enter department name (e.g., Sales, HR, Engineering)"
+                                (keyup.enter)="addDepartment()">
+                            <button type="button" class="btn-add-status" (click)="addDepartment()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Add Department
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="status-chips-wrapper">
+                        <div class="status-chips-header">
+                            <span class="chips-label">Configured Departments ({{ departments.length }})</span>
+                        </div>
+
+                        <div class="status-chips-list">
+                            <div *ngFor="let dept of departments; let i = index" class="status-chip-item"
+                                [class.is-default]="organizationForm.get('defaultDepartment')?.value === dept">
+                                <div class="status-chip-content" (click)="setDefaultDepartment(dept)">
+                                    <div class="default-dept-indicator">
+                                        <div class="radio-outer">
+                                            <div class="radio-inner"
+                                                *ngIf="organizationForm.get('defaultDepartment')?.value === dept"></div>
+                                        </div>
+                                    </div>
+                                    <span class="status-name">{{ dept }}</span>
+                                    <span class="default-badge"
+                                        *ngIf="organizationForm.get('defaultDepartment')?.value === dept">DEFAULT</span>
+                                </div>
+                                <button type="button" class="btn-remove-status" (click)="removeDepartment(i)"
+                                    title="Remove department">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div *ngIf="departments.length === 0" class="empty-status-state">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <p>No departments added yet</p>
+                                <small>Add your first department above to get started</small>
+                            </div>
+                        </div>
+                    </div>
+                    <span *ngIf="isFieldInvalid('departments')" class="error-message"
+                        style="margin-top: 10px; display: block;">
+                        {{ getFieldError('departments') }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Address Information Section -->
+            <div class="form-section" formGroupName="address">
+                <h3 class="section-title">Office Location</h3>
+
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="state" class="form-label">State <span class="required">*</span></label>
+                        <select id="state" class="form-control" formControlName="state"
+                            [class.invalid]="isFieldInvalid('address.state')">
+                            <option value="">Select State</option>
+                            <option *ngFor="let state of states" [value]="state">{{ state }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="city" class="form-label">City <span class="required">*</span></label>
+                        <select id="city" class="form-control" formControlName="city" [disabled]="!cities.length"
+                            [class.invalid]="isFieldInvalid('address.city')">
+                            <option value="">Select City</option>
+                            <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pincode" class="form-label">Pincode <span class="required">*</span></label>
+                        <select id="pincode" class="form-control" formControlName="pincode"
+                            [disabled]="!pincodes.length" [class.invalid]="isFieldInvalid('address.pincode')">
+                            <option value="">Select Pincode</option>
+                            <option *ngFor="let pincode of pincodes" [value]="pincode">{{ pincode }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="street" class="form-label">Street Address</label>
                     <textarea id="street" class="form-control" formControlName="street" rows="2"
-                        placeholder="Enter street address"></textarea>
+                        placeholder="Enter full street address"></textarea>
                 </div>
             </div>
-        </div>
 
-        <!-- Additional Information -->
-        <div class="form-section">
-            <h3 class="section-title">Additional Information</h3>
+            <!-- Additional Information Section -->
+            <div class="form-section">
+                <h3 class="section-title">About Organization</h3>
 
-            <div class="form-group">
-                <label for="description" class="form-label">Description</label>
-                <textarea id="description" class="form-control" formControlName="description" rows="4"
-                    placeholder="Enter organization description..."></textarea>
+                <div class="form-group">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea id="description" class="form-control" formControlName="description" rows="4"
+                        placeholder="Describe the organization's focus and background..."></textarea>
+                </div>
             </div>
-        </div>
 
-        <!-- Form Actions -->
-        <div class="form-actions">
-            <button type="button" class="btn btn-cancel" (click)="onCancel()" [disabled]="submitting">
-                Cancel
-            </button>
-            <button type="submit" class="btn btn-submit" [disabled]="submitting">
-                <span *ngIf="!submitting">{{ isEditMode ? 'Update Organization' : 'Create Organization' }}</span>
-                <span *ngIf="submitting" class="loading-content">
-                    <svg class="spinner-small" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2">
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="button" class="btn btn-cancel" (click)="onCancel()" [disabled]="submitting">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
                     </svg>
-                    {{ isEditMode ? 'Updating...' : 'Creating...' }}
-                </span>
-            </button>
-        </div>
-    </form>
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-submit" [disabled]="submitting || organizationForm.invalid">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        *ngIf="!submitting">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span *ngIf="!submitting">{{ isEditMode ? 'Update Organization' : 'Create Organization'
+                        }}</span>
+                    <span *ngIf="submitting" class="loading-content">
+                        <span class="spinner-border-sm"></span>
+                        {{ isEditMode ? 'Updating...' : 'Creating...' }}
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
 </div>

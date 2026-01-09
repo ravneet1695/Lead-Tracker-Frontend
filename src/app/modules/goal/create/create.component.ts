@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { GoalService } from '../../../services/goal.service';
 import { GroupService } from '../../../services/group.service';
+import { OrganizationService } from '../../../services/organization.service';
 import { AuthService } from '../../../services/auth.service';
 import Swal from 'sweetalert2';
 
@@ -16,7 +17,37 @@ interface FormField {
     calculation?: string;
     maxContacts?: number;
     order: number;
+    // FormArray properties
+    isArrayField?: boolean;
+    displayMode?: 'cards' | 'table';
+    columnCount?: number;
+    arrayFields?: ArraySubField[];
+    minInstances?: number;
+    maxInstances?: number;
 }
+
+interface ArraySubField {
+    fieldName: string;
+    fieldType: string;
+    alias: string;
+    mandatory: boolean;
+    options?: string[];
+    order: number;
+    columnIndex?: number;
+    dependsOn?: {
+        fieldName: string;
+        mappings: Array<{
+            when: string;
+            then: {
+                label?: string;
+                options?: string[];
+                defaultValue?: any;
+                show?: boolean;
+            }
+        }>;
+    };
+}
+
 
 @Component({
     selector: 'app-goal-create',
@@ -28,10 +59,14 @@ interface FormField {
 export class GoalCreateComponent implements OnInit {
     goalForm!: FormGroup;
     groups: any[] = [];
+    organizations: any[] = [];
     formFields: FormField[] = [];
     selectedFieldIndex: number | null = null;
+    selectedColumn: number = 0;  // Track selected column for table mode
     loading = false;
     submitting = false;
+    isSuperAdmin = false;
+    isEditMode = false;
 
     fieldTypes = [
         { value: 'text', label: 'Text', icon: '📝' },
@@ -43,7 +78,8 @@ export class GoalCreateComponent implements OnInit {
         { value: 'textarea', label: 'Text Area', icon: '📄' },
         { value: 'multiContact', label: 'Multi Contact', icon: '👥' },
         { value: 'autoNumber', label: 'Auto Number', icon: '#️⃣' },
-        { value: 'autoCalculate', label: 'Auto Calculate', icon: '🧮' }
+        { value: 'autoCalculate', label: 'Auto Calculate', icon: '🧮' },
+        { value: 'formArray', label: 'Repeatable Group', icon: '🔁' }
     ];
 
     statusOptions: string[] = ['New', 'In Progress', 'Completed', 'Cancelled'];
@@ -53,36 +89,68 @@ export class GoalCreateComponent implements OnInit {
         private fb: FormBuilder,
         private goalService: GoalService,
         private groupService: GroupService,
+        private organizationService: OrganizationService,
         private authService: AuthService,
         private router: Router
     ) { }
 
     ngOnInit(): void {
+        this.checkUserRole();
         this.initializeForm();
-        this.loadGroups();
+        this.loadOrganizations();
+
+        // Load groups immediately for regular users who can't select organization
+        if (!this.isSuperAdmin) {
+            this.loadGroups();
+        }
+
+        // Listen for organization changes for Super Admins
+        if (this.isSuperAdmin) {
+            this.goalForm.get('organization')?.valueChanges.subscribe(orgId => {
+                if (orgId) {
+                    this.loadGroups(orgId);
+                } else {
+                    this.groups = [];
+                    this.goalForm.patchValue({ group: '' });
+                }
+            });
+        }
+    }
+
+    checkUserRole(): void {
+        this.isSuperAdmin = this.authService.hasPermission('organizations.read');
     }
 
     initializeForm(): void {
         this.goalForm = this.fb.group({
+            organization: [''],
             title: ['', [Validators.required, Validators.minLength(3)]],
-            description: [''],
-            target: [null],
             completionStatus: ['Approved'], // Status that indicates lead counts toward goal
-            startDate: [''],
-            endDate: [''],
-            status: ['active'],
-            groups: [[], Validators.required],
-            pointsEntryCreation: [10],
-            pointsStatusUpdate: [5],
-            pointsFieldCompletion: [2]
+            startDate: ['', Validators.required],
+            endDate: ['', Validators.required],
+            group: ['', Validators.required]
         });
+
+        // Make organization required for Super Admins
+        if (this.isSuperAdmin) {
+            this.goalForm.get('organization')?.setValidators([Validators.required]);
+        }
     }
 
-    loadGroups(): void {
+    loadGroups(organizationId?: string): void {
         this.loading = true;
-        this.groupService.getGroups().subscribe({
+
+        // Prepare params
+        const params: any = {};
+        if (organizationId) {
+            params.organization = organizationId;
+        }
+
+        this.groupService.getGroups(params).subscribe({
             next: (response) => {
                 this.groups = response.groups || [];
+                // Clear selected group when reloading
+                this.goalForm.patchValue({ group: '' });
                 this.loading = false;
             },
             error: (error) => {
@@ -98,26 +166,12 @@ export class GoalCreateComponent implements OnInit {
     }
 
     // Group Selection Methods
-    toggleGroupSelection(groupId: string): void {
-        const selectedGroups = this.goalForm.get('groups')?.value || [];
-        const index = selectedGroups.indexOf(groupId);
-
-        if (index > -1) {
-            selectedGroups.splice(index, 1);
-        } else {
-            selectedGroups.push(groupId);
-        }
-
-        this.goalForm.patchValue({ groups: selectedGroups });
+    selectGroup(groupId: string): void {
+        this.goalForm.patchValue({ group: groupId });
     }
 
     isGroupSelected(groupId: string): boolean {
-        const selectedGroups = this.goalForm.get('groups')?.value || [];
-        return selectedGroups.includes(groupId);
-    }
-
-    getSelectedGroupsCount(): number {
-        return (this.goalForm.get('groups')?.value || []).length;
+        return this.goalForm.get('group')?.value === groupId;
     }
 
     // Form Field Builder Methods
@@ -130,11 +184,20 @@ export class GoalCreateComponent implements OnInit {
             order: this.formFields.length,
             ...(fieldType === 'dropdown' && { options: [] }),
             ...(fieldType === 'multiContact' && { maxContacts: 5 }),
-            ...(fieldType === 'autoCalculate' && { calculation: '' })
+            ...(fieldType === 'autoCalculate' && { calculation: '' }),
+            ...(fieldType === 'formArray' && {
+                isArrayField: true,
+                displayMode: 'table',
+                columnCount: 2,
+                arrayFields: [],
+                minInstances: 1,
+                maxInstances: 10
+            })
         };
 
         this.formFields.push(newField);
         this.selectedFieldIndex = this.formFields.length - 1;
+        this.selectedColumn = 0;  // Reset selected column
     }
 
     selectField(index: number): void {
@@ -217,6 +280,29 @@ export class GoalCreateComponent implements OnInit {
         }
     }
 
+    // Array Subfield Option Management
+    // Array Subfield Option Management
+    addArraySubfieldOption(arrayFieldIndex: number, subfield: ArraySubField): void {
+        if (subfield) {
+            if (!subfield.options) {
+                subfield.options = [];
+            }
+            subfield.options.push(`Option ${subfield.options.length + 1}`);
+        }
+    }
+
+    updateArraySubfieldOption(arrayFieldIndex: number, subfield: ArraySubField, optionIndex: number, value: string): void {
+        if (subfield && subfield.options) {
+            subfield.options[optionIndex] = value;
+        }
+    }
+
+    removeArraySubfieldOption(arrayFieldIndex: number, subfield: ArraySubField, optionIndex: number): void {
+        if (subfield && subfield.options) {
+            subfield.options.splice(optionIndex, 1);
+        }
+    }
+
     // Status Options Methods
     addStatusOption(): void {
         if (this.customStatusInput.trim()) {
@@ -230,6 +316,141 @@ export class GoalCreateComponent implements OnInit {
     removeStatusOption(index: number): void {
         this.statusOptions.splice(index, 1);
     }
+
+    // FormArray Management Methods
+    addFieldToArray(arrayFieldIndex: number, fieldType: string): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) {
+            arrayField.arrayFields = [];
+        }
+
+        const newField: FormField = {
+            fieldName: `subfield_${arrayField.arrayFields.length + 1}`,
+            fieldType: fieldType,
+            alias: `Sub Field ${arrayField.arrayFields.length + 1}`,
+            mandatory: false,
+            order: arrayField.arrayFields.length,
+            ...(fieldType === 'dropdown' && { options: [] })
+        };
+
+        arrayField.arrayFields.push(newField);
+    }
+
+    removeFieldFromArray(arrayFieldIndex: number, subfield: ArraySubField): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (arrayField.arrayFields) {
+            const index = arrayField.arrayFields.indexOf(subfield);
+            if (index > -1) {
+                arrayField.arrayFields.splice(index, 1);
+                // Update order
+                arrayField.arrayFields.forEach((field, idx) => {
+                    field.order = idx;
+                });
+            }
+        }
+    }
+
+    updateArraySubfieldAlias(arrayFieldIndex: number, subfield: ArraySubField, value: string): void {
+        if (subfield) {
+            subfield.alias = value;
+            // Auto-generate field name from alias
+            const fieldName = value.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+            subfield.fieldName = fieldName || `subfield_${Date.now()}`;
+        }
+    }
+
+    updateArraySubfieldMandatory(arrayFieldIndex: number, subfield: ArraySubField, value: boolean): void {
+        if (subfield) {
+            subfield.mandatory = value;
+        }
+    }
+
+
+    // Column and Dependency Management Methods
+    getColumnArray(count: number): number[] {
+        return Array.from({ length: count }, (_, i) => i);
+    }
+
+    addFieldToArrayColumn(arrayFieldIndex: number, columnIndex: number, fieldType: string): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) {
+            arrayField.arrayFields = [];
+        }
+
+        const newField: ArraySubField = {
+            fieldName: `col${columnIndex}_field_${arrayField.arrayFields.length + 1}`,
+            fieldType: fieldType,
+            alias: `Column ${columnIndex + 1} Field`,
+            mandatory: false,
+            order: arrayField.arrayFields.length,
+            columnIndex: columnIndex,
+            ...(fieldType === 'dropdown' && { options: [] })
+        };
+
+        arrayField.arrayFields.push(newField);
+    }
+
+    getFieldsInColumn(arrayFieldIndex: number, columnIndex: number): ArraySubField[] {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) return [];
+        return arrayField.arrayFields.filter(f => (f.columnIndex || 0) === columnIndex);
+    }
+
+    canHaveDependency(subfield: ArraySubField): boolean {
+        // Only certain field types can have dependencies
+        return ['text', 'number', 'dropdown', 'email', 'phone'].includes(subfield.fieldType);
+    }
+
+    toggleDependency(arrayFieldIndex: number, subfieldIndex: number): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) return;
+
+        const subfield = arrayField.arrayFields[subfieldIndex];
+        if (subfield.dependsOn) {
+            delete subfield.dependsOn;
+        } else {
+            subfield.dependsOn = {
+                fieldName: '',
+                mappings: []
+            };
+        }
+    }
+
+    getPreviousFields(arrayFieldIndex: number, subfieldIndex: number): ArraySubField[] {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) return [];
+
+        // Return fields that come before this one (can be depended upon)
+        return arrayField.arrayFields.slice(0, subfieldIndex);
+    }
+
+    addDependencyMapping(arrayFieldIndex: number, subfieldIndex: number): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) return;
+
+        const subfield = arrayField.arrayFields[subfieldIndex];
+        if (!subfield.dependsOn) return;
+
+        subfield.dependsOn.mappings.push({
+            when: '',
+            then: {
+                label: '',
+                options: [],
+                show: true
+            }
+        });
+    }
+
+    removeMapping(arrayFieldIndex: number, subfieldIndex: number, mappingIndex: number): void {
+        const arrayField = this.formFields[arrayFieldIndex];
+        if (!arrayField.arrayFields) return;
+
+        const subfield = arrayField.arrayFields[subfieldIndex];
+        if (!subfield.dependsOn) return;
+
+        subfield.dependsOn.mappings.splice(mappingIndex, 1);
+    }
+
 
     // Form Submission
     onSubmit(): void {
@@ -253,22 +474,15 @@ export class GoalCreateComponent implements OnInit {
 
         const goalData = {
             title: formValue.title,
-            description: formValue.description,
-            target: formValue.target,
+            organization: formValue.organization || null,
             completionStatus: formValue.completionStatus || 'Approved',
             timeline: {
                 startDate: formValue.startDate || null,
                 endDate: formValue.endDate || null
             },
-            groups: formValue.groups,
+            group: formValue.group,
             formSchema: this.formFields,
-            statusOptions: this.statusOptions,
-            pointsConfig: {
-                entryCreation: formValue.pointsEntryCreation,
-                statusUpdate: formValue.pointsStatusUpdate,
-                fieldCompletion: formValue.pointsFieldCompletion
-            },
-            status: formValue.status
+            statusOptions: this.statusOptions
         };
 
         this.submitting = true;
@@ -300,11 +514,50 @@ export class GoalCreateComponent implements OnInit {
         this.router.navigate(['/goals/manage']);
     }
 
-    getFieldTypeIcon(fieldType: string): string {
-        return this.fieldTypes.find(ft => ft.value === fieldType)?.icon || '📝';
+    getFieldTypeIcon(type: string): string {
+        return this.fieldTypes.find(ft => ft.value === type)?.icon || '❓';
+    }
+
+    getFieldCategory(type: string): string {
+        const textTypes = ['text', 'email', 'phone', 'textarea', 'autoNumber'];
+        const numberTypes = ['number', 'currency', 'points'];
+        const selectTypes = ['dropdown', 'checkbox', 'radio', 'switch'];
+
+        if (textTypes.includes(type)) return 'cat-text';
+        if (numberTypes.includes(type)) return 'cat-number';
+        if (selectTypes.includes(type)) return 'cat-select';
+        return 'cat-complex';
     }
 
     getFieldTypeLabel(fieldType: string): string {
         return this.fieldTypes.find(ft => ft.value === fieldType)?.label || fieldType;
+    }
+
+    // Helper to get selected field's array fields safely
+    get selectedFieldArrayFields(): ArraySubField[] | undefined {
+        if (this.selectedFieldIndex !== null) {
+            return this.formFields[this.selectedFieldIndex]?.arrayFields;
+        }
+        return undefined;
+    }
+
+    loadOrganizations(): void {
+        if (!this.isSuperAdmin) {
+            return;
+        }
+
+        this.organizationService.getOrganizations().subscribe({
+            next: (response) => {
+                this.organizations = response.organizations || [];
+            },
+            error: (error) => {
+                console.error('Error loading organizations:', error);
+            }
+        });
+    }
+
+    isFieldInvalid(fieldName: string): boolean {
+        const field = this.goalForm.get(fieldName);
+        return !!(field && field.invalid && (field.dirty || field.touched));
     }
 }

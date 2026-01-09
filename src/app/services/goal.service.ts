@@ -6,22 +6,15 @@ import { environment } from '../../environments/environment';
 export interface Goal {
     _id?: string;
     title: string;
-    description: string;
-    target: number;
     timeline: {
         startDate: Date;
         endDate: Date;
     };
     organization?: string;
-    groups: string[];
+    group: string;
     formSchema: any[];
     statusOptions: string[];
-    status?: 'active' | 'inactive' | 'completed';
-    pointsConfig?: {
-        entryCreation: number;
-        statusUpdate: number;
-        fieldCompletion: number;
-    };
+    completionStatus?: string;
 }
 
 @Injectable({
@@ -32,8 +25,8 @@ export class GoalService {
 
     constructor(private http: HttpClient) { }
 
-    getGoals(): Observable<any> {
-        return this.http.get<any>(this.apiUrl);
+    getGoals(params?: any): Observable<any> {
+        return this.http.get<any>(this.apiUrl, { params });
     }
 
     getGoal(id: string): Observable<any> {
@@ -54,5 +47,9 @@ export class GoalService {
 
     getGoalForm(id: string): Observable<any> {
         return this.http.get<any>(`${this.apiUrl}/${id}/form`);
+    }
+
+    updateStatus(id: string, status: string): Observable<any> {
+        return this.http.patch<any>(`${this.apiUrl}/${id}/status`, { status });
     }
 }

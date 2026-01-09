@@ -5,6 +5,7 @@ import { GroupService } from '../../../services/group.service';
 import { UserService } from '../../../services/user.service';
 import { OrganizationService } from '../../../services/organization.service';
 import { AuthService } from '../../../services/auth.service';
+import { BreadcrumbService } from '../../../services/breadcrumb.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -29,7 +30,8 @@ export class GroupFormComponent implements OnInit {
         private organizationService: OrganizationService,
         private authService: AuthService,
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private breadcrumbService: BreadcrumbService
     ) { }
 
     ngOnInit(): void {
@@ -55,9 +57,14 @@ export class GroupFormComponent implements OnInit {
             description: [''],
             organization: [''],
             users: [[]],
-            managers: [[]],
-            isActive: [true]
+            managers: [[]]
         });
+
+        // For Super Admin in create mode, make organization required
+        if (this.showOrganizationField && !this.isEditMode) {
+            this.groupForm.get('organization')?.setValidators([Validators.required]);
+            this.groupForm.get('organization')?.updateValueAndValidity();
+        }
 
         // For non-Super Admin users, auto-populate organization
         if (!this.showOrganizationField) {
@@ -74,10 +81,18 @@ export class GroupFormComponent implements OnInit {
         this.groupForm.get('organization')?.valueChanges.subscribe(orgId => {
             if (orgId) {
                 this.loadUsersByOrganization(orgId);
-                // Fetch new code for the selected organization (for Super Admin)
-                if (this.showOrganizationField && !this.isEditMode) {
+                // Fetch new code for the selected organization
+                if (!this.isEditMode) {
                     this.fetchNextGroupCodeForOrganization(orgId);
                 }
+            } else {
+                // Clear users and code when organization is deselected
+                this.users = [];
+                this.groupForm.patchValue({
+                    code: '',
+                    users: [],
+                    managers: []
+                });
             }
         });
     }
@@ -89,26 +104,28 @@ export class GroupFormComponent implements OnInit {
         if (this.isEditMode && this.groupId) {
             this.loadGroup(this.groupId);
         } else {
-            this.fetchNextGroupCode();
+            // Only fetch code for non-Super Admin (Org Admin)
+            // Super Admin must select organization first
+            if (!this.showOrganizationField) {
+                this.fetchNextGroupCode();
+            }
         }
     }
 
     fetchNextGroupCode(): void {
+        // This is only called for Org Admin (non-Super Admin)
         this.groupService.getNextGroupCode().subscribe({
             next: (response) => {
                 this.groupForm.patchValue({ code: response.code });
             },
             error: (error) => {
                 console.error('Error fetching next code:', error);
-                // Fallback to GRP0001 if API fails
-                this.groupForm.patchValue({ code: 'GRP0001' });
-
-                // Show error to user if it's a permission issue
+                // Show error to user
                 if (error.status === 403 || error.status === 400) {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Code Generation Issue',
-                        text: error.error?.message || 'Using default code GRP0001. Please update if needed.',
+                        text: error.error?.message || 'Failed to generate group code. Please contact administrator.',
                         timer: 3000
                     });
                 }
@@ -132,14 +149,16 @@ export class GroupFormComponent implements OnInit {
         this.groupService.getGroup(id).subscribe({
             next: (response) => {
                 const group = response.group;
+                if (group && this.groupId) {
+                    this.breadcrumbService.setLabel(this.groupId, group.name);
+                }
                 this.groupForm.patchValue({
                     code: group.code,
                     name: group.name,
                     description: group.description,
                     organization: group.organization?._id,
                     users: group.users.map((u: any) => u._id),
-                    managers: group.managers.map((m: any) => m._id),
-                    isActive: group.isActive
+                    managers: group.managers.map((m: any) => m._id)
                 });
 
                 // Load users for this organization
@@ -359,6 +378,10 @@ export class GroupFormComponent implements OnInit {
     getSelectedUsers(): any[] {
         const selectedUserIds = this.groupForm.get('users')?.value || [];
         return this.users.filter(user => selectedUserIds.includes(user._id));
+    }
+
+    getSelectedManagersCount(): number {
+        return (this.groupForm.get('managers')?.value || []).length;
     }
 
     private markFormGroupTouched(formGroup: FormGroup): void {
